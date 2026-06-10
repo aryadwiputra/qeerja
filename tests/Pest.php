@@ -1,5 +1,10 @@
 <?php
 
+use App\Models\Project;
+use App\Models\Task;
+use App\Models\User;
+use App\Models\Workspace;
+use App\Support\Rbac;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,7 +20,7 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -47,4 +52,71 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+function createWorkspaceMember(User $user, string $role = 'owner'): Workspace
+{
+    $workspace = Workspace::factory()->create([
+        'owner_id' => $role === 'owner' ? $user->id : User::factory()->create()->id,
+    ]);
+
+    $workspace->members()->create([
+        'user_id' => $user->id,
+        'role' => $role,
+        'status' => 'active',
+    ]);
+
+    Rbac::syncWorkspaceRole($user, $workspace, $role);
+
+    return $workspace;
+}
+
+function createProjectForWorkspace(Workspace $workspace, User $user, string $role = 'lead'): Project
+{
+    $project = Project::factory()->create([
+        'workspace_id' => $workspace->id,
+        'created_by' => $user->id,
+    ]);
+
+    $project->members()->create([
+        'user_id' => $user->id,
+        'role' => $role,
+    ]);
+
+    $board = $project->boards()->create([
+        'name' => 'Board',
+        'type' => 'kanban',
+        'is_default' => true,
+    ]);
+
+    foreach ([
+        ['name' => 'Todo', 'status_key' => 'todo', 'color' => '#475569', 'position' => 0],
+        ['name' => 'Done', 'status_key' => 'done', 'color' => '#16A34A', 'position' => 1, 'is_done_column' => true],
+    ] as $column) {
+        $board->columns()->create($column);
+    }
+
+    return $project;
+}
+
+function createTaskForProject(Project $project, User $reporter): Task
+{
+    $board = $project->boards()->where('is_default', true)->first();
+    $column = $board->columns()->orderBy('position')->first();
+    $taskType = $project->workspace->taskTypes()->first();
+    $priority = $project->workspace->priorities()->first();
+    $taskNumber = $project->tasks()->withTrashed()->max('task_number') + 1;
+
+    return $project->tasks()->create([
+        'board_id' => $board->id,
+        'board_column_id' => $column->id,
+        'task_type_id' => $taskType->id,
+        'priority_id' => $priority->id,
+        'reporter_id' => $reporter->id,
+        'task_number' => $taskNumber,
+        'code' => $project->key.'-'.$taskNumber,
+        'title' => 'Test task',
+        'status' => $column->status_key,
+        'position' => 0,
+    ]);
 }
