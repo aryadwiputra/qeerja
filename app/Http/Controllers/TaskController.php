@@ -14,6 +14,7 @@ use App\Services\TaskActivityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -335,16 +336,43 @@ class TaskController extends Controller
     {
         $validated = $request->validated();
         $fromColumn = $task->boardColumn;
+        $targetColumn = BoardColumn::findOrFail($validated['board_column_id']);
+        $position = (int) $validated['position'];
 
-        $column = BoardColumn::findOrFail($validated['board_column_id']);
+        $oldColumnId = $task->board_column_id;
 
-        $task->update([
-            'board_column_id' => $column->id,
-            'status' => $column->status_key,
-            'position' => $validated['position'],
-        ]);
+        DB::transaction(function () use ($task, $targetColumn, $position, $oldColumnId) {
+            $task->update([
+                'board_column_id' => $targetColumn->id,
+                'status' => $targetColumn->status_key,
+                'position' => $position,
+            ]);
 
-        $activity->moved($task->refresh(), $request->user(), $fromColumn, $column);
+            // Rebalance target column — shift existing tasks to make room
+            $targetTasks = Task::where('board_column_id', $targetColumn->id)
+                ->where('id', '!=', $task->id)
+                ->orderBy('position')
+                ->orderBy('id')
+                ->get();
+
+            foreach ($targetTasks as $index => $t) {
+                $t->updateQuietly(['position' => $index >= $position ? $index + 1 : $index]);
+            }
+
+            // Rebalance source column (if different) — close the gap
+            if ($oldColumnId && $oldColumnId !== $targetColumn->id) {
+                $sourceTasks = Task::where('board_column_id', $oldColumnId)
+                    ->orderBy('position')
+                    ->orderBy('id')
+                    ->get();
+
+                foreach ($sourceTasks as $index => $t) {
+                    $t->updateQuietly(['position' => $index]);
+                }
+            }
+        });
+
+        $activity->moved($task->refresh(), $request->user(), $fromColumn, $targetColumn);
 
         return back(303);
     }
