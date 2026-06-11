@@ -2,18 +2,17 @@ import {
     DndContext,
     DragOverlay,
     PointerSensor,
+    closestCorners,
     useDroppable,
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
-import type {
-    DragEndEvent,
-    DragStartEvent,
-} from '@dnd-kit/core';
+import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import {
     SortableContext,
     useSortable,
     verticalListSortingStrategy,
+    arrayMove,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Head, Link, router } from '@inertiajs/react';
@@ -126,14 +125,10 @@ interface Props {
 function SortableTask({
     task,
     isDragging,
-    showDropIndicatorAbove,
-    showDropIndicatorBelow,
     onClick,
 }: {
     task: TaskItem;
     isDragging?: boolean;
-    showDropIndicatorAbove?: boolean;
-    showDropIndicatorBelow?: boolean;
     onClick?: () => void;
 }) {
     const {
@@ -153,9 +148,6 @@ function SortableTask({
 
     return (
         <div ref={setNodeRef} style={style} {...attributes}>
-            {showDropIndicatorAbove && (
-                <div className="mx-2 mb-1 h-1 rounded-full bg-primary" />
-            )}
             <div className="group/task relative">
                 <div
                     {...listeners}
@@ -171,9 +163,6 @@ function SortableTask({
                     />
                 </div>
             </div>
-            {showDropIndicatorBelow && (
-                <div className="mx-2 mt-1 h-1 rounded-full bg-primary" />
-            )}
         </div>
     );
 }
@@ -187,7 +176,7 @@ function DroppableColumn({
     activeTaskId: number | null;
     children: React.ReactNode;
 }) {
-    const { setNodeRef, isOver } = useDroppable({ id: column.id });
+    const { setNodeRef, isOver } = useDroppable({ id: `col:${column.id}` });
     const isEmpty = column.tasks.length === 0;
     const hasActiveTask = activeTaskId !== null;
 
@@ -223,19 +212,19 @@ function DroppableColumn({
 }
 
 export default function Board(props: Props) {
-    /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
     return <BoardClient {...props} />;
 }
 
 function BoardClient({
     workspace,
     project,
-    columns,
+    columns: initialColumns,
     taskTypes,
     priorities,
     epics,
     sprints,
 }: Props) {
+    const [columns, setColumns] = useState(initialColumns);
     const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
     const [drawerTaskId, setDrawerTaskId] = useState<number | null>(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -250,21 +239,15 @@ function BoardClient({
         return columns.find((col) => col.tasks.some((t) => t.id === taskId));
     };
 
-    const findColumnById = (columnId: number): Column | undefined => {
-        return columns.find((col) => col.id === columnId);
-    };
-
     const handleDragStart = (event: DragStartEvent) => {
         const task = columns.flatMap((c) => c.tasks).find((t) => t.id === event.active.id);
         setActiveTask(task ?? null);
     };
 
     const handleDragOver = () => {
-        // Columns state must remain stable during drag to keep
-        // SortableContext items intact. Visual feedback is handled
-        // by DragOverlay (card follows cursor) and DroppableColumn's
-        // useDroppable isOver (column highlighting).
-        // Actual move happens in handleDragEnd + API call.
+        // No state updates — prevents re-render loops with DndContext.
+        // UseSortable handles same-column DOM reorder automatically.
+        // UseDroppable on columns handles drop-target highlighting.
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
@@ -276,28 +259,10 @@ function BoardClient({
         }
 
         const taskId = active.id as number;
+        const overId = over.id;
         const fromColumn = findColumnByTaskId(taskId);
 
-        // Determine target column
-        let toColumnId: number | null = null;
-        const columnById = findColumnById(over.id as number);
-
-        if (columnById) {
-            toColumnId = columnById.id;
-        } else {
-            const columnByTask = findColumnByTaskId(over.id as number);
-
-            if (columnByTask) {
-                toColumnId = columnByTask.id;
-            }
-        }
-
-        if (!toColumnId || !fromColumn) {
-            return;
-        }
-
-        // Skip no-op: same column
-        if (toColumnId === fromColumn.id) {
+        if (!fromColumn) {
             return;
         }
 
@@ -307,9 +272,58 @@ function BoardClient({
             return;
         }
 
-        router
-            .optimistic((props: Record<string, unknown>) => ({
-                columns: (props.columns as Column[]).map((col) => {
+        let toColumn: Column | undefined;
+        let overIsColumn = false;
+
+        if (typeof overId === 'string' && overId.startsWith('col:')) {
+            const colId = Number(overId.slice(4));
+            toColumn = columns.find((c) => c.id === colId);
+            overIsColumn = true;
+        } else {
+            toColumn = findColumnByTaskId(overId as number);
+        }
+
+        if (!toColumn) {
+            return;
+        }
+
+        const fromTasks = columns.find((c) => c.id === fromColumn.id)?.tasks ?? [];
+        const toTasks = columns.find((c) => c.id === toColumn.id)?.tasks ?? [];
+
+        let position: number;
+
+        if (fromColumn.id === toColumn.id) {
+            const oldIndex = fromTasks.findIndex((t) => t.id === taskId);
+            const overIndex = fromTasks.findIndex((t) => t.id === (overId as number));
+
+            if (oldIndex === -1 || overIndex === -1 || oldIndex === overIndex) {
+                return;
+            }
+
+            position = overIndex;
+
+            setColumns((prev) =>
+                prev.map((col) => {
+                    if (col.id !== fromColumn.id) {
+                        return col;
+                    }
+
+                    return { ...col, tasks: arrayMove(col.tasks, oldIndex, overIndex) };
+                }),
+            );
+        } else {
+            if (overIsColumn) {
+                position = toTasks.length;
+            } else {
+                position = toTasks.findIndex((t) => t.id === (overId as number));
+
+                if (position < 0) {
+                    position = toTasks.length;
+                }
+            }
+
+            setColumns((prev) =>
+                prev.map((col) => {
                     if (col.id === fromColumn.id) {
                         return {
                             ...col,
@@ -317,26 +331,28 @@ function BoardClient({
                         };
                     }
 
-                    if (col.id === toColumnId) {
-                        return {
-                            ...col,
-                            tasks: [...col.tasks, task],
-                        };
+                    if (col.id === toColumn.id) {
+                        const newTasks = [...col.tasks];
+                        newTasks.splice(position, 0, task);
+
+                        return { ...col, tasks: newTasks };
                     }
 
                     return col;
                 }),
-            }))
-            .post(
-                `/workspaces/${workspace.slug}/projects/${project.slug}/tasks/${taskId}/move`,
-                {
-                    board_column_id: toColumnId,
-                    position: 0,
-                },
-                {
-                    preserveScroll: true,
-                },
             );
+        }
+
+        router.post(
+            `/workspaces/${workspace.slug}/projects/${project.slug}/tasks/${task.id}/move`,
+            {
+                board_column_id: toColumn.id,
+                position,
+            },
+            {
+                preserveScroll: true,
+            },
+        );
     };
 
     return (
@@ -370,6 +386,7 @@ function BoardClient({
                 <DndContext
                     id="board-dnd"
                     sensors={sensors}
+                    collisionDetection={closestCorners}
                     onDragStart={handleDragStart}
                     onDragOver={handleDragOver}
                     onDragEnd={handleDragEnd}
@@ -416,6 +433,7 @@ function BoardClient({
                                             <SortableTask
                                                 key={task.id}
                                                 task={task}
+                                                isDragging={activeTask?.id === task.id}
                                                 onClick={() => {
                                                     setDrawerTaskId(task.id);
                                                     setDrawerOpen(true);
