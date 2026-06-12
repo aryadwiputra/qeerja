@@ -28,7 +28,7 @@ class DashboardController extends Controller
                     ->whereBetween('due_date', [now()->startOfDay(), now()->addDays(7)->endOfDay()])
                     ->count(),
             ],
-            'assignedTasks' => $user->assignedTasks()
+            'assignedTasks' => Inertia::defer(fn () => $user->assignedTasks()
                 ->whereNull('completed_at')
                 ->with(['project:id,name,key,color'])
                 ->latest('tasks.created_at')
@@ -47,8 +47,8 @@ class DashboardController extends Controller
                         'key' => $task->project->key,
                         'color' => $task->project->color,
                     ] : null,
-                ]),
-            'activeProjects' => $user->projects()
+                ])),
+            'activeProjects' => Inertia::defer(fn () => $user->projects()
                 ->where('status', 'active')
                 ->withCount(['tasks' => fn ($q) => $q->whereNull('completed_at')])
                 ->limit(5)
@@ -59,8 +59,8 @@ class DashboardController extends Controller
                     'key' => $project->key,
                     'color' => $project->color,
                     'tasks_count' => $project->tasks_count,
-                ]),
-            'upcomingDeadlines' => $user->assignedTasks()
+                ])),
+            'upcomingDeadlines' => Inertia::defer(fn () => $user->assignedTasks()
                 ->whereNull('completed_at')
                 ->whereNotNull('due_date')
                 ->whereBetween('due_date', [now()->startOfDay(), now()->addDays(7)->endOfDay()])
@@ -78,8 +78,8 @@ class DashboardController extends Controller
                         'name' => $task->project->name,
                         'key' => $task->project->key,
                     ] : null,
-                ]),
-            'recentActivity' => ActivityLog::query()
+                ])),
+            'recentActivity' => Inertia::defer(fn () => ActivityLog::query()
                 ->where('user_id', $user->id)
                 ->latest()
                 ->limit(10)
@@ -89,7 +89,7 @@ class DashboardController extends Controller
                     'action' => $log->action,
                     'description' => $log->description,
                     'created_at' => $log->created_at,
-                ]),
+                ])),
         ]);
     }
 }

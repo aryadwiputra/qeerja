@@ -1,9 +1,21 @@
-import { Head } from '@inertiajs/react';
-import { ActiveProjectsWidget } from '@/components/dashboard/active-projects-widget';
-import { AssignedTasksWidget } from '@/components/dashboard/assigned-tasks-widget';
+import { Head, WhenVisible } from '@inertiajs/react';
+import {
+    ActiveProjectsWidget,
+    ActiveProjectsWidgetSkeleton,
+} from '@/components/dashboard/active-projects-widget';
+import {
+    AssignedTasksWidget,
+    AssignedTasksWidgetSkeleton,
+} from '@/components/dashboard/assigned-tasks-widget';
 import { OverdueTasksWidget } from '@/components/dashboard/overdue-tasks-widget';
-import { RecentActivityWidget } from '@/components/dashboard/recent-activity-widget';
-import { UpcomingDeadlinesWidget } from '@/components/dashboard/upcoming-deadlines-widget';
+import {
+    RecentActivityWidget,
+    RecentActivityWidgetSkeleton,
+} from '@/components/dashboard/recent-activity-widget';
+import {
+    UpcomingDeadlinesWidget,
+    UpcomingDeadlinesWidgetSkeleton,
+} from '@/components/dashboard/upcoming-deadlines-widget';
 import { dashboard } from '@/routes';
 import type {
     DashboardActivity,
@@ -15,10 +27,10 @@ import type {
 
 interface Props {
     stats: DashboardStats;
-    assignedTasks: DashboardTask[];
-    activeProjects: DashboardProject[];
-    upcomingDeadlines: DashboardDeadline[];
-    recentActivity: DashboardActivity[];
+    assignedTasks?: DashboardTask[];
+    activeProjects?: DashboardProject[];
+    upcomingDeadlines?: DashboardDeadline[];
+    recentActivity?: DashboardActivity[];
 }
 
 export default function Dashboard({
@@ -43,16 +55,38 @@ export default function Dashboard({
                 </div>
 
                 <div className="grid auto-rows-min gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <AssignedTasksWidget
-                        tasks={assignedTasks}
-                        total={stats.assigned}
-                    />
+                    <WhenVisible
+                        data="assignedTasks"
+                        fallback={<AssignedTasksWidgetSkeleton />}
+                    >
+                        <AssignedTasksWidget
+                            tasks={assignedTasks ?? []}
+                            total={stats.assigned}
+                        />
+                    </WhenVisible>
                     <OverdueTasksWidget count={stats.overdue} />
-                    <ActiveProjectsWidget projects={activeProjects} />
-                    <UpcomingDeadlinesWidget deadlines={upcomingDeadlines} />
+                    <WhenVisible
+                        data="activeProjects"
+                        fallback={<ActiveProjectsWidgetSkeleton />}
+                    >
+                        <ActiveProjectsWidget projects={activeProjects ?? []} />
+                    </WhenVisible>
+                    <WhenVisible
+                        data="upcomingDeadlines"
+                        fallback={<UpcomingDeadlinesWidgetSkeleton />}
+                    >
+                        <UpcomingDeadlinesWidget
+                            deadlines={upcomingDeadlines ?? []}
+                        />
+                    </WhenVisible>
                 </div>
 
-                <RecentActivityWidget activities={recentActivity} />
+                <WhenVisible
+                    data="recentActivity"
+                    fallback={<RecentActivityWidgetSkeleton />}
+                >
+                    <RecentActivityWidget activities={recentActivity ?? []} />
+                </WhenVisible>
             </div>
         </>
     );

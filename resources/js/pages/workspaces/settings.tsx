@@ -1,4 +1,4 @@
-import { Form, Head, router } from '@inertiajs/react';
+import { Form, Head, Link, router } from '@inertiajs/react';
 import {
     AlertTriangle,
     ArrowLeft,
@@ -29,6 +29,27 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { WorkspaceMemberDialog } from '@/components/workspace-member-dialog';
+import {
+    destroy as workspaceDestroy,
+    index as workspaceIndex,
+    restore as workspaceRestore,
+    update as workspaceUpdate,
+} from '@/routes/workspaces';
+import {
+    destroy as memberDestroy,
+    update as memberUpdate,
+} from '@/routes/workspaces/members';
+import {
+    destroy as priorityDestroy,
+    store as priorityStore,
+    update as priorityUpdate,
+} from '@/routes/workspaces/priorities';
+import { update as workspaceSettingsUpdate } from '@/routes/workspaces/settings';
+import {
+    destroy as taskTypeDestroy,
+    store as taskTypeStore,
+    update as taskTypeUpdate,
+} from '@/routes/workspaces/task-types';
 
 interface Member {
     id: number;
@@ -105,7 +126,7 @@ export default function WorkspaceSettings({
 
     const handleRoleChange = (memberId: number, newRole: string) => {
         router.put(
-            `/workspaces/${workspace.slug}/members/${memberId}`,
+            memberUpdate({ workspace: workspace.slug, member: memberId }),
             { role: newRole },
             { preserveScroll: true },
         );
@@ -116,9 +137,12 @@ export default function WorkspaceSettings({
             return;
         }
 
-        router.delete(`/workspaces/${workspace.slug}/members/${memberId}`, {
-            preserveScroll: true,
-        });
+        router.delete(
+            memberDestroy({ workspace: workspace.slug, member: memberId }),
+            {
+                preserveScroll: true,
+            },
+        );
     };
 
     const handleUpdateTaskType = () => {
@@ -127,7 +151,10 @@ export default function WorkspaceSettings({
         }
 
         router.put(
-            `/workspaces/${workspace.slug}/task-types/${editingTaskType.id}`,
+            taskTypeUpdate({
+                workspace: workspace.slug,
+                taskType: editingTaskType.id,
+            }),
             {
                 name: editingTaskType.name,
                 color: editingTaskType.color,
@@ -145,9 +172,15 @@ export default function WorkspaceSettings({
             return;
         }
 
-        router.delete(`/workspaces/${workspace.slug}/task-types/${typeId}`, {
-            preserveScroll: true,
-        });
+        router.delete(
+            taskTypeDestroy({
+                workspace: workspace.slug,
+                taskType: typeId,
+            }),
+            {
+                preserveScroll: true,
+            },
+        );
     };
 
     const handleUpdatePriority = () => {
@@ -156,7 +189,10 @@ export default function WorkspaceSettings({
         }
 
         router.put(
-            `/workspaces/${workspace.slug}/priorities/${editingPriority.id}`,
+            priorityUpdate({
+                workspace: workspace.slug,
+                priority: editingPriority.id,
+            }),
             {
                 name: editingPriority.name,
                 level: editingPriority.level,
@@ -175,7 +211,10 @@ export default function WorkspaceSettings({
         }
 
         router.delete(
-            `/workspaces/${workspace.slug}/priorities/${priorityId}`,
+            priorityDestroy({
+                workspace: workspace.slug,
+                priority: priorityId,
+            }),
             { preserveScroll: true },
         );
     };
@@ -186,13 +225,13 @@ export default function WorkspaceSettings({
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
                 <div className="flex items-center gap-4">
-                    <a
-                        href="/workspaces"
+                    <Link
+                        href={workspaceIndex()}
                         className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                         <ArrowLeft className="size-4" />
                         <span>Workspaces</span>
-                    </a>
+                    </Link>
                     <Separator orientation="vertical" className="h-4" />
                     <h1 className="text-2xl font-semibold tracking-tight">
                         {workspace.name}
@@ -223,7 +262,9 @@ export default function WorkspaceSettings({
                                 </CardHeader>
                                 <CardContent>
                                     <Form
-                                        action={`/workspaces/${workspace.slug}`}
+                                        action={workspaceUpdate(
+                                            workspace.slug,
+                                        )}
                                         method="put"
                                         className="flex flex-col gap-4"
                                     >
@@ -323,7 +364,9 @@ export default function WorkspaceSettings({
                                 </CardHeader>
                                 <CardContent>
                                     <Form
-                                        action={`/workspaces/${workspace.slug}/settings`}
+                                        action={workspaceSettingsUpdate(
+                                            workspace.slug,
+                                        )}
                                         method="put"
                                         className="flex flex-col gap-6"
                                     >
@@ -479,7 +522,9 @@ export default function WorkspaceSettings({
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-6">
                                     <Form
-                                        action={`/workspaces/${workspace.slug}/task-types`}
+                                        action={taskTypeStore(
+                                            workspace.slug,
+                                        )}
                                         method="post"
                                         className="grid gap-3 sm:grid-cols-[1fr_auto_auto]"
                                         resetOnSuccess
@@ -674,7 +719,9 @@ export default function WorkspaceSettings({
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-6">
                                     <Form
-                                        action={`/workspaces/${workspace.slug}/priorities`}
+                                        action={priorityStore(
+                                            workspace.slug,
+                                        )}
                                         method="post"
                                         className="grid gap-3 sm:grid-cols-[1fr_auto_auto_auto]"
                                         resetOnSuccess
@@ -1024,7 +1071,9 @@ export default function WorkspaceSettings({
                                             {deleteConfirmOpen && (
                                                 <div className="flex items-center gap-2">
                                                     <form
-                                                        action={`/workspaces/${workspace.slug}`}
+                                                        action={workspaceDestroy.url(
+                                                            workspace.slug,
+                                                        )}
                                                         method="post"
                                                     >
                                                         <input
@@ -1073,7 +1122,9 @@ export default function WorkspaceSettings({
                                                 active again.
                                             </p>
                                             <form
-                                                action={`/workspaces/${workspace.id}/restore`}
+                                                action={workspaceRestore.url(
+                                                    workspace.id,
+                                                )}
                                                 method="post"
                                             >
                                                 <input

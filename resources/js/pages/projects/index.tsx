@@ -3,6 +3,11 @@ import { ArrowLeft, FolderKanban, Plus, Users } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import {
+    create as projectCreate,
+    show as projectShow,
+} from '@/routes/projects';
+import { index as workspacesIndex } from '@/routes/workspaces';
 
 interface ProjectItem {
     id: number;
@@ -40,7 +45,7 @@ export default function ProjectsIndex({ workspace, projects }: Props) {
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
                 <div className="flex items-center gap-4">
                     <Link
-                        href="/workspaces"
+                        href={workspacesIndex()}
                         className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                         <ArrowLeft className="size-4" />
@@ -58,7 +63,7 @@ export default function ProjectsIndex({ workspace, projects }: Props) {
                         </p>
                     </div>
                     <Link
-                        href={`/workspaces/${workspace.slug}/projects/create`}
+                        href={projectCreate({ workspace: workspace.slug })}
                         className={cn(
                             buttonVariants(),
                             'flex items-center gap-2',
@@ -82,7 +87,7 @@ export default function ProjectsIndex({ workspace, projects }: Props) {
                             </p>
                         </div>
                         <Link
-                            href={`/workspaces/${workspace.slug}/projects/create`}
+                            href={projectCreate({ workspace: workspace.slug })}
                             className={cn(
                                 buttonVariants(),
                                 'flex items-center gap-2',
@@ -99,19 +104,25 @@ export default function ProjectsIndex({ workspace, projects }: Props) {
                         {activeProjects.map((project) => (
                             <Link
                                 key={project.id}
-                                href={`/workspaces/${workspace.slug}/projects/${project.slug}`}
+                                href={projectShow({
+                                    workspace: workspace.slug,
+                                    project: project.slug,
+                                })}
                                 className="block"
                             >
                                 <Card className="transition-shadow hover:shadow-md">
                                     <CardContent className="flex flex-col gap-3 pt-6">
                                         <div className="flex items-start gap-3">
                                             <div
-                                                className="flex size-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white"
-                                                style={{
-                                                    backgroundColor:
-                                                        project.color ??
-                                                        '#64748B',
-                                                }}
+                                                className={`flex size-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${project.color ? 'text-white' : 'bg-muted text-muted-foreground'}`}
+                                                style={
+                                                    project.color
+                                                        ? {
+                                                              backgroundColor:
+                                                                  project.color,
+                                                          }
+                                                        : undefined
+                                                }
                                             >
                                                 {project.key
                                                     .charAt(0)

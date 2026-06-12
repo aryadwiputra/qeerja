@@ -10,11 +10,11 @@ interface Props {
 }
 
 const priorityColor: Record<number, string> = {
-    1: 'border-l-gray-400',
-    2: 'border-l-blue-400',
-    3: 'border-l-amber-400',
-    4: 'border-l-orange-400',
-    5: 'border-l-red-400',
+    1: 'border-l-gray-400 dark:border-l-gray-500',
+    2: 'border-l-blue-400 dark:border-l-blue-500',
+    3: 'border-l-amber-400 dark:border-l-amber-500',
+    4: 'border-l-orange-400 dark:border-l-orange-500',
+    5: 'border-l-red-400 dark:border-l-red-500',
 };
 
 export function AssignedTasksWidget({ tasks, total }: Props) {

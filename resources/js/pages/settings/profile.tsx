@@ -38,7 +38,8 @@ export default function Profile({
                 />
 
                 <Form
-                    {...ProfileController.update.form()}
+                    action={ProfileController.update.url()}
+                    method="patch"
                     options={{
                         preserveScroll: true,
                     }}
@@ -102,7 +103,7 @@ export default function Profile({
 
                                         {status ===
                                             'verification-link-sent' && (
-                                            <div className="mt-2 text-sm font-medium text-green-600">
+                                            <div className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
                                                 A new verification link has been
                                                 sent to your email address.
                                             </div>

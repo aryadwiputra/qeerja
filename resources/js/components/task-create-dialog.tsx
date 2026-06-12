@@ -18,6 +18,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { store as taskStore } from '@/routes/projects/tasks';
 
 interface Props {
     workspaceSlug: string;
@@ -43,6 +44,8 @@ interface Props {
         end_date: string | null;
     }>;
     onCreated?: () => void;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
 
 const NO_PRIORITY_VALUE = 'none';
@@ -57,8 +60,13 @@ export function TaskCreateDialog({
     epics = [],
     sprints = [],
     onCreated,
+    open: controlledOpen,
+    onOpenChange: controlledOnOpenChange,
 }: Props) {
-    const [open, setOpen] = useState(false);
+    const [internalOpen, setInternalOpen] = useState(false);
+
+    const open = controlledOpen ?? internalOpen;
+    const setOpen = controlledOnOpenChange ?? setInternalOpen;
     const [title, setTitle] = useState('');
     const [taskTypeId, setTaskTypeId] = useState<string>(
         taskTypes[0]?.id?.toString() ?? '',
@@ -74,7 +82,10 @@ export function TaskCreateDialog({
 
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = `/workspaces/${workspaceSlug}/projects/${projectSlug}/tasks`;
+        form.action = taskStore.url({
+            workspace: workspaceSlug,
+            project: projectSlug,
+        });
 
         const token = document.createElement('input');
         token.type = 'hidden';

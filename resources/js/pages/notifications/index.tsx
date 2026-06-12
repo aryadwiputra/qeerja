@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { readAll as notificationReadAll, read as notificationRead } from '@/routes/my-notifications';
 
 interface NotificationItem {
     id: string;
@@ -105,7 +106,7 @@ export default function NotificationsIndex({
                             variant="outline"
                             size="sm"
                             onClick={() =>
-                                router.post('/notifications/read-all')
+                                router.post(notificationReadAll())
                             }
                         >
                             <CheckCheck className="size-4" />
@@ -202,7 +203,7 @@ export default function NotificationsIndex({
                                                                 ) => {
                                                                     e.stopPropagation();
                                                                     router.patch(
-                                                                        `/notifications/${notification.id}/read`,
+                                                                        notificationRead({ notification: notification.id }),
                                                                         undefined,
                                                                         {
                                                                             preserveScroll: true,

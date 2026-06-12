@@ -18,6 +18,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { store as memberStore } from '@/routes/workspaces/members';
 
 interface Props {
     workspaceSlug: string;
@@ -84,7 +85,7 @@ export function WorkspaceMemberDialog({
         }
 
         router.post(
-            `/workspaces/${workspaceSlug}/members`,
+            memberStore({ workspace: workspaceSlug }),
             { user_id: selectedUserId, role: selectedRole },
             {
                 onSuccess: () => onOpenChange(false),

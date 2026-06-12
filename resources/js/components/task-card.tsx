@@ -42,12 +42,12 @@ interface TaskData {
 }
 
 const priorityColors: Record<string, string> = {
-    lowest: 'bg-gray-400',
-    low: 'bg-blue-400',
-    medium: 'bg-amber-400',
-    high: 'bg-orange-400',
-    highest: 'bg-red-400',
-    urgent: 'bg-red-500',
+    lowest: 'bg-gray-400 dark:bg-gray-500',
+    low: 'bg-blue-400 dark:bg-blue-500',
+    medium: 'bg-amber-400 dark:bg-amber-500',
+    high: 'bg-orange-400 dark:bg-orange-500',
+    highest: 'bg-red-400 dark:bg-red-500',
+    urgent: 'bg-red-500 dark:bg-red-600',
 };
 
 export function TaskCard({

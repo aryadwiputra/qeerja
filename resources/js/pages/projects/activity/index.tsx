@@ -1,6 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Activity, ArrowLeft } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -10,6 +9,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { show as projectShow } from '@/routes/projects';
+import { index as activityIndex } from '@/routes/projects/activity';
+import { show as taskShow } from '@/routes/projects/tasks';
 
 interface UserRef {
     id: number;
@@ -82,7 +84,7 @@ export default function ActivityIndex({
 }: Props) {
     const updateFilter = (key: string, value: string) => {
         router.get(
-            `/workspaces/${workspace.slug}/projects/${project.slug}/activity`,
+            activityIndex({ workspace: workspace.slug, project: project.slug }),
             { ...filters, [key]: value === 'all' ? undefined : value },
             { preserveScroll: true, preserveState: true, replace: true },
         );
@@ -93,7 +95,11 @@ export default function ActivityIndex({
             return;
         }
 
-        router.get(pageUrl, {}, { preserveScroll: true, preserveState: true, replace: true });
+        router.get(
+            pageUrl,
+            {},
+            { preserveScroll: true, preserveState: true, replace: true },
+        );
     };
 
     return (
@@ -103,7 +109,10 @@ export default function ActivityIndex({
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
                 <div className="flex items-center gap-4">
                     <Link
-                        href={`/workspaces/${workspace.slug}/projects/${project.slug}`}
+                        href={projectShow({
+                            workspace: workspace.slug,
+                            project: project.slug,
+                        })}
                         className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                         <ArrowLeft className="size-4" />
@@ -200,7 +209,9 @@ export default function ActivityIndex({
                                         >
                                             <div className="flex flex-col items-center gap-1 pt-0.5">
                                                 <div className="size-2 rounded-full bg-muted-foreground/30" />
-                                                {i < activities.data.length - 1 && (
+                                                {i <
+                                                    activities.data.length -
+                                                        1 && (
                                                     <div className="w-px flex-1 bg-border" />
                                                 )}
                                             </div>
@@ -218,7 +229,13 @@ export default function ActivityIndex({
                                                         item.new_value,
                                                     )}{' '}
                                                     <Link
-                                                        href={`/workspaces/${workspace.slug}/projects/${project.slug}/tasks/${item.task.id}`}
+                                                        href={taskShow({
+                                                            workspace:
+                                                                workspace.slug,
+                                                            project:
+                                                                project.slug,
+                                                            task: item.task.id,
+                                                        })}
                                                         className="font-mono text-xs text-muted-foreground underline-offset-2 hover:underline"
                                                     >
                                                         {item.task.code}
@@ -241,8 +258,8 @@ export default function ActivityIndex({
                                             No activity yet
                                         </p>
                                         <p className="text-sm text-muted-foreground">
-                                            Activity will appear here when
-                                            tasks are created or updated.
+                                            Activity will appear here when tasks
+                                            are created or updated.
                                         </p>
                                     </div>
                                 </div>
@@ -251,8 +268,8 @@ export default function ActivityIndex({
                             {activities.last_page > 1 && (
                                 <div className="mt-6 flex items-center justify-between gap-3">
                                     <p className="text-sm text-muted-foreground">
-                                        Showing {activities.from}–{activities.to}{' '}
-                                        of {activities.total}
+                                        Showing {activities.from}–
+                                        {activities.to} of {activities.total}
                                     </p>
                                     <div className="flex gap-2">
                                         {activities.links
@@ -261,7 +278,9 @@ export default function ActivityIndex({
                                                     !link.label.includes(
                                                         'Previous',
                                                     ) &&
-                                                    !link.label.includes('Next'),
+                                                    !link.label.includes(
+                                                        'Next',
+                                                    ),
                                             )
                                             .map((link) => (
                                                 <Button
@@ -332,9 +351,7 @@ function formatAction(
 }
 
 function formatActionLabel(action: string): string {
-    return action
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, (c) => c.toUpperCase());
+    return action.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function formatTimeAgo(date: string): string {
@@ -345,10 +362,21 @@ function formatTimeAgo(date: string): string {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffMins < 1) return 'just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffMins < 1) {
+        return 'just now';
+    }
+
+    if (diffMins < 60) {
+        return `${diffMins}m ago`;
+    }
+
+    if (diffHours < 24) {
+        return `${diffHours}h ago`;
+    }
+
+    if (diffDays < 7) {
+        return `${diffDays}d ago`;
+    }
 
     return then.toLocaleDateString('en-US', {
         month: 'short',

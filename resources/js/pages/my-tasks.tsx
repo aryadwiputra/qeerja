@@ -12,6 +12,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { index as myTasksIndex } from '@/routes/my-tasks';
 import type { MyTaskItem } from '@/types/dashboard';
 
 interface ProjectOption {
@@ -71,7 +72,7 @@ export default function MyTasks({ tasks, projects, filters }: Props) {
             params.delete(key);
         }
 
-        router.visit(`/my-tasks?${params.toString()}`, {
+        router.visit(myTasksIndex({ query: Object.fromEntries(params) }), {
             preserveScroll: true,
             preserveState: true,
         });
@@ -171,7 +172,71 @@ export default function MyTasks({ tasks, projects, filters }: Props) {
                     </div>
                 ) : (
                     <div className="flex flex-col">
-                        <div className="overflow-hidden rounded-lg border">
+                        <div className="grid gap-3 md:hidden">
+                            {tasks.data.map((task) => (
+                                <button
+                                    key={task.id}
+                                    type="button"
+                                    className="rounded-lg border bg-card p-4 text-left shadow-sm transition-colors hover:bg-muted/50"
+                                    onClick={() => handleTaskClick(task)}
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="min-w-0">
+                                            <p className="font-mono text-xs text-muted-foreground">
+                                                {task.code}
+                                            </p>
+                                            <p className="mt-1 line-clamp-2 text-sm font-medium">
+                                                {task.title}
+                                            </p>
+                                        </div>
+                                        <Badge
+                                            variant="outline"
+                                            className="shrink-0 text-xs"
+                                        >
+                                            {task.project.key}
+                                        </Badge>
+                                    </div>
+
+                                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                                        <Badge
+                                            variant="secondary"
+                                            className="text-xs"
+                                        >
+                                            {task.status.replace(/_/g, ' ')}
+                                        </Badge>
+                                        {task.priority && (
+                                            <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                                                <span
+                                                    className="size-2 rounded-full"
+                                                    style={{
+                                                        backgroundColor:
+                                                            task.priority
+                                                                .color ??
+                                                            '#94A3B8',
+                                                    }}
+                                                />
+                                                {task.priority.name}
+                                            </span>
+                                        )}
+                                        {task.due_date && (
+                                            <span
+                                                className={cn(
+                                                    'inline-flex items-center gap-1 text-xs text-muted-foreground',
+                                                    new Date(task.due_date) <
+                                                        new Date() &&
+                                                        'text-destructive',
+                                                )}
+                                            >
+                                                <Calendar className="size-3" />
+                                                {formatDate(task.due_date)}
+                                            </span>
+                                        )}
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="hidden overflow-hidden rounded-lg border md:block">
                             <table className="w-full">
                                 <thead>
                                     <tr className="border-b bg-muted/50">

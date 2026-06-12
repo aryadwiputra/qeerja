@@ -5,6 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    index as projectsIndex,
+    store as projectStore,
+} from '@/routes/projects';
 
 interface Workspace {
     id: number;
@@ -25,7 +29,7 @@ export default function ProjectsCreate({ workspace }: Props) {
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
                 <Link
-                    href={`/workspaces/${workspace.slug}/projects`}
+                    href={projectsIndex({ workspace: workspace.slug })}
                     className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <ArrowLeft className="size-4" />
@@ -39,7 +43,9 @@ export default function ProjectsCreate({ workspace }: Props) {
                         </CardHeader>
                         <CardContent>
                             <Form
-                                action={`/workspaces/${workspace.slug}/projects`}
+                                action={projectStore.url({
+                                    workspace: workspace.slug,
+                                })}
                                 method="post"
                                 className="flex flex-col gap-4"
                                 resetOnSuccess

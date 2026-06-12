@@ -33,7 +33,15 @@ import {
 import { dashboard } from '@/routes';
 import { index as notificationsIndex } from '@/routes/my-notifications';
 import { index as myTasksIndex } from '@/routes/my-tasks';
-import { board as projectBoard } from '@/routes/projects';
+import { edit as profileEdit } from '@/routes/profile';
+import {
+    board as projectBoard,
+    create as projectCreate,
+} from '@/routes/projects';
+import {
+    create as workspaceCreate,
+    switchMethod as switchWorkspaceRoute,
+} from '@/routes/workspaces';
 import type { NavItem } from '@/types';
 import type { CurrentWorkspaceProps, WorkspaceProps } from '@/types/dashboard';
 
@@ -58,14 +66,14 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Settings',
-        href: '/settings/profile',
+        href: profileEdit(),
         icon: Settings,
     },
 ];
 
 function switchWorkspace(workspaceSlug: string) {
     router.post(
-        `/workspaces/${workspaceSlug}/switch`,
+        switchWorkspaceRoute.url(workspaceSlug),
         {},
         { preserveScroll: true },
     );
@@ -121,7 +129,7 @@ export function AppSidebar() {
                                 <DropdownMenuItem
                                     className="cursor-pointer"
                                     onClick={() =>
-                                        router.visit('/workspaces/create')
+                                        router.visit(workspaceCreate())
                                     }
                                 >
                                     <Plus className="size-4" />
@@ -149,7 +157,10 @@ export function AppSidebar() {
                                     aria-label="New project"
                                     onClick={() =>
                                         router.visit(
-                                            `/workspaces/${currentWorkspace.slug}/projects/create`,
+                                            projectCreate.url({
+                                                workspace:
+                                                    currentWorkspace.slug,
+                                            }),
                                         )
                                     }
                                 >
@@ -175,12 +186,15 @@ export function AppSidebar() {
                                                 }
                                             >
                                                 <div
-                                                    className="flex size-4 shrink-0 items-center justify-center rounded-sm text-[10px] font-bold text-white"
-                                                    style={{
-                                                        backgroundColor:
-                                                            project.color ??
-                                                            '#64748B',
-                                                    }}
+                                                    className={`flex size-4 shrink-0 items-center justify-center rounded-sm text-[10px] font-bold ${project.color ? 'text-white' : 'bg-muted text-muted-foreground'}`}
+                                                    style={
+                                                        project.color
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      project.color,
+                                                              }
+                                                            : undefined
+                                                    }
                                                 >
                                                     {project.key
                                                         .charAt(0)

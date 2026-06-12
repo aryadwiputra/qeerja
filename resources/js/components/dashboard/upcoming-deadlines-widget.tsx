@@ -9,11 +9,11 @@ interface Props {
 }
 
 const priorityIndicator: Record<number, string> = {
-    1: 'bg-gray-400',
-    2: 'bg-blue-400',
-    3: 'bg-amber-400',
-    4: 'bg-orange-400',
-    5: 'bg-red-400',
+    1: 'bg-gray-400 dark:bg-gray-500',
+    2: 'bg-blue-400 dark:bg-blue-500',
+    3: 'bg-amber-400 dark:bg-amber-500',
+    4: 'bg-orange-400 dark:bg-orange-500',
+    5: 'bg-red-400 dark:bg-red-500',
 };
 
 export function UpcomingDeadlinesWidget({ deadlines }: Props) {

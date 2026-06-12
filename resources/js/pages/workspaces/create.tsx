@@ -5,6 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    index as workspaceIndex,
+    store as workspaceStore,
+} from '@/routes/workspaces';
 
 export default function WorkspacesCreate() {
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
@@ -15,7 +19,7 @@ export default function WorkspacesCreate() {
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
                 <Link
-                    href="/workspaces"
+                    href={workspaceIndex()}
                     className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <ArrowLeft className="size-4" />
@@ -29,7 +33,7 @@ export default function WorkspacesCreate() {
                         </CardHeader>
                         <CardContent>
                             <Form
-                                action="/workspaces"
+                                action={workspaceStore()}
                                 method="post"
                                 className="flex flex-col gap-4"
                                 resetOnSuccess

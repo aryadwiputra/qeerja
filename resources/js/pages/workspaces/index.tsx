@@ -4,6 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import {
+    create as workspaceCreate,
+    index as workspaceIndex,
+    restore as workspaceRestore,
+    settings as workspaceSettings,
+} from '@/routes/workspaces';
 
 interface Props {
     workspaces: Array<{
@@ -39,7 +45,7 @@ export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
                         </p>
                     </div>
                     <Link
-                        href="/workspaces/create"
+                        href={workspaceCreate()}
                         className={cn(
                             buttonVariants(),
                             'flex items-center gap-2',
@@ -63,7 +69,7 @@ export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
                             </p>
                         </div>
                         <Link
-                            href="/workspaces/create"
+                            href={workspaceCreate()}
                             className={cn(
                                 buttonVariants(),
                                 'flex items-center gap-2',
@@ -80,7 +86,9 @@ export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
                         {activeWorkspaces.map((workspace) => (
                             <Link
                                 key={workspace.id}
-                                href={`/workspaces/${workspace.slug}/settings`}
+                                href={workspaceSettings({
+                                    workspace: workspace.slug,
+                                })}
                                 className="block"
                             >
                                 <Card className="transition-shadow hover:shadow-md">
@@ -151,7 +159,9 @@ export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
                                             </div>
                                         </div>
                                         <form
-                                            action={`/workspaces/${workspace.id}/restore`}
+                                            action={workspaceRestore.url(
+                                                workspace.id,
+                                            )}
                                             method="post"
                                         >
                                             <input
@@ -185,7 +195,9 @@ export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
                     archivedWorkspaces.length === 0 && (
                         <div className="flex justify-center">
                             <Link
-                                href={`/workspaces?archived=1`}
+                                href={workspaceIndex({
+                                    query: { archived: '1' },
+                                })}
                                 className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                             >
                                 {showArchived
