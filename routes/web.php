@@ -14,6 +14,7 @@ use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\ProjectSettingController;
 use App\Http\Controllers\SprintController;
 use App\Http\Controllers\TaskAttachmentController;
+use App\Http\Controllers\TaskBulkOperationController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskRelationController;
@@ -120,6 +121,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/boards/{board}/columns/{boardColumn}', [BoardColumnController::class, 'destroy'])->name('projects.boards.columns.destroy');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/boards/{board}/columns/reorder', [BoardColumnController::class, 'reorder'])->name('projects.boards.columns.reorder');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks', [TaskController::class, 'store'])->name('projects.tasks.store');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/bulk', [TaskBulkOperationController::class, 'store'])->name('projects.tasks.bulk');
         Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}', [TaskController::class, 'show'])->name('projects.tasks.show');
         Route::patch('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}', [TaskController::class, 'update'])->name('projects.tasks.update');
         Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}', [TaskController::class, 'destroy'])->name('projects.tasks.destroy');

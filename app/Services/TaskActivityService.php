@@ -117,6 +117,11 @@ class TaskActivityService
         $this->log($task, $user, 'deleted', description: sprintf('deleted %s', $task->code));
     }
 
+    public function bulkChanged(Task $task, User $user, string $action, ?string $fieldName = null, ?string $oldValue = null, ?string $newValue = null): void
+    {
+        $this->log($task, $user, $action, $fieldName, $oldValue, $newValue, sprintf('bulk changed %s on %s', str_replace('_', ' ', $fieldName ?? $action), $task->code));
+    }
+
     public function commented(Task $task, User $user, TaskComment $comment): void
     {
         $this->log($task, $user, 'commented', description: sprintf('commented on %s', $task->code));

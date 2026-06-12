@@ -22,10 +22,14 @@ import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EpicDialog } from '@/components/epic-dialog';
 import { LabelDialog } from '@/components/label-dialog';
 import { SprintDialog } from '@/components/sprint-dialog';
+import { TaskBulkDialog } from '@/components/task-bulk-dialog';
+import { TaskBulkToolbar } from '@/components/task-bulk-toolbar';
+import type { BulkOperation } from '@/components/task-bulk-toolbar';
 import { TaskDetailDrawer } from '@/components/task-detail-drawer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
@@ -105,6 +109,12 @@ interface TaskRow {
         color: string | null;
     };
     assignees: UserRef[];
+    labels: Array<{
+        id: number;
+        name: string;
+        slug: string;
+        color: string | null;
+    }>;
     epics: Array<{
         id: number;
         name: string;
@@ -181,6 +191,26 @@ interface ActivityRow {
     user: UserRef | null;
 }
 
+interface BoardColumnOption {
+    id: number;
+    name: string;
+    status_key: string;
+    color: string | null;
+    board: {
+        id: number;
+        name: string;
+        is_default: boolean;
+    };
+}
+
+interface PriorityOption {
+    id: number;
+    name: string;
+    key: string;
+    level: number;
+    color: string | null;
+}
+
 interface Props {
     workspace: Workspace;
     project: ProjectData;
@@ -189,6 +219,8 @@ interface Props {
     epics: EpicRow[];
     sprints: SprintRow[];
     labels: LabelRow[];
+    boardColumns: BoardColumnOption[];
+    priorities: PriorityOption[];
     attachments: AttachmentRow[];
     activities: ActivityRow[];
 }
@@ -198,10 +230,13 @@ const pageSize = 10;
 export default function ProjectShow({
     workspace,
     project,
+    members,
     tasks,
     epics,
     sprints,
     labels,
+    boardColumns,
+    priorities,
     attachments,
     activities,
 }: Props) {
@@ -222,6 +257,13 @@ export default function ProjectShow({
     const [labelDialogOpen, setLabelDialogOpen] = useState(false);
     const [editingLabel, setEditingLabel] = useState<LabelRow | null>(null);
     const [deletingLabel, setDeletingLabel] = useState<LabelRow | null>(null);
+    const [selectedTaskIds, setSelectedTaskIds] = useState<Set<number>>(
+        () => new Set(),
+    );
+    const [bulkOperation, setBulkOperation] = useState<BulkOperation | null>(
+        null,
+    );
+    const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
 
     useKeyboardShortcuts([
         {
@@ -365,6 +407,44 @@ export default function ProjectShow({
     const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
     const pageRows = rows.slice(page * pageSize, page * pageSize + pageSize);
     const timelineGroups = groupTasksByDueDate(tasks);
+    const selectedTaskIdList = Array.from(selectedTaskIds);
+    const visibleTaskIds = pageRows.map((row) => row.original.id);
+    const allVisibleSelected =
+        visibleTaskIds.length > 0 &&
+        visibleTaskIds.every((id) => selectedTaskIds.has(id));
+
+    const toggleTaskSelection = (taskId: number) => {
+        setSelectedTaskIds((current) => {
+            const next = new Set(current);
+
+            if (next.has(taskId)) {
+                next.delete(taskId);
+            } else {
+                next.add(taskId);
+            }
+
+            return next;
+        });
+    };
+
+    const toggleVisibleSelection = () => {
+        setSelectedTaskIds((current) => {
+            const next = new Set(current);
+
+            if (allVisibleSelected) {
+                visibleTaskIds.forEach((id) => next.delete(id));
+            } else {
+                visibleTaskIds.forEach((id) => next.add(id));
+            }
+
+            return next;
+        });
+    };
+
+    const openBulkDialog = (operation: BulkOperation) => {
+        setBulkOperation(operation);
+        setBulkDialogOpen(true);
+    };
 
     return (
         <>
@@ -482,6 +562,14 @@ export default function ProjectShow({
                                 </div>
                             </CardHeader>
                             <CardContent>
+                                <TaskBulkToolbar
+                                    selectedCount={selectedTaskIds.size}
+                                    onClear={() =>
+                                        setSelectedTaskIds(new Set())
+                                    }
+                                    onAction={openBulkDialog}
+                                />
+
                                 <div className="overflow-hidden rounded-md border">
                                     <table className="w-full text-sm">
                                         <thead className="bg-muted/50">
@@ -489,6 +577,17 @@ export default function ProjectShow({
                                                 .getHeaderGroups()
                                                 .map((headerGroup) => (
                                                     <tr key={headerGroup.id}>
+                                                        <th className="w-10 px-3 py-2 text-left">
+                                                            <Checkbox
+                                                                checked={
+                                                                    allVisibleSelected
+                                                                }
+                                                                aria-label="Select visible tasks"
+                                                                onCheckedChange={
+                                                                    toggleVisibleSelection
+                                                                }
+                                                            />
+                                                        </th>
                                                         {headerGroup.headers.map(
                                                             (header) => (
                                                                 <th
@@ -534,6 +633,23 @@ export default function ProjectShow({
                                                         setDrawerOpen(true);
                                                     }}
                                                 >
+                                                    <td className="px-3 py-3 align-top">
+                                                        <Checkbox
+                                                            checked={selectedTaskIds.has(
+                                                                row.original.id,
+                                                            )}
+                                                            aria-label={`Select ${row.original.code}`}
+                                                            onClick={(event) =>
+                                                                event.stopPropagation()
+                                                            }
+                                                            onCheckedChange={() =>
+                                                                toggleTaskSelection(
+                                                                    row.original
+                                                                        .id,
+                                                                )
+                                                            }
+                                                        />
+                                                    </td>
                                                     {row
                                                         .getVisibleCells()
                                                         .map((cell) => (
@@ -554,7 +670,9 @@ export default function ProjectShow({
                                             {pageRows.length === 0 && (
                                                 <tr>
                                                     <td
-                                                        colSpan={columns.length}
+                                                        colSpan={
+                                                            columns.length + 1
+                                                        }
                                                         className="px-3 py-12 text-center text-sm text-muted-foreground"
                                                     >
                                                         No tasks match your
@@ -1356,6 +1474,20 @@ export default function ProjectShow({
                     open={drawerOpen}
                     onOpenChange={setDrawerOpen}
                     onDelete={() => router.reload()}
+                />
+
+                <TaskBulkDialog
+                    open={bulkDialogOpen}
+                    onOpenChange={setBulkDialogOpen}
+                    operation={bulkOperation}
+                    selectedTaskIds={selectedTaskIdList}
+                    workspaceSlug={workspace.slug}
+                    projectSlug={project.slug}
+                    members={members}
+                    boardColumns={boardColumns}
+                    priorities={priorities}
+                    labels={labels}
+                    onSuccess={() => setSelectedTaskIds(new Set())}
                 />
             </div>
         </>

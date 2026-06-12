@@ -118,7 +118,7 @@ class ProjectController extends Controller
             ]);
 
         $tasks = $project->tasks()
-            ->with(['assignees:id,name,avatar', 'priority:id,name,key,level,color', 'taskType:id,name,key,color', 'boardColumn:id,name,status_key,color', 'epics:id,name,color,status', 'sprints:id,name,status,start_date,end_date'])
+            ->with(['assignees:id,name,avatar', 'priority:id,name,key,level,color', 'taskType:id,name,key,color', 'boardColumn:id,name,status_key,color', 'labels:id,name,slug,color', 'epics:id,name,color,status', 'sprints:id,name,status,start_date,end_date'])
             ->latest('tasks.created_at')
             ->get()
             ->map(fn ($task) => [
@@ -152,6 +152,12 @@ class ProjectController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'avatar' => $user->avatar,
+                ]),
+                'labels' => $task->labels->map(fn ($label) => [
+                    'id' => $label->id,
+                    'name' => $label->name,
+                    'slug' => $label->slug,
+                    'color' => $label->color,
                 ]),
                 'epics' => $task->epics->map(fn ($epic) => [
                     'id' => $epic->id,
@@ -268,6 +274,35 @@ class ProjectController extends Controller
                 ] : null,
             ]);
 
+        $boardColumns = $project->boards()
+            ->with(['columns' => fn ($query) => $query->orderBy('position')])
+            ->orderByDesc('is_default')
+            ->orderBy('name')
+            ->get(['id', 'name', 'is_default'])
+            ->flatMap(fn ($board) => $board->columns->map(fn ($column) => [
+                'id' => $column->id,
+                'name' => $column->name,
+                'status_key' => $column->status_key,
+                'color' => $column->color,
+                'board' => [
+                    'id' => $board->id,
+                    'name' => $board->name,
+                    'is_default' => $board->is_default,
+                ],
+            ]))
+            ->values();
+
+        $priorities = $workspace->priorities()
+            ->orderBy('level')
+            ->get(['id', 'name', 'key', 'level', 'color'])
+            ->map(fn ($priority) => [
+                'id' => $priority->id,
+                'name' => $priority->name,
+                'key' => $priority->key,
+                'level' => $priority->level,
+                'color' => $priority->color,
+            ]);
+
         return Inertia::render('projects/show', [
             'workspace' => [
                 'id' => $workspace->id,
@@ -289,6 +324,8 @@ class ProjectController extends Controller
             'epics' => $epics,
             'sprints' => $sprints,
             'labels' => $labels,
+            'boardColumns' => $boardColumns,
+            'priorities' => $priorities,
             'attachments' => $attachments,
             'activities' => $activities,
         ]);
