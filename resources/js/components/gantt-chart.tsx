@@ -1,0 +1,259 @@
+import { useMemo, useRef } from 'react';
+import { cn } from '@/lib/utils';
+
+interface TaskSummary {
+    id: number;
+    code: string;
+    title: string;
+    status: string;
+    start_date: string | null;
+    due_date: string | null;
+    priority: { key: string; color: string | null } | null;
+}
+
+const DAY_WIDTH = 30;
+const ROW_HEIGHT = 36;
+const SIDEBAR_WIDTH = 240;
+const HEADER_HEIGHT = 44;
+
+const statusColors: Record<string, string> = {
+    todo: 'bg-blue-400 dark:bg-blue-500',
+    'in-progress': 'bg-amber-400 dark:bg-amber-500',
+    done: 'bg-emerald-400 dark:bg-emerald-500',
+    cancelled: 'bg-gray-400 dark:bg-gray-500',
+};
+
+function toDate(s: string | null): Date | null {
+    if (!s) {
+        return null;
+    }
+
+    const d = new Date(s);
+
+    return isNaN(d.getTime()) ? null : d;
+}
+
+function diffDays(a: Date, b: Date): number {
+    return Math.round((a.getTime() - b.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+function daysInMonth(year: number, month: number): number {
+    return new Date(year, month + 1, 0).getDate();
+}
+
+interface GanttChartProps {
+    tasks: TaskSummary[];
+    onTaskClick: (taskId: number) => void;
+}
+
+export function GanttChart({ tasks, onTaskClick }: GanttChartProps) {
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    const { rangeStart, rangeEnd, totalDays, todayOffset } = useMemo(() => {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+
+        let min = new Date(now.getFullYear(), now.getMonth(), 1);
+        min.setDate(min.getDate() - 7);
+        let max = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+        max.setDate(max.getDate() + 7);
+
+        for (const t of tasks) {
+            const s = toDate(t.start_date);
+            const e = toDate(t.due_date);
+
+            if (s && s < min) {
+                min = new Date(s);
+            }
+
+            if (e && e > max) {
+                max = new Date(e);
+            }
+        }
+
+        const total = Math.max(diffDays(max, min) + 1, 1);
+        const today = diffDays(now, min);
+
+        return {
+            rangeStart: min,
+            rangeEnd: max,
+            totalDays: total,
+            todayOffset: today,
+        };
+    }, [tasks]);
+
+    const months = useMemo(() => {
+        const list: Array<{ label: string; left: number; width: number }> = [];
+        const cursor = new Date(rangeStart);
+
+        while (cursor <= rangeEnd) {
+            const days = daysInMonth(cursor.getFullYear(), cursor.getMonth());
+            const monthStart = new Date(
+                cursor.getFullYear(),
+                cursor.getMonth(),
+                1,
+            );
+
+            if (monthStart < rangeStart) {
+                const offset = diffDays(rangeStart, monthStart);
+                const remaining = days - offset;
+                list.push({
+                    label: cursor.toLocaleDateString('en-US', {
+                        month: 'short',
+                        year: 'numeric',
+                    }),
+                    left: 0,
+                    width: remaining * DAY_WIDTH,
+                });
+            } else {
+                const left = diffDays(monthStart, rangeStart) * DAY_WIDTH;
+                list.push({
+                    label: cursor.toLocaleDateString('en-US', {
+                        month: 'short',
+                        year: 'numeric',
+                    }),
+                    left,
+                    width: days * DAY_WIDTH,
+                });
+            }
+
+            cursor.setMonth(cursor.getMonth() + 1);
+        }
+
+        return list;
+    }, [rangeStart, rangeEnd]);
+
+    const rows = useMemo(() => {
+        return tasks
+            .filter((t) => toDate(t.start_date) || toDate(t.due_date))
+            .sort((a, b) => {
+                const sa = toDate(a.start_date)?.getTime() ?? 0;
+                const sb = toDate(b.start_date)?.getTime() ?? 0;
+
+                return sa - sb || a.code.localeCompare(b.code);
+            });
+    }, [tasks]);
+
+    const totalWidth = totalDays * DAY_WIDTH;
+
+    return (
+        <div className="overflow-hidden rounded-md border">
+            <div className="flex">
+                <div
+                    className="shrink-0 border-r bg-muted/30"
+                    style={{ width: SIDEBAR_WIDTH }}
+                >
+                    <div
+                        className="flex items-end border-b px-3 font-medium text-muted-foreground"
+                        style={{ height: HEADER_HEIGHT }}
+                    >
+                        <span className="text-xs">Tasks</span>
+                    </div>
+                    {rows.map((task) => (
+                        <button
+                            key={task.id}
+                            type="button"
+                            onClick={() => onTaskClick(task.id)}
+                            className="flex w-full items-center gap-2 border-b px-3 text-left text-sm transition-colors hover:bg-muted/50"
+                            style={{ height: ROW_HEIGHT }}
+                        >
+                            <span className="min-w-0 flex-1 truncate font-medium">
+                                {task.title}
+                            </span>
+                            <span className="shrink-0 font-mono text-xs text-muted-foreground">
+                                {task.code}
+                            </span>
+                        </button>
+                    ))}
+                </div>
+                <div ref={scrollRef} className="overflow-x-auto">
+                    <div
+                        className="relative"
+                        style={{ width: totalWidth, minWidth: '100%' }}
+                    >
+                        <div
+                            className="sticky top-0 z-10 border-b bg-muted/30"
+                            style={{ height: HEADER_HEIGHT }}
+                        >
+                            {months.map((m) => (
+                                <div
+                                    key={m.label}
+                                    className="absolute top-0 flex items-end border-r px-2 pb-1"
+                                    style={{
+                                        left: m.left,
+                                        width: m.width,
+                                        height: HEADER_HEIGHT,
+                                    }}
+                                >
+                                    <span className="text-xs font-medium text-muted-foreground">
+                                        {m.label}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                        <div>
+                            {rows.map((task) => {
+                                const s = toDate(task.start_date);
+                                const e = toDate(task.due_date);
+                                const left = s
+                                    ? diffDays(s, rangeStart) * DAY_WIDTH
+                                    : e
+                                      ? diffDays(e, rangeStart) * DAY_WIDTH
+                                      : 0;
+                                const barWidth =
+                                    s && e
+                                        ? Math.max(
+                                              (diffDays(e, s) + 1) * DAY_WIDTH,
+                                              4,
+                                          )
+                                        : 4;
+                                const barColor =
+                                    statusColors[task.status] ?? 'bg-primary';
+
+                                return (
+                                    <div
+                                        key={task.id}
+                                        className="relative border-b"
+                                        style={{ height: ROW_HEIGHT }}
+                                    >
+                                        <div
+                                            className={cn(
+                                                'absolute top-1/2 h-5 -translate-y-1/2 rounded-sm px-1',
+                                                barColor,
+                                            )}
+                                            style={{
+                                                left: `${left}px`,
+                                                width: `${barWidth}px`,
+                                                minWidth: '4px',
+                                            }}
+                                        >
+                                            {barWidth > 40 && (
+                                                <span className="block truncate px-1 text-[10px] leading-5 font-medium text-white">
+                                                    {task.title}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        {todayOffset >= 0 && todayOffset < totalDays && (
+                            <div
+                                className="pointer-events-none absolute top-0 w-px bg-red-500"
+                                style={{
+                                    left: `${todayOffset * DAY_WIDTH}px`,
+                                    height: `${(rows.length + 1) * ROW_HEIGHT}px`,
+                                }}
+                            />
+                        )}
+                    </div>
+                </div>
+            </div>
+            {rows.length === 0 && (
+                <div className="py-12 text-center text-sm text-muted-foreground">
+                    No tasks with dates to display on the Gantt chart.
+                </div>
+            )}
+        </div>
+    );
+}

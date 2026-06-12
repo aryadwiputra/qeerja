@@ -29,4 +29,19 @@ class TaskAttachment extends Model
     {
         return $this->belongsTo(User::class, 'uploaded_by');
     }
+
+    public function isImage(): bool
+    {
+        return str_starts_with($this->mime_type ?? '', 'image/');
+    }
+
+    public function isPdf(): bool
+    {
+        return $this->mime_type === 'application/pdf';
+    }
+
+    public function isPreviewable(): bool
+    {
+        return $this->isImage() || $this->isPdf();
+    }
 }

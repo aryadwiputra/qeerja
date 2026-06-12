@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use App\Models\Integration;
 use App\Models\Project;
 use App\Models\TaskActivity;
 use App\Models\TaskAttachment;
@@ -387,6 +388,9 @@ class ProjectController extends Controller
             'sprints' => $sprints,
             'settings' => $settings->all($project),
             'boards' => $boards,
+            'integration' => Integration::where('project_id', $project->id)
+                ->where('provider', 'github')
+                ->first(['provider_user_id', 'metadata']),
         ]);
     }
 
