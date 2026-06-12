@@ -7,6 +7,7 @@ use App\Http\Requests\UpdatePriorityRequest;
 use App\Models\Priority;
 use App\Models\Workspace;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -49,6 +50,8 @@ class PriorityController extends Controller
 
     public function destroy(Workspace $workspace, Priority $priority): RedirectResponse
     {
+        Gate::authorize('update', $workspace);
+
         abort_unless((int) $priority->workspace_id === (int) $workspace->id, 404);
 
         if ($priority->tasks()->exists()) {

@@ -29,6 +29,8 @@ class LabelController extends Controller
 
     public function show(Workspace $workspace, Project $project, Label $label): Response
     {
+        Gate::authorize('view', $project);
+
         $this->ensureLabelBelongsToProject($label, $project);
 
         $label->loadCount('tasks');

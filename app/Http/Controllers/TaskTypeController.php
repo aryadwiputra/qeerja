@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateTaskTypeRequest;
 use App\Models\TaskType;
 use App\Models\Workspace;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -49,6 +50,8 @@ class TaskTypeController extends Controller
 
     public function destroy(Workspace $workspace, TaskType $taskType): RedirectResponse
     {
+        Gate::authorize('update', $workspace);
+
         abort_unless((int) $taskType->workspace_id === (int) $workspace->id, 404);
 
         if ($taskType->tasks()->exists()) {

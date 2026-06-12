@@ -31,6 +31,8 @@ class SprintController extends Controller
 
     public function show(Workspace $workspace, Project $project, Sprint $sprint): Response
     {
+        Gate::authorize('view', $project);
+
         $this->ensureSprintBelongsToProject($sprint, $project);
 
         $sprint->loadCount('tasks');
