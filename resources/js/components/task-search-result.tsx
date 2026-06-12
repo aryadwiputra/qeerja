@@ -65,7 +65,10 @@ export function TaskSearchResult({ task, onOpen }: Props) {
                         <Badge variant="outline" className="text-xs">
                             {task.project.key}
                         </Badge>
-                        <Badge variant="secondary" className="text-xs capitalize">
+                        <Badge
+                            variant="secondary"
+                            className="text-xs capitalize"
+                        >
                             {task.status.replace(/_/g, ' ')}
                         </Badge>
                         {task.archived_at && (

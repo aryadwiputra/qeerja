@@ -17,7 +17,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { store as columnStore, update as columnUpdate, destroy as columnDestroy } from '@/routes/projects/boards/columns';
+import {
+    store as columnStore,
+    update as columnUpdate,
+    destroy as columnDestroy,
+} from '@/routes/projects/boards/columns';
 
 interface ColumnData {
     id: number;
@@ -51,11 +55,13 @@ const COLOR_OPTIONS = [
 ];
 
 function generateStatusKey(name: string): string {
-    return name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '_')
-        .replace(/^_|_$/g, '')
-        .slice(0, 50) || 'column';
+    return (
+        name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_|_$/g, '')
+            .slice(0, 50) || 'column'
+    );
 }
 
 export function BoardColumnManager({
@@ -83,7 +89,11 @@ export function BoardColumnManager({
         setProcessing(true);
 
         router.post(
-            columnStore({ workspace: workspaceSlug, project: projectSlug, board: boardId }),
+            columnStore({
+                workspace: workspaceSlug,
+                project: projectSlug,
+                board: boardId,
+            }),
             {
                 name: newName.trim(),
                 status_key: generateStatusKey(newName.trim()),
@@ -121,7 +131,12 @@ export function BoardColumnManager({
         setProcessing(true);
 
         router.put(
-            columnUpdate({ workspace: workspaceSlug, project: projectSlug, board: boardId, boardColumn: editingId }),
+            columnUpdate({
+                workspace: workspaceSlug,
+                project: projectSlug,
+                board: boardId,
+                boardColumn: editingId,
+            }),
             {
                 name: editName.trim(),
                 color: editColor,
@@ -147,7 +162,12 @@ export function BoardColumnManager({
         }
 
         router.delete(
-            columnDestroy({ workspace: workspaceSlug, project: projectSlug, board: boardId, boardColumn: column.id }),
+            columnDestroy({
+                workspace: workspaceSlug,
+                project: projectSlug,
+                board: boardId,
+                boardColumn: column.id,
+            }),
             { preserveScroll: true },
         );
     };
@@ -184,9 +204,7 @@ export function BoardColumnManager({
                                                 />
                                                 <Select
                                                     value={editColor}
-                                                    onValueChange={
-                                                        setEditColor
-                                                    }
+                                                    onValueChange={setEditColor}
                                                 >
                                                     <SelectTrigger className="h-8 w-20">
                                                         <SelectValue>
@@ -237,7 +255,8 @@ export function BoardColumnManager({
                                                         checked={editIsDone}
                                                         onChange={(e) =>
                                                             setEditIsDone(
-                                                                e.target.checked,
+                                                                e.target
+                                                                    .checked,
                                                             )
                                                         }
                                                         className="size-3.5"
@@ -350,9 +369,7 @@ export function BoardColumnManager({
                     )}
 
                     <div className="border-t pt-4">
-                        <h4 className="mb-3 text-sm font-medium">
-                            Add column
-                        </h4>
+                        <h4 className="mb-3 text-sm font-medium">Add column</h4>
                         <div className="flex flex-col gap-3">
                             <div className="flex items-center gap-2">
                                 <div className="flex-1">

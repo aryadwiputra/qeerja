@@ -18,9 +18,16 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Head, Link, router } from '@inertiajs/react';
-import { ArrowDown, ArrowLeft, GripVertical, Settings2 } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { useEcho, useEchoPresence } from '@laravel/echo-react';
+import {
+    ArrowDown,
+    ArrowLeft,
+    GripVertical,
+    Settings2,
+    Users,
+} from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { BoardColumnManager } from '@/components/board-column-manager';
 import { TaskCard } from '@/components/task-card';
 import { TaskCreateDialog } from '@/components/task-create-dialog';
@@ -144,6 +151,71 @@ interface Props {
     }>;
 }
 
+function getInitials(name: string): string {
+    return name
+        .split(' ')
+        .map((part) => part[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+}
+
+const AVATAR_COLORS = [
+    'bg-blue-500',
+    'bg-emerald-500',
+    'bg-violet-500',
+    'bg-amber-500',
+    'bg-rose-500',
+    'bg-cyan-500',
+    'bg-fuchsia-500',
+    'bg-lime-500',
+];
+
+function getAvatarColor(userId: number): string {
+    return AVATAR_COLORS[userId % AVATAR_COLORS.length];
+}
+
+function PresenceAvatars({
+    users,
+    currentUserId,
+}: {
+    users: Array<{ id: number; name: string }>;
+    currentUserId: number;
+}) {
+    const others = users.filter((u) => u.id !== currentUserId);
+    const visible = others.slice(0, 5);
+    const remainder = others.length - visible.length;
+
+    if (others.length === 0) {
+        return null;
+    }
+
+    return (
+        <div className="flex items-center gap-1.5">
+            <Users className="size-3.5 text-muted-foreground" />
+            <div className="flex -space-x-1.5">
+                {visible.map((user) => (
+                    <div
+                        key={user.id}
+                        title={user.name}
+                        className={cn(
+                            'flex size-6 items-center justify-center rounded-full border-2 border-background text-[10px] font-medium text-white',
+                            getAvatarColor(user.id),
+                        )}
+                    >
+                        {getInitials(user.name)}
+                    </div>
+                ))}
+                {remainder > 0 && (
+                    <div className="flex size-6 items-center justify-center rounded-full border-2 border-background bg-muted text-[10px] font-medium text-muted-foreground">
+                        +{remainder}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
 function SortableTask({
     task,
     isDragging,
@@ -256,6 +328,43 @@ function BoardClient({
     const [columnManagerOpen, setColumnManagerOpen] = useState(false);
     const [newTaskOpen, setNewTaskOpen] = useState(false);
 
+    const [presenceUsers, setPresenceUsers] = useState<
+        Array<{ id: number; name: string }>
+    >([]);
+
+    const presence = useEchoPresence(
+        `board.${project.id}`,
+        [],
+        () => {},
+        [],
+    );
+
+    useEffect(() => {
+        const ch = presence.channel();
+
+        if (!ch) {
+            return;
+        }
+
+        ch.here((users: Array<{ id: number; name: string }>) => {
+            setPresenceUsers(users);
+        });
+
+        ch.joining((user: { id: number; name: string }) => {
+            setPresenceUsers((prev) => {
+                if (prev.some((u) => u.id === user.id)) {
+                    return prev;
+                }
+
+                return [...prev, user];
+            });
+        });
+
+        ch.leaving((user: { id: number; name: string }) => {
+            setPresenceUsers((prev) => prev.filter((u) => u.id !== user.id));
+        });
+    }, [presence]);
+
     useKeyboardShortcuts([
         {
             key: 'n',
@@ -367,6 +476,62 @@ function BoardClient({
             });
         });
     };
+
+    interface TaskMovedEvent {
+        task_id: number;
+        from_column_id: number;
+        to_column_id: number;
+        position: number;
+        status: string;
+        task: TaskItem;
+    }
+
+    const handleTaskMoved = useCallback((e: TaskMovedEvent) => {
+        if (activeTask?.id === e.task_id) {
+            return;
+        }
+
+        setColumns((prev) => {
+            const srcIdx = prev.findIndex((c) =>
+                c.tasks.some((t) => t.id === e.task_id),
+            );
+
+            if (srcIdx < 0) {
+                return prev;
+            }
+
+            const tgtIdx = prev.findIndex((c) => c.id === e.to_column_id);
+
+            if (tgtIdx < 0) {
+                return prev;
+            }
+
+            return prev.map((col, idx) => {
+                if (idx === srcIdx) {
+                    return {
+                        ...col,
+                        tasks: col.tasks.filter((t) => t.id !== e.task_id),
+                    };
+                }
+
+                if (idx === tgtIdx) {
+                    const updated = [...col.tasks];
+
+                    if (e.position < updated.length) {
+                        updated.splice(e.position, 0, e.task);
+                    } else {
+                        updated.push(e.task);
+                    }
+
+                    return { ...col, tasks: updated };
+                }
+
+                return col;
+            });
+        });
+    }, [activeTask]);
+
+    useEcho(`private-project.${project.id}`, '.task.moved', handleTaskMoved);
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
@@ -517,7 +682,11 @@ function BoardClient({
                         )}
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
+                        <PresenceAvatars
+                            users={presenceUsers}
+                            currentUserId={(usePage().props.auth as { user: { id: number } })?.user?.id}
+                        />
                         <Button
                             variant="outline"
                             size="sm"

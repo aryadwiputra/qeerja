@@ -18,7 +18,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { store as createLabel, update as updateLabel } from '@/routes/projects/labels';
+import {
+    store as createLabel,
+    update as updateLabel,
+} from '@/routes/projects/labels';
 
 interface LabelData {
     id: number;
@@ -94,7 +97,10 @@ export function LabelDialog({
             );
         } else {
             router.post(
-                createLabel.url({ workspace: workspaceSlug, project: projectSlug }),
+                createLabel.url({
+                    workspace: workspaceSlug,
+                    project: projectSlug,
+                }),
                 data,
                 options,
             );

@@ -93,14 +93,19 @@ export default function LabelShow({
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
                 <div className="flex items-center gap-4">
                     <Link
-                        href={projectSettings({ workspace: workspace.slug, project: project.slug })}
+                        href={projectSettings({
+                            workspace: workspace.slug,
+                            project: project.slug,
+                        })}
                         className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                         <ArrowLeft className="size-4" />
                         <span>Settings</span>
                     </Link>
                     <span className="text-sm text-muted-foreground">/</span>
-                    <span className="text-sm text-muted-foreground">Labels</span>
+                    <span className="text-sm text-muted-foreground">
+                        Labels
+                    </span>
                 </div>
 
                 <div className="mx-auto w-full max-w-3xl">
@@ -124,7 +129,10 @@ export default function LabelShow({
                             </div>
                         </div>
                         <Link
-                            href={projectSettings({ workspace: workspace.slug, project: project.slug })}
+                            href={projectSettings({
+                                workspace: workspace.slug,
+                                project: project.slug,
+                            })}
                         >
                             <Button variant="outline" size="sm">
                                 Edit label
@@ -165,10 +173,16 @@ export default function LabelShow({
                                                     </span>
                                                 </div>
                                                 <div className="mt-1 flex flex-wrap items-center gap-2">
-                                                    <Badge variant="outline" className="text-[10px]">
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="text-[10px]"
+                                                    >
                                                         {task.board_column.name}
                                                     </Badge>
-                                                    <Badge variant="secondary" className="text-[10px]">
+                                                    <Badge
+                                                        variant="secondary"
+                                                        className="text-[10px]"
+                                                    >
                                                         {task.task_type.name}
                                                     </Badge>
                                                     {task.priority && (
@@ -176,21 +190,34 @@ export default function LabelShow({
                                                             <div
                                                                 className={cn(
                                                                     'size-1.5 rounded-full',
-                                                                    priorityColors[task.priority.key] ??
+                                                                    priorityColors[
+                                                                        task
+                                                                            .priority
+                                                                            .key
+                                                                    ] ??
                                                                         'bg-muted-foreground',
                                                                 )}
                                                             />
                                                             {task.priority.name}
                                                         </div>
                                                     )}
-                                                    {task.assignees.length > 0 && (
+                                                    {task.assignees.length >
+                                                        0 && (
                                                         <span className="text-[10px] text-muted-foreground">
-                                                            {task.assignees.map((a) => a.name).join(', ')}
+                                                            {task.assignees
+                                                                .map(
+                                                                    (a) =>
+                                                                        a.name,
+                                                                )
+                                                                .join(', ')}
                                                         </span>
                                                     )}
                                                     {task.due_date && (
                                                         <span className="text-[10px] text-muted-foreground">
-                                                            Due {formatDate(task.due_date)}
+                                                            Due{' '}
+                                                            {formatDate(
+                                                                task.due_date,
+                                                            )}
                                                         </span>
                                                     )}
                                                 </div>
@@ -202,9 +229,12 @@ export default function LabelShow({
                                 <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
                                     <Hash className="size-8 text-muted-foreground" />
                                     <div>
-                                        <p className="text-sm font-medium">No tasks with this label</p>
+                                        <p className="text-sm font-medium">
+                                            No tasks with this label
+                                        </p>
                                         <p className="text-sm text-muted-foreground">
-                                            Assign this label to tasks via the task drawer.
+                                            Assign this label to tasks via the
+                                            task drawer.
                                         </p>
                                     </div>
                                 </div>

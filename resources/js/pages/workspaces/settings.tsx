@@ -262,9 +262,7 @@ export default function WorkspaceSettings({
                                 </CardHeader>
                                 <CardContent>
                                     <Form
-                                        action={workspaceUpdate(
-                                            workspace.slug,
-                                        )}
+                                        action={workspaceUpdate(workspace.slug)}
                                         method="put"
                                         className="flex flex-col gap-4"
                                     >
@@ -522,9 +520,7 @@ export default function WorkspaceSettings({
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-6">
                                     <Form
-                                        action={taskTypeStore(
-                                            workspace.slug,
-                                        )}
+                                        action={taskTypeStore(workspace.slug)}
                                         method="post"
                                         className="grid gap-3 sm:grid-cols-[1fr_auto_auto]"
                                         resetOnSuccess
@@ -719,9 +715,7 @@ export default function WorkspaceSettings({
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-6">
                                     <Form
-                                        action={priorityStore(
-                                            workspace.slug,
-                                        )}
+                                        action={priorityStore(workspace.slug)}
                                         method="post"
                                         className="grid gap-3 sm:grid-cols-[1fr_auto_auto_auto]"
                                         resetOnSuccess

@@ -85,7 +85,8 @@ export function TaskSearchFilters({ filters, options }: Props) {
     const selectedProjectId = filters.project_id?.toString() ?? null;
     const visibleProjects = selectedWorkspaceId
         ? options.projects.filter(
-              (project) => project.workspace_id.toString() === selectedWorkspaceId,
+              (project) =>
+                  project.workspace_id.toString() === selectedWorkspaceId,
           )
         : options.projects;
     const visiblePriorities = selectedWorkspaceId
@@ -179,7 +180,9 @@ export function TaskSearchFilters({ filters, options }: Props) {
 
                 <Select
                     value={selectedWorkspaceId ?? ALL_FILTERS_VALUE}
-                    onValueChange={(value) => updateFilter('workspace_id', value)}
+                    onValueChange={(value) =>
+                        updateFilter('workspace_id', value)
+                    }
                 >
                     <SelectTrigger>
                         <SelectValue placeholder="Workspace" />
@@ -239,7 +242,9 @@ export function TaskSearchFilters({ filters, options }: Props) {
 
                 <Select
                     value={filters.priority_id?.toString() ?? ALL_FILTERS_VALUE}
-                    onValueChange={(value) => updateFilter('priority_id', value)}
+                    onValueChange={(value) =>
+                        updateFilter('priority_id', value)
+                    }
                 >
                     <SelectTrigger>
                         <SelectValue placeholder="Priority" />
@@ -271,7 +276,10 @@ export function TaskSearchFilters({ filters, options }: Props) {
                             All labels
                         </SelectItem>
                         {visibleLabels.map((label) => (
-                            <SelectItem key={label.id} value={label.id.toString()}>
+                            <SelectItem
+                                key={label.id}
+                                value={label.id.toString()}
+                            >
                                 {label.name}
                             </SelectItem>
                         ))}
@@ -280,7 +288,9 @@ export function TaskSearchFilters({ filters, options }: Props) {
 
                 <Select
                     value={filters.assignee_id?.toString() ?? ALL_FILTERS_VALUE}
-                    onValueChange={(value) => updateFilter('assignee_id', value)}
+                    onValueChange={(value) =>
+                        updateFilter('assignee_id', value)
+                    }
                 >
                     <SelectTrigger>
                         <SelectValue placeholder="Assignee" />
@@ -290,7 +300,10 @@ export function TaskSearchFilters({ filters, options }: Props) {
                             Any assignee
                         </SelectItem>
                         {options.users.map((user) => (
-                            <SelectItem key={user.id} value={user.id.toString()}>
+                            <SelectItem
+                                key={user.id}
+                                value={user.id.toString()}
+                            >
                                 {user.name}
                             </SelectItem>
                         ))}
@@ -299,7 +312,9 @@ export function TaskSearchFilters({ filters, options }: Props) {
 
                 <Select
                     value={filters.reporter_id?.toString() ?? ALL_FILTERS_VALUE}
-                    onValueChange={(value) => updateFilter('reporter_id', value)}
+                    onValueChange={(value) =>
+                        updateFilter('reporter_id', value)
+                    }
                 >
                     <SelectTrigger>
                         <SelectValue placeholder="Reporter" />
@@ -309,7 +324,10 @@ export function TaskSearchFilters({ filters, options }: Props) {
                             Any reporter
                         </SelectItem>
                         {options.users.map((user) => (
-                            <SelectItem key={user.id} value={user.id.toString()}>
+                            <SelectItem
+                                key={user.id}
+                                value={user.id.toString()}
+                            >
                                 {user.name}
                             </SelectItem>
                         ))}
@@ -327,7 +345,9 @@ export function TaskSearchFilters({ filters, options }: Props) {
                 <Input
                     type="date"
                     value={filters.due_to ?? ''}
-                    onChange={(event) => updateFilter('due_to', event.target.value)}
+                    onChange={(event) =>
+                        updateFilter('due_to', event.target.value)
+                    }
                     aria-label="Due to"
                 />
                 <Input

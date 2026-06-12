@@ -187,16 +187,11 @@ function renderBodyWithMentions(
             return <span key={index}>{part}</span>;
         }
 
-        const mention = mentions.find(
-            (m) => `@${m.mentioned_text}` === part,
-        );
+        const mention = mentions.find((m) => `@${m.mentioned_text}` === part);
 
         if (mention) {
             return (
-                <span
-                    key={index}
-                    className="font-medium text-primary"
-                >
+                <span key={index} className="font-medium text-primary">
                     {part}
                 </span>
             );

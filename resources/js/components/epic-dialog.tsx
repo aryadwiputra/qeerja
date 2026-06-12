@@ -18,7 +18,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { store as createEpic, update as updateEpic } from '@/routes/projects/epics';
+import {
+    store as createEpic,
+    update as updateEpic,
+} from '@/routes/projects/epics';
 
 interface EpicData {
     id: number;
@@ -105,7 +108,10 @@ export function EpicDialog({
             );
         } else {
             router.post(
-                createEpic.url({ workspace: workspaceSlug, project: projectSlug }),
+                createEpic.url({
+                    workspace: workspaceSlug,
+                    project: projectSlug,
+                }),
                 data,
                 options,
             );

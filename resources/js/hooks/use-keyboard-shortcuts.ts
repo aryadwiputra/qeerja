@@ -52,7 +52,9 @@ export function useKeyboardShortcuts(shortcuts: Shortcut[]) {
     }, []);
 
     useEffect(() => {
-        const seqShortcuts = shortcuts.filter((s): s is SequenceShortcut => !isSimple(s));
+        const seqShortcuts = shortcuts.filter(
+            (s): s is SequenceShortcut => !isSimple(s),
+        );
         const simpleShortcuts = shortcuts.filter(isSimple);
 
         function onKeyDown(e: KeyboardEvent) {
@@ -66,7 +68,9 @@ export function useKeyboardShortcuts(shortcuts: Shortcut[]) {
                 }
 
                 const matchKey = e.key.toLowerCase() === s.key.toLowerCase();
-                const matchCtrl = s.ctrl ? (e.ctrlKey || e.metaKey) : !e.ctrlKey && !e.metaKey;
+                const matchCtrl = s.ctrl
+                    ? e.ctrlKey || e.metaKey
+                    : !e.ctrlKey && !e.metaKey;
                 const matchAlt = s.alt ? e.altKey : !e.altKey;
                 const matchShift = s.shift ? e.shiftKey : !e.shiftKey;
 
@@ -106,7 +110,10 @@ export function useKeyboardShortcuts(shortcuts: Shortcut[]) {
                         clearTimeout(timer.current);
                     }
 
-                    timer.current = setTimeout(clearBuffer, seq.timeout ?? 1500);
+                    timer.current = setTimeout(
+                        clearBuffer,
+                        seq.timeout ?? 1500,
+                    );
                 }
             } else {
                 clearBuffer();

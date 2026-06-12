@@ -1,5 +1,6 @@
 import type { RequestPayload } from '@inertiajs/core';
 import { router, usePage } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import {
     Activity,
     ChevronRight,
@@ -14,7 +15,8 @@ import {
     Upload,
     X,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AttachmentPreviewDialog } from '@/components/attachment-preview-dialog';
 import { MentionInput } from '@/components/mention-autocomplete';
 import { TaskComment } from '@/components/task-comment';
 import { Badge } from '@/components/ui/badge';
@@ -29,7 +31,12 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet';
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetTitle,
+} from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import {
     destroy as destroyTask,
@@ -44,6 +51,7 @@ import {
 import {
     destroy as destroyComment,
     store as storeComment,
+    typing as typingRoute,
     update as updateComment,
 } from '@/routes/projects/tasks/comments';
 import {
@@ -68,6 +76,7 @@ interface TaskDetail {
     start_date: string | null;
     completed_at: string | null;
     parent_id: number | null;
+    project_id: number;
     created_at: string;
     updated_at: string;
     priority: {
@@ -166,6 +175,10 @@ interface AttachmentItem {
     file_size: number;
     mime_type: string | null;
     url: string;
+    download_url: string;
+    is_previewable: boolean;
+    is_image: boolean;
+    is_pdf: boolean;
     created_at: string;
     uploader: UserRef;
 }
@@ -267,9 +280,22 @@ export function TaskDetailDrawer({
     const [activities, setActivities] = useState<ActivityItem[]>([]);
     const [commentBody, setCommentBody] = useState('');
     const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+    const [previewAttachment, setPreviewAttachment] =
+        useState<AttachmentItem | null>(null);
     const [newRelationTaskId, setNewRelationTaskId] = useState<string>('none');
-    const [newRelationType, setNewRelationType] = useState<string>('relates_to');
+    const [newRelationType, setNewRelationType] =
+        useState<string>('relates_to');
     const [subTaskTitle, setSubTaskTitle] = useState('');
+    const [projectId, setProjectId] = useState<number | null>(null);
+    const [typingUsers, setTypingUsers] = useState<
+        Array<{ userId: number; name: string }>
+    >([]);
+    const typingTimersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(
+        new Map(),
+    );
+    const typingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
+        null,
+    );
     const abortRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
@@ -283,6 +309,7 @@ export function TaskDetailDrawer({
         /* eslint-disable react-hooks/set-state-in-effect */
         setLoading(true);
         setTask(null);
+        setProjectId(null);
         setOptions({
             assignees: [],
             labels: [],
@@ -297,6 +324,7 @@ export function TaskDetailDrawer({
         setComments([]);
         setAttachments([]);
         setActivities([]);
+        setTypingUsers([]);
         /* eslint-enable react-hooks/set-state-in-effect */
 
         fetch(
@@ -316,6 +344,7 @@ export function TaskDetailDrawer({
             .then((r) => r.json())
             .then((data) => {
                 setTask(data.task);
+                setProjectId(data.task.project_id);
 
                 setOptions(data.options);
 
@@ -392,6 +421,106 @@ export function TaskDetailDrawer({
         setTask((current) => (current ? { ...current, ...partial } : current));
     };
 
+    useEcho(
+        projectId ? `private-project.${projectId}` : '',
+        '.comment.created',
+        (e: { task_id: number; comment_id: number; body: string }) => {
+            if (e.task_id !== taskId || !user) {
+                return;
+            }
+
+            refreshTaskDetails();
+        },
+        [projectId, taskId, user],
+    );
+
+    useEcho(
+        projectId ? `private-project.${projectId}` : '',
+        '.task.field.updated',
+        (e: { task_id: number; changes: Record<string, unknown> }) => {
+            if (e.task_id !== taskId) {
+                return;
+            }
+
+            setTask((prev) => {
+                if (!prev) {
+                    return prev;
+                }
+
+                return { ...prev, ...e.changes };
+            });
+        },
+        [projectId, taskId],
+    );
+
+    useEcho(
+        projectId ? `private-project.${projectId}` : '',
+        '.activity.logged',
+        (e: {
+            task_id: number;
+            id: number;
+            action: string;
+            field_name: string | null;
+            old_value: string | null;
+            new_value: string | null;
+            user_id: number;
+            user_name: string;
+            created_at: string;
+        }) => {
+            if (e.task_id !== taskId) {
+                return;
+            }
+
+            const newItem: ActivityItem = {
+                id: e.id,
+                action: e.action,
+                field_name: e.field_name,
+                old_value: e.old_value,
+                new_value: e.new_value,
+                created_at: e.created_at,
+                user: { id: e.user_id, name: e.user_name, avatar: null },
+            };
+
+            setActivities((prev) => [newItem, ...prev].slice(0, 20));
+        },
+        [projectId, taskId],
+    );
+
+    useEcho(
+        projectId ? `private-project.${projectId}` : '',
+        '.comment.typing',
+        (e: { task_id: number; user_id: number; user_name: string }) => {
+            if (e.task_id !== taskId || e.user_id === user?.id) {
+                return;
+            }
+
+            setTypingUsers((prev) => {
+                if (prev.some((u) => u.userId === e.user_id)) {
+                    return prev;
+                }
+
+                return [...prev, { userId: e.user_id, name: e.user_name }];
+            });
+
+            const existing = typingTimersRef.current.get(e.user_id);
+
+            if (existing) {
+                clearTimeout(existing);
+            }
+
+            typingTimersRef.current.set(
+                e.user_id,
+                setTimeout(() => {
+                    setTypingUsers((prev) =>
+                        prev.filter((u) => u.userId !== e.user_id),
+                    );
+                    typingTimersRef.current.delete(e.user_id);
+                }, 4000),
+            );
+        },
+        [projectId, taskId, user?.id],
+    );
+
     const handleAssigneeToggle = (assignee: UserRef, checked: boolean) => {
         if (!task) {
             return;
@@ -457,11 +586,43 @@ export function TaskDetailDrawer({
         );
     };
 
+    const sendTypingPing = useCallback(() => {
+        if (!workspaceSlug || !projectSlug || !taskId) {
+            return;
+        }
+
+        fetch(
+            typingRoute.url({
+                workspace: workspaceSlug,
+                project: projectSlug,
+                task: taskId,
+            }),
+            { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } },
+        ).catch(() => {});
+    }, [workspaceSlug, projectSlug, taskId]);
+
+    const handleCommentInputChange = useCallback(
+        (value: string) => {
+            setCommentBody(value);
+
+            if (typingDebounceRef.current) {
+                clearTimeout(typingDebounceRef.current);
+            }
+
+            typingDebounceRef.current = setTimeout(sendTypingPing, 1500);
+        },
+        [sendTypingPing],
+    );
+
     const handleAddComment = (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!commentBody.trim() || !workspaceSlug || !projectSlug || !taskId) {
             return;
+        }
+
+        if (typingDebounceRef.current) {
+            clearTimeout(typingDebounceRef.current);
         }
 
         router.post(
@@ -772,7 +933,8 @@ export function TaskDetailDrawer({
                     {task ? task.title : 'Task details'}
                 </SheetTitle>
                 <SheetDescription className="sr-only">
-                    View and edit task details, comments, attachments, and activity.
+                    View and edit task details, comments, attachments, and
+                    activity.
                 </SheetDescription>
                 {loading ? (
                     <div className="flex items-center justify-center py-20">
@@ -861,7 +1023,10 @@ export function TaskDetailDrawer({
                                         </Badge>
                                     ))}
                                     {task.sprints.map((sprint) => (
-                                        <Badge key={sprint.id} variant="secondary">
+                                        <Badge
+                                            key={sprint.id}
+                                            variant="secondary"
+                                        >
                                             {sprint.name}
                                         </Badge>
                                     ))}
@@ -889,14 +1054,14 @@ export function TaskDetailDrawer({
                                                 ? 'Watching'
                                                 : 'Watch'}
                                         </span>
-                                    {task.watcher_count > 0 && (
-                                        <span className="ml-0.5 text-muted-foreground">
-                                            {task.watcher_count}
-                                        </span>
-                                    )}
-                                </Button>
+                                        {task.watcher_count > 0 && (
+                                            <span className="ml-0.5 text-muted-foreground">
+                                                {task.watcher_count}
+                                            </span>
+                                        )}
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
                         </div>
 
                         <div className="flex flex-col gap-6 px-6 py-4">
@@ -1222,7 +1387,11 @@ export function TaskDetailDrawer({
                                         Sub-tasks
                                     </h3>
                                     <span className="text-xs text-muted-foreground">
-                                        {task.children.filter((c) => c.completed_at).length}
+                                        {
+                                            task.children.filter(
+                                                (c) => c.completed_at,
+                                            ).length
+                                        }
                                         /{task.children.length}
                                     </span>
                                 </div>
@@ -1236,7 +1405,9 @@ export function TaskDetailDrawer({
                                             >
                                                 <input
                                                     type="checkbox"
-                                                    checked={!!child.completed_at}
+                                                    checked={
+                                                        !!child.completed_at
+                                                    }
                                                     onChange={() =>
                                                         handleSubTaskToggle(
                                                             child.id,
@@ -1280,8 +1451,7 @@ export function TaskDetailDrawer({
                                                                         'open-task',
                                                                         {
                                                                             detail: {
-                                                                                taskId:
-                                                                                    child.id,
+                                                                                taskId: child.id,
                                                                             },
                                                                         },
                                                                     );
@@ -1476,9 +1646,9 @@ export function TaskDetailDrawer({
                                                 className="flex items-center justify-between gap-3 border-b px-3 py-2 last:border-0"
                                             >
                                                 <a
-                                                    href={attachment.url}
-                                                    target="_blank"
-                                                    rel="noreferrer"
+                                                    href={
+                                                        attachment.download_url
+                                                    }
                                                     className="min-w-0 flex-1"
                                                 >
                                                     <span className="block truncate text-sm font-medium hover:underline">
@@ -1508,6 +1678,21 @@ export function TaskDetailDrawer({
                                                 >
                                                     <Trash2 className="size-4" />
                                                 </Button>
+                                                {attachment.is_previewable && (
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="size-8 text-muted-foreground"
+                                                        onClick={() =>
+                                                            setPreviewAttachment(
+                                                                attachment,
+                                                            )
+                                                        }
+                                                    >
+                                                        <Eye className="size-4" />
+                                                    </Button>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
@@ -1535,7 +1720,7 @@ export function TaskDetailDrawer({
                                                 key={rel.id}
                                                 className="flex items-center gap-2 border-b px-3 py-2 last:border-0"
                                             >
-                                                <span className="text-xs font-medium uppercase text-muted-foreground">
+                                                <span className="text-xs font-medium text-muted-foreground uppercase">
                                                     {rel.type.replace(
                                                         /_/g,
                                                         ' ',
@@ -1577,9 +1762,7 @@ export function TaskDetailDrawer({
                                         </Label>
                                         <Select
                                             value={newRelationTaskId}
-                                            onValueChange={
-                                                setNewRelationTaskId
-                                            }
+                                            onValueChange={setNewRelationTaskId}
                                         >
                                             <SelectTrigger className="h-8 w-40 text-xs">
                                                 <SelectValue />
@@ -1603,12 +1786,9 @@ export function TaskDetailDrawer({
                                                     .map((t) => (
                                                         <SelectItem
                                                             key={t.id}
-                                                            value={String(
-                                                                t.id,
-                                                            )}
+                                                            value={String(t.id)}
                                                         >
-                                                            {t.code}:{' '}
-                                                            {t.title}
+                                                            {t.code}: {t.title}
                                                         </SelectItem>
                                                     ))}
                                             </SelectContent>
@@ -1620,9 +1800,7 @@ export function TaskDetailDrawer({
                                         </Label>
                                         <Select
                                             value={newRelationType}
-                                            onValueChange={
-                                                setNewRelationType
-                                            }
+                                            onValueChange={setNewRelationType}
                                         >
                                             <SelectTrigger className="h-8 w-28 text-xs">
                                                 <SelectValue />
@@ -1644,9 +1822,7 @@ export function TaskDetailDrawer({
                                         type="submit"
                                         variant="outline"
                                         size="sm"
-                                        disabled={
-                                            newRelationTaskId === 'none'
-                                        }
+                                        disabled={newRelationTaskId === 'none'}
                                     >
                                         <Plus className="size-3" />
                                         <span>Add</span>
@@ -1670,10 +1846,18 @@ export function TaskDetailDrawer({
                                 >
                                     <MentionInput
                                         value={commentBody}
-                                        onChange={setCommentBody}
+                                        onChange={handleCommentInputChange}
                                         members={options.assignees}
                                         placeholder="Write a comment... Use @ to mention someone"
                                     />
+                                    {typingUsers.length > 0 && (
+                                        <p className="mt-1 text-xs italic text-muted-foreground">
+                                            {typingUsers
+                                                .map((u) => u.name)
+                                                .join(', ')}{' '}
+                                            typing...
+                                        </p>
+                                    )}
                                 </form>
 
                                 {comments.length > 0 ? (
@@ -1758,6 +1942,19 @@ export function TaskDetailDrawer({
                         </p>
                     </div>
                 )}
+                <AttachmentPreviewDialog
+                    open={previewAttachment !== null}
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            setPreviewAttachment(null);
+                        }
+                    }}
+                    fileName={previewAttachment?.file_name ?? ''}
+                    url={previewAttachment?.url ?? ''}
+                    downloadUrl={previewAttachment?.download_url ?? ''}
+                    isImage={previewAttachment?.is_image ?? false}
+                    isPdf={previewAttachment?.is_pdf ?? false}
+                />
             </SheetContent>
         </Sheet>
     );

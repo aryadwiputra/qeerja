@@ -38,7 +38,8 @@ export function MentionInput({ value, onChange, members, placeholder }: Props) {
 
         document.addEventListener('mousedown', handleClickOutside);
 
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        return () =>
+            document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     const detectMention = (newValue: string, cursorPos: number) => {
@@ -48,7 +49,11 @@ export function MentionInput({ value, onChange, members, placeholder }: Props) {
         if (atIndex !== -1) {
             const query = textBeforeCursor.slice(atIndex + 1);
 
-            if (!query.includes(' ') && !query.includes('\n') && !query.includes('@')) {
+            if (
+                !query.includes(' ') &&
+                !query.includes('\n') &&
+                !query.includes('@')
+            ) {
                 setMentionQuery(query);
                 setMentionIndex(-1);
 
@@ -110,12 +115,17 @@ export function MentionInput({ value, onChange, members, placeholder }: Props) {
         if (mentionQuery && filteredMembers.length > 0) {
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
-                setMentionIndex((prev) => Math.min(prev + 1, filteredMembers.length - 1));
+                setMentionIndex((prev) =>
+                    Math.min(prev + 1, filteredMembers.length - 1),
+                );
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 setMentionIndex((prev) => Math.max(prev - 1, 0));
             } else if (e.key === 'Enter' || e.key === 'Tab') {
-                if (mentionIndex >= 0 && mentionIndex < filteredMembers.length) {
+                if (
+                    mentionIndex >= 0 &&
+                    mentionIndex < filteredMembers.length
+                ) {
                     e.preventDefault();
                     insertMention(filteredMembers[mentionIndex]);
                 }

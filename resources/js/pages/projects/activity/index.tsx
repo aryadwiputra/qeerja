@@ -1,5 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import { Activity, ArrowLeft } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -77,11 +79,56 @@ interface Props {
 export default function ActivityIndex({
     workspace,
     project,
-    activities,
+    activities: initialActivities,
     filters,
     actions,
     members,
 }: Props) {
+    const [activities, setActivities] = useState(initialActivities);
+
+    useEffect(() => {
+        /* eslint-disable-next-line react-hooks/set-state-in-effect */
+        setActivities(initialActivities);
+    }, [initialActivities]);
+
+    useEcho(
+        `private-project.${project.id}`,
+        '.activity.logged',
+        (e: {
+            id: number;
+            action: string;
+            task_id: number;
+            task_code: string;
+            user_id: number;
+            user_name: string;
+            created_at: string;
+        }) => {
+            if (activities.current_page !== 1) {
+                return;
+            }
+
+            const newItem: ActivityItem = {
+                id: e.id,
+                action: e.action,
+                field_name: null,
+                old_value: null,
+                new_value: null,
+                created_at: e.created_at,
+                task: { id: e.task_id, code: e.task_code, title: '' },
+                user: { id: e.user_id, name: e.user_name, avatar: null },
+            };
+
+            setActivities((prev) => ({
+                ...prev,
+                data: [newItem, ...prev.data].slice(0, 30),
+                total: prev.total + 1,
+                from: prev.from ?? 1,
+                to: Math.min((prev.to ?? 0) + 1, prev.total + 1),
+            }));
+        },
+        [project.id, activities.current_page],
+    );
+
     const updateFilter = (key: string, value: string) => {
         router.get(
             activityIndex({ workspace: workspace.slug, project: project.slug }),

@@ -1,6 +1,5 @@
 import { router, usePage } from '@inertiajs/react';
 import {
-    Bell,
     CheckSquare,
     ChevronDown,
     LayoutGrid,
@@ -9,9 +8,11 @@ import {
     Settings,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
+import { ConnectionStatus } from '@/components/connection-status';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
+import { NotificationSidebarItem } from '@/components/notification-sidebar-item';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -32,7 +33,6 @@ import {
     SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { index as notificationsIndex } from '@/routes/my-notifications';
 import { index as myTasksIndex } from '@/routes/my-tasks';
 import { edit as profileEdit } from '@/routes/profile';
 import {
@@ -62,11 +62,6 @@ const mainNavItems: NavItem[] = [
         title: 'Search',
         href: taskSearch(),
         icon: Search,
-    },
-    {
-        title: 'Notifications',
-        href: notificationsIndex(),
-        icon: Bell,
     },
 ];
 
@@ -151,6 +146,10 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain items={mainNavItems} />
 
+                <SidebarMenu className="px-2 py-0">
+                    <NotificationSidebarItem />
+                </SidebarMenu>
+
                 {currentWorkspace && currentWorkspace.projects.length > 0 && (
                     <SidebarMenu className="px-2 py-0">
                         <SidebarMenuItem>
@@ -231,6 +230,7 @@ export function AppSidebar() {
 
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
+                <ConnectionStatus />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

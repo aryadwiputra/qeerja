@@ -18,7 +18,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { store as createSprint, update as updateSprint } from '@/routes/projects/sprints';
+import {
+    store as createSprint,
+    update as updateSprint,
+} from '@/routes/projects/sprints';
 
 interface SprintData {
     id: number;
@@ -89,7 +92,10 @@ export function SprintDialog({
             );
         } else {
             router.post(
-                createSprint.url({ workspace: workspaceSlug, project: projectSlug }),
+                createSprint.url({
+                    workspace: workspaceSlug,
+                    project: projectSlug,
+                }),
                 data,
                 options,
             );

@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import {
     flexRender,
     getCoreRowModel,
@@ -9,6 +10,8 @@ import type { ColumnDef, SortingState } from '@tanstack/react-table';
 import {
     Activity as ActivityIcon,
     ArrowLeft,
+    BarChart3,
+    Calendar as CalendarIcon,
     CalendarDays,
     FileText,
     Flag,
@@ -17,10 +20,13 @@ import {
     Settings,
     Upload,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { CalendarView } from '@/components/calendar-view';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EpicDialog } from '@/components/epic-dialog';
+import { GanttChart } from '@/components/gantt-chart';
 import { LabelDialog } from '@/components/label-dialog';
+import { ReportsTab } from '@/components/reports-tab';
 import { SprintDialog } from '@/components/sprint-dialog';
 import { TaskBulkDialog } from '@/components/task-bulk-dialog';
 import { TaskBulkToolbar } from '@/components/task-bulk-toolbar';
@@ -246,6 +252,37 @@ export default function ProjectShow({
     const [page, setPage] = useState(0);
     const [drawerTaskId, setDrawerTaskId] = useState<number | null>(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [localTasks, setLocalTasks] = useState(tasks);
+
+    useEffect(() => {
+        setLocalTasks(tasks);
+    }, [tasks]);
+
+    useEcho(
+        `private-project.${project.id}`,
+        '.task.field.updated',
+        (e: { task_id: number; changes: Record<string, unknown> }) => {
+            setLocalTasks((prev) =>
+                prev.map((t) =>
+                    t.id === e.task_id ? { ...t, ...e.changes } : t,
+                ),
+            );
+        },
+        [project.id],
+    );
+
+    useEcho(
+        `private-project.${project.id}`,
+        '.activity.logged',
+        (e: { action: string; task_id: number }) => {
+            if (e.action === 'created') {
+                router.reload({ only: ['tasks'] });
+            } else if (e.action === 'deleted') {
+                setLocalTasks((prev) => prev.filter((t) => t.id !== e.task_id));
+            }
+        },
+        [project.id],
+    );
     const [epicDialogOpen, setEpicDialogOpen] = useState(false);
     const [editingEpic, setEditingEpic] = useState<EpicRow | null>(null);
     const [deletingEpic, setDeletingEpic] = useState<EpicRow | null>(null);
@@ -264,6 +301,9 @@ export default function ProjectShow({
         null,
     );
     const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
+    const [timelineView, setTimelineView] = useState<'gantt' | 'calendar'>(
+        'gantt',
+    );
 
     useKeyboardShortcuts([
         {
@@ -299,7 +339,7 @@ export default function ProjectShow({
 
     const filteredTasks = useMemo(
         () =>
-            tasks.filter((task) => {
+            localTasks.filter((task) => {
                 const query = search.toLowerCase();
 
                 return (
@@ -311,7 +351,7 @@ export default function ProjectShow({
                     )
                 );
             }),
-        [search, tasks],
+        [search, localTasks],
     );
 
     const columns: Array<ColumnDef<TaskRow>> = useMemo(
@@ -406,7 +446,6 @@ export default function ProjectShow({
     const rows = table.getRowModel().rows;
     const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
     const pageRows = rows.slice(page * pageSize, page * pageSize + pageSize);
-    const timelineGroups = groupTasksByDueDate(tasks);
     const selectedTaskIdList = Array.from(selectedTaskIds);
     const visibleTaskIds = pageRows.map((row) => row.original.id);
     const allVisibleSelected =
@@ -541,6 +580,7 @@ export default function ProjectShow({
                         <TabsTrigger value="labels">Labels</TabsTrigger>
                         <TabsTrigger value="timeline">Timeline</TabsTrigger>
                         <TabsTrigger value="files">Files</TabsTrigger>
+                        <TabsTrigger value="reports">Reports</TabsTrigger>
                         <TabsTrigger value="activity">Activity</TabsTrigger>
                     </TabsList>
 
@@ -1164,51 +1204,69 @@ export default function ProjectShow({
 
                     <TabsContent value="timeline">
                         <Card>
-                            <CardHeader>
+                            <CardHeader className="flex flex-row items-center justify-between gap-4">
                                 <CardTitle className="flex items-center gap-2">
                                     <CalendarDays className="size-5" />
                                     Timeline
                                 </CardTitle>
+                                <div className="flex items-center gap-1 rounded-md border p-0.5">
+                                    <Button
+                                        type="button"
+                                        variant={
+                                            timelineView === 'gantt'
+                                                ? 'secondary'
+                                                : 'ghost'
+                                        }
+                                        size="sm"
+                                        onClick={() => setTimelineView('gantt')}
+                                    >
+                                        <BarChart3 className="size-4" />
+                                        <span>Gantt</span>
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant={
+                                            timelineView === 'calendar'
+                                                ? 'secondary'
+                                                : 'ghost'
+                                        }
+                                        size="sm"
+                                        onClick={() =>
+                                            setTimelineView('calendar')
+                                        }
+                                    >
+                                        <CalendarIcon className="size-4" />
+                                        <span>Calendar</span>
+                                    </Button>
+                                </div>
                             </CardHeader>
-                            <CardContent className="flex flex-col gap-6">
-                                {timelineGroups.map((group) => (
-                                    <div key={group.label}>
-                                        <h3 className="mb-3 text-sm font-medium text-muted-foreground">
-                                            {group.label}
-                                        </h3>
-                                        <div className="flex flex-col rounded-md border">
-                                            {group.tasks.map((task) => (
-                                                <button
-                                                    key={task.id}
-                                                    type="button"
-                                                    className="flex items-center justify-between gap-4 border-b px-3 py-3 text-left transition-colors last:border-0 hover:bg-muted/40"
-                                                    onClick={() => {
-                                                        setDrawerTaskId(
-                                                            task.id,
-                                                        );
-                                                        setDrawerOpen(true);
-                                                    }}
-                                                >
-                                                    <div className="min-w-0">
-                                                        <p className="truncate text-sm font-medium">
-                                                            {task.title}
-                                                        </p>
-                                                        <p className="font-mono text-xs text-muted-foreground">
-                                                            {task.code}
-                                                        </p>
-                                                    </div>
-                                                    <span className="text-sm text-muted-foreground">
-                                                        {formatDate(
-                                                            task.due_date,
-                                                        )}
-                                                    </span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ))}
+                            <CardContent>
+                                {timelineView === 'gantt' ? (
+                                    <GanttChart
+                                        tasks={tasks}
+                                        onTaskClick={(id) => {
+                                            setDrawerTaskId(id);
+                                            setDrawerOpen(true);
+                                        }}
+                                    />
+                                ) : (
+                                    <CalendarView
+                                        tasks={tasks}
+                                        onTaskClick={(id) => {
+                                            setDrawerTaskId(id);
+                                            setDrawerOpen(true);
+                                        }}
+                                    />
+                                )}
                             </CardContent>
                         </Card>
+                    </TabsContent>
+
+                    <TabsContent value="reports">
+                        <ReportsTab
+                            workspaceSlug={workspace.slug}
+                            projectSlug={project.slug}
+                        />
                     </TabsContent>
 
                     <TabsContent value="files">
@@ -1543,48 +1601,6 @@ function ProgressSummary({
             </div>
         </div>
     );
-}
-
-function groupTasksByDueDate(tasks: TaskRow[]): Array<{
-    label: string;
-    tasks: TaskRow[];
-}> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const groups = [
-        { label: 'Overdue', tasks: [] as TaskRow[] },
-        { label: 'Today', tasks: [] as TaskRow[] },
-        { label: 'This week', tasks: [] as TaskRow[] },
-        { label: 'Later', tasks: [] as TaskRow[] },
-        { label: 'No due date', tasks: [] as TaskRow[] },
-    ];
-
-    tasks.forEach((task) => {
-        if (!task.due_date) {
-            groups[4].tasks.push(task);
-
-            return;
-        }
-
-        const dueDate = new Date(task.due_date);
-        dueDate.setHours(0, 0, 0, 0);
-        const diffDays = Math.floor(
-            (dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
-        );
-
-        if (diffDays < 0) {
-            groups[0].tasks.push(task);
-        } else if (diffDays === 0) {
-            groups[1].tasks.push(task);
-        } else if (diffDays <= 7) {
-            groups[2].tasks.push(task);
-        } else {
-            groups[3].tasks.push(task);
-        }
-    });
-
-    return groups.filter((group) => group.tasks.length > 0);
 }
 
 function formatBytes(bytes: number): string {

@@ -1,18 +1,24 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import {
+    AtSign,
     Bell,
+    CalendarClock,
     CheckCheck,
+    ClipboardList,
+    GitBranch,
+    Info,
     MessageSquare,
     Trash2,
     UserPlus,
-    ClipboardList,
-    CalendarClock,
-    GitBranch,
-    Info,
 } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { readAll as notificationReadAll, read as notificationRead } from '@/routes/my-notifications';
+import {
+    readAll as notificationReadAll,
+    read as notificationRead,
+} from '@/routes/my-notifications';
 
 interface NotificationItem {
     id: string;
@@ -24,6 +30,16 @@ interface NotificationItem {
     created_at: string;
 }
 
+interface StreamedNotification {
+    type: string;
+    title: string;
+    body: string;
+    task_code: string;
+    project_slug: string;
+    notification_id: string | null;
+    task_id: number | null;
+}
+
 interface Props {
     notifications: {
         data: NotificationItem[];
@@ -33,19 +49,31 @@ interface Props {
 }
 
 const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-    task_assigned: ClipboardList,
-    task_updated: GitBranch,
-    comment_added: MessageSquare,
-    member_added: UserPlus,
-    due_date_reminder: CalendarClock,
+    'task.assigned': ClipboardList,
+    'task.updated': GitBranch,
+    'task.commented': MessageSquare,
+    'task.mentioned': AtSign,
+    'member.added': UserPlus,
+    'due_date_reminder': CalendarClock,
 };
 
 const typeLabels: Record<string, string> = {
-    task_assigned: 'Task assigned',
-    task_updated: 'Task updated',
-    comment_added: 'Comment',
-    member_added: 'Member added',
-    due_date_reminder: 'Due date',
+    'task.assigned': 'Task assigned',
+    'task.updated': 'Task updated',
+    'task.commented': 'Comment',
+    'task.mentioned': 'Mention',
+    'member.added': 'Member added',
+    'due_date_reminder': 'Due date',
+};
+
+const taskRoute = (workspaceSlug: string, notification: NotificationItem): string | null => {
+    const data = notification.data as Record<string, unknown> | null;
+
+    if (!data?.project_slug || !data?.task_id) {
+        return null;
+    }
+
+    return `/${workspaceSlug}/projects/${data.project_slug}/tasks/${data.task_id}`;
 };
 
 function groupByDate(notifications: NotificationItem[]) {
@@ -82,10 +110,75 @@ function groupByDate(notifications: NotificationItem[]) {
 }
 
 export default function NotificationsIndex({
-    notifications,
-    unreadCount,
+    notifications: initialNotifications,
+    unreadCount: initialUnreadCount,
 }: Props) {
+    const { props } = usePage();
+    const workspaceSlug = (
+        props.currentWorkspace as { slug: string } | null
+    )?.slug;
+    const userId = (props.auth as { user: { id: number } })?.user?.id;
+
+    const [notifications, setNotifications] = useState(initialNotifications);
+    const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
+
+    useEcho(
+        userId ? `private-user.${userId}` : '',
+        '.notification',
+        (e: StreamedNotification) => {
+            if (!e.notification_id) {
+                return;
+            }
+
+            setUnreadCount((prev) => prev + 1);
+
+            const newItem: NotificationItem = {
+                id: e.notification_id,
+                type: e.type,
+                title: e.title,
+                body: e.body,
+                data: {
+                    project_slug: e.project_slug,
+                    task_id: e.task_id,
+                    task_code: e.task_code,
+                },
+                read_at: null,
+                created_at: new Date().toISOString(),
+            };
+
+            setNotifications((prev) => ({
+                ...prev,
+                data: [newItem, ...prev.data].slice(0, 60),
+            }));
+        },
+    );
+
     const groups = groupByDate(notifications.data);
+
+    const handleRowClick = (notification: NotificationItem) => {
+        if (!workspaceSlug) {
+            return;
+        }
+
+        const route = taskRoute(workspaceSlug, notification);
+
+        if (route) {
+            if (!notification.read_at) {
+                router.patch(
+                    notificationRead({ notification: notification.id }),
+                    undefined,
+                    {
+                        preserveScroll: true,
+                        onSuccess: () => {
+                            router.visit(route);
+                        },
+                    },
+                );
+            } else {
+                router.visit(route);
+            }
+        }
+    };
 
     return (
         <>
@@ -105,9 +198,11 @@ export default function NotificationsIndex({
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={() =>
-                                router.post(notificationReadAll())
-                            }
+                            onClick={() => {
+                                router.post(notificationReadAll(), undefined, {
+                                    onSuccess: () => setUnreadCount(0),
+                                });
+                            }}
                         >
                             <CheckCheck className="size-4" />
                             <span>Mark all read</span>
@@ -144,8 +239,26 @@ export default function NotificationsIndex({
                                         return (
                                             <div
                                                 key={notification.id}
+                                                onClick={() =>
+                                                    handleRowClick(
+                                                        notification,
+                                                    )
+                                                }
+                                                onKeyDown={(e) => {
+                                                    if (
+                                                        e.key === 'Enter' ||
+                                                        e.key === ' '
+                                                    ) {
+                                                        e.preventDefault();
+                                                        handleRowClick(
+                                                            notification,
+                                                        );
+                                                    }
+                                                }}
+                                                role="button"
+                                                tabIndex={0}
                                                 className={cn(
-                                                    'flex items-start gap-3 border-b px-4 py-3 transition-colors last:border-0',
+                                                    'flex cursor-pointer items-start gap-3 border-b px-4 py-3 transition-colors last:border-0 hover:bg-muted/50',
                                                     !notification.read_at &&
                                                         'bg-muted/30',
                                                 )}
@@ -203,10 +316,48 @@ export default function NotificationsIndex({
                                                                 ) => {
                                                                     e.stopPropagation();
                                                                     router.patch(
-                                                                        notificationRead({ notification: notification.id }),
+                                                                        notificationRead(
+                                                                            {
+                                                                                notification:
+                                                                                    notification.id,
+                                                                            },
+                                                                        ),
                                                                         undefined,
                                                                         {
                                                                             preserveScroll: true,
+                                                                            onSuccess:
+                                                                                () => {
+                                                                                    setNotifications(
+                                                                                        (
+                                                                                            prev,
+                                                                                        ) => ({
+                                                                                            ...prev,
+                                                                                            data: prev.data.map(
+                                                                                                (
+                                                                                                    n,
+                                                                                                ) =>
+                                                                                                    n.id ===
+                                                                                                    notification.id
+                                                                                                        ? {
+                                                                                                              ...n,
+                                                                                                              read_at:
+                                                                                                                  new Date().toISOString(),
+                                                                                                          }
+                                                                                                        : n,
+                                                                                            ),
+                                                                                        }),
+                                                                                    );
+                                                                                    setUnreadCount(
+                                                                                        (
+                                                                                            prev,
+                                                                                        ) =>
+                                                                                            Math.max(
+                                                                                                0,
+                                                                                                prev -
+                                                                                                    1,
+                                                                                            ),
+                                                                                    );
+                                                                                },
                                                                         },
                                                                     );
                                                                 }}
@@ -223,6 +374,23 @@ export default function NotificationsIndex({
                                                                     `/notifications/${notification.id}`,
                                                                     {
                                                                         preserveScroll: true,
+                                                                        onSuccess:
+                                                                            () => {
+                                                                                setNotifications(
+                                                                                    (
+                                                                                        prev,
+                                                                                    ) => ({
+                                                                                        ...prev,
+                                                                                        data: prev.data.filter(
+                                                                                            (
+                                                                                                n,
+                                                                                            ) =>
+                                                                                                n.id !==
+                                                                                                notification.id,
+                                                                                        ),
+                                                                                    }),
+                                                                                );
+                                                                            },
                                                                     },
                                                                 );
                                                             }}
