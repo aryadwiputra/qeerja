@@ -30,6 +30,8 @@ class EpicController extends Controller
 
     public function show(Workspace $workspace, Project $project, Epic $epic): Response
     {
+        Gate::authorize('view', $project);
+
         $this->ensureEpicBelongsToProject($epic, $project);
 
         $epic->loadCount('tasks');
