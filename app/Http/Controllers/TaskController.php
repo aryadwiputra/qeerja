@@ -42,7 +42,11 @@ class TaskController extends Controller
         ]);
 
         $comments = $task->comments()
-            ->with(['user:id,name,avatar', 'replies.user:id,name,avatar'])
+            ->with([
+                'user:id,name,avatar',
+                'replies.user:id,name,avatar',
+                'mentions.user:id,name',
+            ])
             ->whereNull('parent_id')
             ->latest()
             ->get()
@@ -52,6 +56,11 @@ class TaskController extends Controller
                 'created_at' => $c->created_at,
                 'edited_at' => $c->edited_at,
                 'user' => ['id' => $c->user->id, 'name' => $c->user->name, 'avatar' => $c->user->avatar],
+                'mentions' => $c->mentions->map(fn ($m) => [
+                    'user_id' => $m->user_id,
+                    'user_name' => $m->user->name,
+                    'mentioned_text' => $m->mentioned_text,
+                ]),
                 'replies' => $c->replies->map(fn ($r) => [
                     'id' => $r->id,
                     'body' => $r->body,

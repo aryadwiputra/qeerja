@@ -5,6 +5,7 @@ import {
     ChevronDown,
     LayoutGrid,
     Plus,
+    Search,
     Settings,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -38,6 +39,7 @@ import {
     board as projectBoard,
     create as projectCreate,
 } from '@/routes/projects';
+import { search as taskSearch } from '@/routes/tasks';
 import {
     create as workspaceCreate,
     switchMethod as switchWorkspaceRoute,
@@ -55,6 +57,11 @@ const mainNavItems: NavItem[] = [
         title: 'My Tasks',
         href: myTasksIndex(),
         icon: CheckSquare,
+    },
+    {
+        title: 'Search',
+        href: taskSearch(),
+        icon: Search,
     },
     {
         title: 'Notifications',

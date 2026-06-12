@@ -18,6 +18,7 @@ use App\Http\Controllers\TaskBulkOperationController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskRelationController;
+use App\Http\Controllers\TaskSearchController;
 use App\Http\Controllers\TaskTypeController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\WorkspaceMemberController;
@@ -31,6 +32,7 @@ Route::inertia('/', 'welcome')->name('home');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
     Route::get('/my-tasks', [MyTasksController::class, 'index'])->name('my-tasks.index');
+    Route::get('/tasks/search', [TaskSearchController::class, 'index'])->name('tasks.search');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('my-notifications.index');
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('my-notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('my-notifications.read-all');

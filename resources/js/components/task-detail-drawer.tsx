@@ -15,6 +15,7 @@ import {
     X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { MentionInput } from '@/components/mention-autocomplete';
 import { TaskComment } from '@/components/task-comment';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -266,7 +267,6 @@ export function TaskDetailDrawer({
     const [activities, setActivities] = useState<ActivityItem[]>([]);
     const [commentBody, setCommentBody] = useState('');
     const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
-    const commentInputRef = useRef<HTMLInputElement>(null);
     const [newRelationTaskId, setNewRelationTaskId] = useState<string>('none');
     const [newRelationType, setNewRelationType] = useState<string>('relates_to');
     const [subTaskTitle, setSubTaskTitle] = useState('');
@@ -1668,14 +1668,11 @@ export function TaskDetailDrawer({
                                     onSubmit={handleAddComment}
                                     className="mb-4"
                                 >
-                                    <Input
-                                        ref={commentInputRef}
+                                    <MentionInput
                                         value={commentBody}
-                                        onChange={(e) =>
-                                            setCommentBody(e.target.value)
-                                        }
-                                        placeholder="Write a comment..."
-                                        className="text-sm"
+                                        onChange={setCommentBody}
+                                        members={options.assignees}
+                                        placeholder="Write a comment... Use @ to mention someone"
                                     />
                                 </form>
 

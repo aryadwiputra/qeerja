@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -8,12 +9,19 @@ interface User {
     avatar: string | null;
 }
 
+interface MentionData {
+    user_id: number;
+    user_name: string;
+    mentioned_text: string;
+}
+
 interface CommentData {
     id: number;
     body: string;
     created_at: string;
     edited_at: string | null;
     user: User;
+    mentions?: MentionData[];
     replies?: Array<{
         id: number;
         body: string;
@@ -98,7 +106,10 @@ export function TaskComment({
                         </div>
                     ) : (
                         <p className="text-sm whitespace-pre-wrap">
-                            {comment.body}
+                            {renderBodyWithMentions(
+                                comment.body,
+                                comment.mentions ?? [],
+                            )}
                         </p>
                     )}
                     {canManage && (onDelete || onUpdate) && !editing && (
@@ -149,6 +160,50 @@ export function TaskComment({
             )}
         </div>
     );
+}
+
+function renderBodyWithMentions(
+    body: string,
+    mentions: MentionData[],
+): ReactNode {
+    if (mentions.length === 0) {
+        return body;
+    }
+
+    const escapedPatterns = mentions.map((m) =>
+        m.mentioned_text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+    );
+    const pattern = escapedPatterns.map((t) => `@${t}`).join('|');
+
+    if (!pattern) {
+        return body;
+    }
+
+    const regex = new RegExp(`(${pattern})`, 'g');
+    const parts = body.split(regex);
+
+    return parts.map((part, index) => {
+        if (!part.startsWith('@')) {
+            return <span key={index}>{part}</span>;
+        }
+
+        const mention = mentions.find(
+            (m) => `@${m.mentioned_text}` === part,
+        );
+
+        if (mention) {
+            return (
+                <span
+                    key={index}
+                    className="font-medium text-primary"
+                >
+                    {part}
+                </span>
+            );
+        }
+
+        return <span key={index}>{part}</span>;
+    });
 }
 
 function formatTimeAgo(date: string): string {
