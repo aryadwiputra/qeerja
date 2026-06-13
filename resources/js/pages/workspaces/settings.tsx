@@ -275,7 +275,7 @@ export default function WorkspaceSettings({
         <>
             <Head title={`${workspace.name} — Settings`} />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex items-center gap-4">
                     <Link
                         href={workspaceIndex()}

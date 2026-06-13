@@ -62,7 +62,7 @@ export function AppSidebar() {
         props.currentWorkspace as CurrentWorkspaceProps | null;
 
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar collapsible="icon" variant="sidebar">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>

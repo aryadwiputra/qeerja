@@ -38,7 +38,7 @@ export default function TaskSearch({ tasks, filters, options }: Props) {
         <>
             <Head title="Task Search" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                         <h1 className="text-2xl font-semibold tracking-tight">

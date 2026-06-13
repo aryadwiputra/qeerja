@@ -160,7 +160,7 @@ export default function SprintShow({
         <>
             <Head title={`${sprint.name} — ${project.name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex items-center gap-4">
                     <Link
                         href={projectShow({

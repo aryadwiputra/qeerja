@@ -17,7 +17,7 @@ export default function WorkspacesCreate() {
         <>
             <Head title="Create workspace" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Link
                     href={workspaceIndex()}
                     className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"

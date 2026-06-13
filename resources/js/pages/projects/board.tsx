@@ -623,7 +623,7 @@ function BoardClient({
             <Head title={`${project.name} — Board`} />
 
             <div
-                className="flex h-full flex-1 flex-col overflow-hidden p-6"
+                className="flex h-full flex-1 flex-col overflow-hidden"
                 suppressHydrationWarning
             >
                 <div className="mb-4 flex shrink-0 items-center justify-between gap-4">

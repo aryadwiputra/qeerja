@@ -88,7 +88,7 @@ export default function MyTasks({ tasks, projects, filters }: Props) {
         <>
             <Head title="My Tasks" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight">
                         My Tasks

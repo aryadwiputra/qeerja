@@ -27,7 +27,7 @@ export default function ProjectsCreate({ workspace }: Props) {
         <>
             <Head title={`${workspace.name} — Create project`} />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Link
                     href={projectsIndex({ workspace: workspace.slug })}
                     className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
