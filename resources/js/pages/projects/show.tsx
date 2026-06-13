@@ -246,6 +246,8 @@ export default function ProjectShow({
     attachments,
     activities,
 }: Props) {
+    'use no memo';
+
     const [search, setSearch] = useState('');
     const [activeTab, setActiveTab] = useState('list');
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -434,6 +436,7 @@ export default function ProjectShow({
         [],
     );
 
+    // eslint-disable-next-line react-hooks/incompatible-library
     const table = useReactTable({
         data: filteredTasks,
         columns,
