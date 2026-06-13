@@ -94,6 +94,28 @@ class WorkspaceController extends Controller
                 'status' => $member->status,
             ]);
 
+        $invitations = $workspace->invitations()
+            ->whereNull('accepted_at')
+            ->where(function ($query) {
+                $query->whereNull('expired_at')
+                    ->orWhere('expired_at', '>', now());
+            })
+            ->with('invitedBy:id,name,email')
+            ->latest()
+            ->get()
+            ->map(fn ($invitation) => [
+                'id' => $invitation->id,
+                'email' => $invitation->email,
+                'role' => $invitation->role,
+                'expired_at' => $invitation->expired_at,
+                'created_at' => $invitation->created_at,
+                'invited_by' => [
+                    'id' => $invitation->invitedBy->id,
+                    'name' => $invitation->invitedBy->name,
+                    'email' => $invitation->invitedBy->email,
+                ],
+            ]);
+
         return Inertia::render('workspaces/settings', [
             'workspace' => [
                 'id' => $workspace->id,
@@ -106,6 +128,7 @@ class WorkspaceController extends Controller
                 'created_at' => $workspace->created_at,
             ],
             'members' => $members,
+            'invitations' => $invitations,
             'settings' => $settings->all($workspace),
             'taskTypes' => $workspace->taskTypes()->orderBy('name')->get(['id', 'name', 'key', 'icon', 'color']),
             'priorities' => $workspace->priorities()->orderBy('level')->get(['id', 'name', 'key', 'level', 'color']),

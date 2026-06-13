@@ -25,6 +25,7 @@ use App\Http\Controllers\TaskRelationController;
 use App\Http\Controllers\TaskSearchController;
 use App\Http\Controllers\TaskTypeController;
 use App\Http\Controllers\WorkspaceController;
+use App\Http\Controllers\WorkspaceInvitationController;
 use App\Http\Controllers\WorkspaceMemberController;
 use App\Http\Controllers\WorkspaceSettingController;
 use App\Models\User;
@@ -68,6 +69,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/workspaces/{workspace:slug}/members', [WorkspaceMemberController::class, 'store'])->name('workspaces.members.store');
         Route::put('/workspaces/{workspace:slug}/members/{member}', [WorkspaceMemberController::class, 'update'])->name('workspaces.members.update');
         Route::delete('/workspaces/{workspace:slug}/members/{member}', [WorkspaceMemberController::class, 'destroy'])->name('workspaces.members.destroy');
+
+        Route::post('/workspaces/{workspace:slug}/invitations', [WorkspaceInvitationController::class, 'store'])->name('workspaces.invitations.store');
+        Route::delete('/workspaces/{workspace:slug}/invitations/{invitation}', [WorkspaceInvitationController::class, 'destroy'])->name('workspaces.invitations.destroy');
 
         Route::put('/workspaces/{workspace:slug}/settings', [WorkspaceSettingController::class, 'update'])->name('workspaces.settings.update');
 
@@ -153,6 +157,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/relations/{relation}', [TaskRelationController::class, 'destroy'])->name('projects.tasks.relations.destroy');
     });
 });
+
+Route::middleware(['auth', 'verified'])->get('/invitations/{invitation:token}/accept', [WorkspaceInvitationController::class, 'accept'])->name('workspace-invitations.accept');
 
 // GitHub webhook — no auth (signed by GitHub)
 Route::scopeBindings()->post('/workspaces/{workspace:slug}/projects/{project:slug}/github/webhook', [GitHubWebhookController::class, 'handle'])->name('projects.github.webhook');

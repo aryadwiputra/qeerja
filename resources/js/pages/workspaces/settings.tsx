@@ -7,7 +7,9 @@ import {
     Check,
     Clock,
     Globe,
+    Mail,
     Plus,
+    Send,
     Tag,
     Trash2,
     X,
@@ -36,6 +38,10 @@ import {
     update as workspaceUpdate,
 } from '@/routes/workspaces';
 import {
+    destroy as invitationDestroy,
+    store as invitationStore,
+} from '@/routes/workspaces/invitations';
+import {
     destroy as memberDestroy,
     update as memberUpdate,
 } from '@/routes/workspaces/members';
@@ -59,6 +65,19 @@ interface Member {
     avatar: string | null;
     role: string;
     status: string;
+}
+
+interface Invitation {
+    id: number;
+    email: string;
+    role: string;
+    expired_at: string | null;
+    created_at: string;
+    invited_by: {
+        id: number;
+        name: string;
+        email: string;
+    };
 }
 
 interface Workspace {
@@ -94,6 +113,7 @@ interface PriorityData {
 interface Props {
     workspace: Workspace;
     members: Member[];
+    invitations: Invitation[];
     settings: WorkspaceSettings;
     taskTypes: TaskTypeData[];
     priorities: PriorityData[];
@@ -110,11 +130,14 @@ const roleLabels: Record<string, string> = {
 export default function WorkspaceSettings({
     workspace,
     members,
+    invitations,
     settings,
     taskTypes,
     priorities,
 }: Props) {
     const [addMemberOpen, setAddMemberOpen] = useState(false);
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [inviteRole, setInviteRole] = useState('member');
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [editingTaskType, setEditingTaskType] = useState<TaskTypeData | null>(
         null,
@@ -142,6 +165,35 @@ export default function WorkspaceSettings({
             {
                 preserveScroll: true,
             },
+        );
+    };
+
+    const handleSendInvitation = () => {
+        if (!inviteEmail.trim()) {
+            return;
+        }
+
+        router.post(
+            invitationStore({ workspace: workspace.slug }),
+            { email: inviteEmail, role: inviteRole },
+            {
+                preserveScroll: true,
+                onSuccess: () => setInviteEmail(''),
+            },
+        );
+    };
+
+    const handleCancelInvitation = (invitationId: number) => {
+        if (!confirm('Cancel this invitation?')) {
+            return;
+        }
+
+        router.delete(
+            invitationDestroy({
+                workspace: workspace.slug,
+                invitation: invitationId,
+            }),
+            { preserveScroll: true },
         );
     };
 
@@ -1033,6 +1085,122 @@ export default function WorkspaceSettings({
                                 open={addMemberOpen}
                                 onOpenChange={setAddMemberOpen}
                             />
+
+                            <Card className="mt-6">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Mail className="size-5" />
+                                        Invitations
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex flex-col gap-6">
+                                    <div className="grid gap-3 sm:grid-cols-[1fr_160px_auto]">
+                                        <div className="flex flex-col gap-2">
+                                            <Label htmlFor="invite-email">
+                                                Email address
+                                            </Label>
+                                            <Input
+                                                id="invite-email"
+                                                type="email"
+                                                value={inviteEmail}
+                                                onChange={(e) =>
+                                                    setInviteEmail(
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                placeholder="teammate@example.com"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            <Label htmlFor="invite-role">
+                                                Role
+                                            </Label>
+                                            <Select
+                                                value={inviteRole}
+                                                onValueChange={setInviteRole}
+                                            >
+                                                <SelectTrigger id="invite-role">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="admin">
+                                                        Admin
+                                                    </SelectItem>
+                                                    <SelectItem value="manager">
+                                                        Manager
+                                                    </SelectItem>
+                                                    <SelectItem value="member">
+                                                        Member
+                                                    </SelectItem>
+                                                    <SelectItem value="viewer">
+                                                        Viewer
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="flex items-end">
+                                            <Button
+                                                type="button"
+                                                className="w-full gap-2"
+                                                onClick={handleSendInvitation}
+                                                disabled={!inviteEmail.trim()}
+                                            >
+                                                <Send className="size-4" />
+                                                Send invite
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        {invitations.map((invitation) => (
+                                            <div
+                                                key={invitation.id}
+                                                className="flex items-center gap-3 border-b py-3 last:border-0"
+                                            >
+                                                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-medium">
+                                                    <Mail className="size-4" />
+                                                </div>
+                                                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                                                    <span className="truncate text-sm font-medium">
+                                                        {invitation.email}
+                                                    </span>
+                                                    <span className="truncate text-xs text-muted-foreground">
+                                                        Invited by{' '}
+                                                        {
+                                                            invitation
+                                                                .invited_by.name
+                                                        }
+                                                    </span>
+                                                </div>
+                                                <Badge variant="secondary">
+                                                    {
+                                                        roleLabels[
+                                                            invitation.role
+                                                        ]
+                                                    }
+                                                </Badge>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="size-8 text-muted-foreground hover:text-destructive"
+                                                    onClick={() =>
+                                                        handleCancelInvitation(
+                                                            invitation.id,
+                                                        )
+                                                    }
+                                                >
+                                                    <X className="size-4" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                        {invitations.length === 0 && (
+                                            <p className="py-8 text-center text-sm text-muted-foreground">
+                                                No pending invitations.
+                                            </p>
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </TabsContent>
 
                         <TabsContent value="danger">
