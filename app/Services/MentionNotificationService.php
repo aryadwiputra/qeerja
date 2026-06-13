@@ -7,6 +7,7 @@ use App\Models\Notification;
 use App\Models\Task;
 use App\Models\TaskComment;
 use App\Models\User;
+use App\Notifications\TaskMentionedNotification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -48,6 +49,8 @@ class MentionNotificationService
                 $notification->id,
                 $task->id,
             );
+
+            $user->notify(new TaskMentionedNotification($task, $comment, $commenter));
         }
     }
 }

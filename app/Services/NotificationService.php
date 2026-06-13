@@ -9,6 +9,8 @@ use App\Models\Notification;
 use App\Models\Task;
 use App\Models\TaskComment;
 use App\Models\User;
+use App\Notifications\TaskAssignedNotification;
+use App\Notifications\TaskCommentedNotification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -38,6 +40,8 @@ class NotificationService
             $notification?->id,
             $task->id,
         );
+
+        $assignee->notify(new TaskAssignedNotification($task, $assignedBy));
     }
 
     /**
@@ -109,6 +113,8 @@ class NotificationService
                 $notification?->id,
                 $task->id,
             );
+
+            $recipient->notify(new TaskCommentedNotification($task, $comment, $commenter));
         }
     }
 
