@@ -15,9 +15,7 @@ class DashboardController extends Controller
         $user = $request->user();
 
         if ($user->workspaces()->count() === 0) {
-            Inertia::flash('toast', ['type' => 'info', 'message' => 'Create your first workspace to get started.']);
-
-            return to_route('workspaces.create');
+            return to_route('onboarding');
         }
 
         return Inertia::render('dashboard', [

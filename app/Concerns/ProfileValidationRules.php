@@ -18,6 +18,9 @@ trait ProfileValidationRules
         return [
             'name' => $this->nameRules(),
             'email' => $this->emailRules($userId),
+            'timezone' => ['nullable', 'string', 'max:100'],
+            'locale' => ['nullable', 'string', 'max:20'],
+            'avatar' => ['nullable', 'string', 'max:500'],
         ];
     }
 

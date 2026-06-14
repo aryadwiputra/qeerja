@@ -7,12 +7,12 @@ test('guests are redirected to the login page', function () {
     $response->assertRedirect(route('login'));
 });
 
-test('authenticated users without workspace are redirected to create workspace', function () {
+test('authenticated users without workspace are redirected to onboarding', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
     $this->get(route('dashboard'))
-        ->assertRedirect(route('workspaces.create'));
+        ->assertRedirect(route('onboarding'));
 });
 
 test('authenticated users with workspace can visit the dashboard', function () {

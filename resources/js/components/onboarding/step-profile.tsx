@@ -1,0 +1,191 @@
+import { Form, usePage } from '@inertiajs/react';
+import { Camera } from 'lucide-react';
+import { useRef, useState } from 'react';
+import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import type { Auth } from '@/types';
+
+const timezones = [
+    'Asia/Jakarta',
+    'Asia/Makassar',
+    'Asia/Jayapura',
+    'Asia/Singapore',
+    'Asia/Kuala_Lumpur',
+    'Asia/Bangkok',
+    'Asia/Ho_Chi_Minh',
+    'Asia/Manila',
+    'Asia/Tokyo',
+    'Asia/Seoul',
+    'Asia/Shanghai',
+    'Asia/Kolkata',
+    'Asia/Dubai',
+    'Europe/London',
+    'Europe/Paris',
+    'Europe/Berlin',
+    'America/New_York',
+    'America/Chicago',
+    'America/Denver',
+    'America/Los_Angeles',
+    'Pacific/Auckland',
+    'Australia/Sydney',
+];
+
+const locales = [
+    { value: 'id', label: 'Bahasa Indonesia' },
+    { value: 'en', label: 'English' },
+];
+
+interface StepProfileProps {
+    onSkip: () => void;
+    onDone: () => void;
+}
+
+export function StepProfile({ onSkip, onDone }: StepProfileProps) {
+    const { auth } = usePage<{ auth: Auth }>().props;
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatarPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Personalize your profile</CardTitle>
+                <CardDescription>
+                    Set your avatar, timezone, and language. You can skip this
+                    and update later.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form
+                    action={ProfileController.update.url()}
+                    method="patch"
+                    encType="multipart/form-data"
+                    className="flex flex-col gap-4"
+                    onSuccess={() => onDone()}
+                >
+                    {({ processing }) => (
+                        <>
+                            <div className="flex flex-col items-center gap-4">
+                                <button
+                                    type="button"
+                                    className="relative flex size-20 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-muted-foreground/30 transition-colors hover:border-muted-foreground/50"
+                                    onClick={() =>
+                                        fileInputRef.current?.click()
+                                    }
+                                >
+                                    {avatarPreview ? (
+                                        <img
+                                            src={avatarPreview}
+                                            alt="Avatar preview"
+                                            className="size-full object-cover"
+                                        />
+                                    ) : (
+                                        <Camera className="size-6 text-muted-foreground" />
+                                    )}
+                                </button>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    name="avatar_file"
+                                    accept="image/jpeg,image/png"
+                                    className="hidden"
+                                    onChange={handleAvatarChange}
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Click to upload avatar (JPG/PNG, max 2MB)
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="timezone">Timezone</Label>
+                                <Select
+                                    defaultValue={
+                                        auth.user.timezone ?? 'Asia/Jakarta'
+                                    }
+                                    name="timezone"
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select timezone" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {timezones.map((tz) => (
+                                            <SelectItem key={tz} value={tz}>
+                                                {tz.replace(/_/g, ' ')}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="locale">Language</Label>
+                                <Select
+                                    defaultValue={auth.user.locale ?? 'id'}
+                                    name="locale"
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select language" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {locales.map((loc) => (
+                                            <SelectItem
+                                                key={loc.value}
+                                                value={loc.value}
+                                            >
+                                                {loc.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={onSkip}
+                                    className="flex-1"
+                                >
+                                    Skip
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="flex-1"
+                                >
+                                    {processing ? 'Saving...' : 'Save profile'}
+                                </Button>
+                            </div>
+                        </>
+                    )}
+                </Form>
+            </CardContent>
+        </Card>
+    );
+}
