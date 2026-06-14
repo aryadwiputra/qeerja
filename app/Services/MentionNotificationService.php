@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Events\TaskUpdated;
 use App\Models\Notification;
+use App\Models\NotificationPreference;
 use App\Models\Task;
 use App\Models\TaskComment;
 use App\Models\User;
@@ -23,34 +24,38 @@ class MentionNotificationService
                 continue;
             }
 
-            $notification = Notification::create([
-                'id' => (string) Str::uuid(),
-                'user_id' => $user->id,
-                'type' => 'task.mentioned',
-                'title' => 'You were mentioned',
-                'body' => sprintf('%s mentioned you in %s.', $commenter->name, $task->code),
-                'data' => [
-                    'workspace_id' => $task->project->workspace_id,
-                    'project_id' => $task->project_id,
-                    'project_slug' => $task->project->slug,
-                    'task_id' => $task->id,
-                    'task_code' => $task->code,
-                    'comment_id' => $comment->id,
-                ],
-            ]);
+            if (NotificationPreference::isInAppEnabled($user, 'task.mentioned')) {
+                $notification = Notification::create([
+                    'id' => (string) Str::uuid(),
+                    'user_id' => $user->id,
+                    'type' => 'task.mentioned',
+                    'title' => 'You were mentioned',
+                    'body' => sprintf('%s mentioned you in %s.', $commenter->name, $task->code),
+                    'data' => [
+                        'workspace_id' => $task->project->workspace_id,
+                        'project_id' => $task->project_id,
+                        'project_slug' => $task->project->slug,
+                        'task_id' => $task->id,
+                        'task_code' => $task->code,
+                        'comment_id' => $comment->id,
+                    ],
+                ]);
 
-            TaskUpdated::dispatch(
-                $user->id,
-                'task.mentioned',
-                'You were mentioned',
-                sprintf('%s mentioned you in %s.', $commenter->name, $task->code),
-                $task->code,
-                $task->project->slug,
-                $notification->id,
-                $task->id,
-            );
+                TaskUpdated::dispatch(
+                    $user->id,
+                    'task.mentioned',
+                    'You were mentioned',
+                    sprintf('%s mentioned you in %s.', $commenter->name, $task->code),
+                    $task->code,
+                    $task->project->slug,
+                    $notification->id,
+                    $task->id,
+                );
+            }
 
-            $user->notify(new TaskMentionedNotification($task, $comment, $commenter));
+            if (NotificationPreference::isEmailEnabled($user, 'task.mentioned')) {
+                $user->notify(new TaskMentionedNotification($task, $comment, $commenter));
+            }
         }
     }
 }

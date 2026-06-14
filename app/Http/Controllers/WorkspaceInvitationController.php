@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWorkspaceInvitationRequest;
+use App\Models\NotificationPreference;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Models\WorkspaceInvitation;
@@ -40,8 +41,13 @@ class WorkspaceInvitationController extends Controller
             'expired_at' => now()->addDays(7),
         ]);
 
-        Notification::route('mail', $email)
-            ->notify(new WorkspaceInvitationNotification($invitation->load(['workspace', 'invitedBy'])));
+        if ($existingUser && NotificationPreference::isEmailEnabled($existingUser, 'workspace.invitation')) {
+            Notification::route('mail', $email)
+                ->notify(new WorkspaceInvitationNotification($invitation->load(['workspace', 'invitedBy'])));
+        } elseif (! $existingUser) {
+            Notification::route('mail', $email)
+                ->notify(new WorkspaceInvitationNotification($invitation->load(['workspace', 'invitedBy'])));
+        }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Invitation sent.']);
 

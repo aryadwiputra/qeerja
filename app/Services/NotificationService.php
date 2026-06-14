@@ -6,6 +6,7 @@ use App\Events\TaskAssigned;
 use App\Events\TaskCommented;
 use App\Events\TaskUpdated;
 use App\Models\Notification;
+use App\Models\NotificationPreference;
 use App\Models\Task;
 use App\Models\TaskComment;
 use App\Models\User;
@@ -24,24 +25,28 @@ class NotificationService
 
         $projectSlug = $task->project->slug;
 
-        $notification = $this->create($assignee, 'task.assigned', 'Task assigned', sprintf(
-            '%s assigned you to %s.',
-            $assignedBy->name,
-            $task->code,
-        ), $task);
+        if (NotificationPreference::isInAppEnabled($assignee, 'task.assigned')) {
+            $notification = $this->create($assignee, 'task.assigned', 'Task assigned', sprintf(
+                '%s assigned you to %s.',
+                $assignedBy->name,
+                $task->code,
+            ), $task);
 
-        TaskAssigned::dispatch(
-            $assignee->id,
-            'task.assigned',
-            'Task assigned',
-            sprintf('%s assigned you to %s.', $assignedBy->name, $task->code),
-            $task->code,
-            $projectSlug,
-            $notification?->id,
-            $task->id,
-        );
+            TaskAssigned::dispatch(
+                $assignee->id,
+                'task.assigned',
+                'Task assigned',
+                sprintf('%s assigned you to %s.', $assignedBy->name, $task->code),
+                $task->code,
+                $projectSlug,
+                $notification?->id,
+                $task->id,
+            );
+        }
 
-        $assignee->notify(new TaskAssignedNotification($task, $assignedBy));
+        if (NotificationPreference::isEmailEnabled($assignee, 'task.assigned')) {
+            $assignee->notify(new TaskAssignedNotification($task, $assignedBy));
+        }
     }
 
     /**
@@ -66,22 +71,24 @@ class NotificationService
                 continue;
             }
 
-            $notification = $this->create($watcher, 'task.updated', 'Task updated', sprintf(
-                '%s updated %s.',
-                $actor->name,
-                $task->code,
-            ), $task);
+            if (NotificationPreference::isInAppEnabled($watcher, 'task.updated')) {
+                $notification = $this->create($watcher, 'task.updated', 'Task updated', sprintf(
+                    '%s updated %s.',
+                    $actor->name,
+                    $task->code,
+                ), $task);
 
-            TaskUpdated::dispatch(
-                $watcher->id,
-                'task.updated',
-                'Task updated',
-                sprintf('%s updated %s.', $actor->name, $task->code),
-                $task->code,
-                $projectSlug,
-                $notification?->id,
-                $task->id,
-            );
+                TaskUpdated::dispatch(
+                    $watcher->id,
+                    'task.updated',
+                    'Task updated',
+                    sprintf('%s updated %s.', $actor->name, $task->code),
+                    $task->code,
+                    $projectSlug,
+                    $notification?->id,
+                    $task->id,
+                );
+            }
         }
     }
 
@@ -97,24 +104,28 @@ class NotificationService
         $projectSlug = $task->project->slug;
 
         foreach ($recipients as $recipient) {
-            $notification = $this->create($recipient, 'task.commented', 'New comment', sprintf(
-                '%s commented on %s.',
-                $commenter->name,
-                $task->code,
-            ), $task, ['comment_id' => $comment->id]);
+            if (NotificationPreference::isInAppEnabled($recipient, 'task.commented')) {
+                $notification = $this->create($recipient, 'task.commented', 'New comment', sprintf(
+                    '%s commented on %s.',
+                    $commenter->name,
+                    $task->code,
+                ), $task, ['comment_id' => $comment->id]);
 
-            TaskCommented::dispatch(
-                $recipient->id,
-                'task.commented',
-                'New comment',
-                sprintf('%s commented on %s.', $commenter->name, $task->code),
-                $task->code,
-                $projectSlug,
-                $notification?->id,
-                $task->id,
-            );
+                TaskCommented::dispatch(
+                    $recipient->id,
+                    'task.commented',
+                    'New comment',
+                    sprintf('%s commented on %s.', $commenter->name, $task->code),
+                    $task->code,
+                    $projectSlug,
+                    $notification?->id,
+                    $task->id,
+                );
+            }
 
-            $recipient->notify(new TaskCommentedNotification($task, $comment, $commenter));
+            if (NotificationPreference::isEmailEnabled($recipient, 'task.commented')) {
+                $recipient->notify(new TaskCommentedNotification($task, $comment, $commenter));
+            }
         }
     }
 
