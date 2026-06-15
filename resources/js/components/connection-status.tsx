@@ -1,7 +1,24 @@
 import { useConnectionStatus } from '@laravel/echo-react';
 import { Wifi, WifiOff } from 'lucide-react';
+import { useSyncExternalStore } from 'react';
+
+const emptySubscribe = () => () => {};
 
 export function ConnectionStatus() {
+    const isClient = useSyncExternalStore(
+        emptySubscribe,
+        () => true,
+        () => false,
+    );
+
+    if (!isClient) {
+        return null;
+    }
+
+    return <ConnectionStatusInner />;
+}
+
+function ConnectionStatusInner() {
     const status = useConnectionStatus();
 
     if (status === 'connected') {
