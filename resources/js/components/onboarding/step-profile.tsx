@@ -1,4 +1,4 @@
-import { Form, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { Camera } from 'lucide-react';
 import { useRef, useState } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
@@ -59,6 +59,7 @@ export function StepProfile({ onSkip, onDone }: StepProfileProps) {
     const { auth } = usePage<{ auth: Auth }>().props;
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const [processing, setProcessing] = useState(false);
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -72,6 +73,34 @@ export function StepProfile({ onSkip, onDone }: StepProfileProps) {
         }
     };
 
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setProcessing(true);
+
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(ProfileController.update.url(), {
+                method: 'PATCH',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': decodeURIComponent(
+                        document.cookie
+                            .match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? '',
+                    ),
+                },
+                body: formData,
+            });
+
+            if (response.ok) {
+                onDone();
+            }
+        } finally {
+            setProcessing(false);
+        }
+    };
+
     return (
         <Card>
             <CardHeader>
@@ -82,109 +111,101 @@ export function StepProfile({ onSkip, onDone }: StepProfileProps) {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <Form
-                    action={ProfileController.update.url()}
-                    method="patch"
+                <form
+                    onSubmit={handleSubmit}
                     encType="multipart/form-data"
                     className="flex flex-col gap-4"
-                    onSuccess={() => onDone()}
                 >
-                    {({ processing }) => (
-                        <>
-                            <div className="flex flex-col items-center gap-4">
-                                <button
-                                    type="button"
-                                    className="relative flex size-20 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-muted-foreground/30 transition-colors hover:border-muted-foreground/50"
-                                    onClick={() =>
-                                        fileInputRef.current?.click()
-                                    }
-                                >
-                                    {avatarPreview ? (
-                                        <img
-                                            src={avatarPreview}
-                                            alt="Avatar preview"
-                                            className="size-full object-cover"
-                                        />
-                                    ) : (
-                                        <Camera className="size-6 text-muted-foreground" />
-                                    )}
-                                </button>
-                                <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    name="avatar_file"
-                                    accept="image/jpeg,image/png"
-                                    className="hidden"
-                                    onChange={handleAvatarChange}
+                    <div className="flex flex-col items-center gap-4">
+                        <button
+                            type="button"
+                            className="relative flex size-20 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-muted-foreground/30 transition-colors hover:border-muted-foreground/50"
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                            {avatarPreview ? (
+                                <img
+                                    src={avatarPreview}
+                                    alt="Avatar preview"
+                                    className="size-full object-cover"
                                 />
-                                <p className="text-xs text-muted-foreground">
-                                    Click to upload avatar (JPG/PNG, max 2MB)
-                                </p>
-                            </div>
+                            ) : (
+                                <Camera className="size-6 text-muted-foreground" />
+                            )}
+                        </button>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            name="avatar_file"
+                            accept="image/jpeg,image/png"
+                            className="hidden"
+                            onChange={handleAvatarChange}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Click to upload avatar (JPG/PNG, max 2MB)
+                        </p>
+                    </div>
 
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="timezone">Timezone</Label>
-                                <Select
-                                    defaultValue={
-                                        auth.user.timezone ?? 'Asia/Jakarta'
-                                    }
-                                    name="timezone"
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select timezone" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {timezones.map((tz) => (
-                                            <SelectItem key={tz} value={tz}>
-                                                {tz.replace(/_/g, ' ')}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="timezone">Timezone</Label>
+                        <Select
+                            defaultValue={
+                                auth.user.timezone ?? 'Asia/Jakarta'
+                            }
+                            name="timezone"
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select timezone" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {timezones.map((tz) => (
+                                    <SelectItem key={tz} value={tz}>
+                                        {tz.replace(/_/g, ' ')}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
 
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="locale">Language</Label>
-                                <Select
-                                    defaultValue={auth.user.locale ?? 'id'}
-                                    name="locale"
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select language" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {locales.map((loc) => (
-                                            <SelectItem
-                                                key={loc.value}
-                                                value={loc.value}
-                                            >
-                                                {loc.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="locale">Language</Label>
+                        <Select
+                            defaultValue={auth.user.locale ?? 'id'}
+                            name="locale"
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select language" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {locales.map((loc) => (
+                                    <SelectItem
+                                        key={loc.value}
+                                        value={loc.value}
+                                    >
+                                        {loc.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
 
-                            <div className="flex gap-3">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={onSkip}
-                                    className="flex-1"
-                                >
-                                    Skip
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="flex-1"
-                                >
-                                    {processing ? 'Saving...' : 'Save profile'}
-                                </Button>
-                            </div>
-                        </>
-                    )}
-                </Form>
+                    <div className="flex gap-3">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={onSkip}
+                            className="flex-1"
+                        >
+                            Skip
+                        </Button>
+                        <Button
+                            type="submit"
+                            disabled={processing}
+                            className="flex-1"
+                        >
+                            {processing ? 'Saving...' : 'Save profile'}
+                        </Button>
+                    </div>
+                </form>
             </CardContent>
         </Card>
     );

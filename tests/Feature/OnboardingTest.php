@@ -38,3 +38,19 @@ test('onboarding page renders with correct props', function () {
         ->has('currentWorkspace')
     );
 });
+
+test('authenticated users with workspace can visit onboarding when onboarding_workspace_id exists', function () {
+    $user = User::factory()->create();
+    $workspace = createWorkspaceMember($user, 'owner');
+
+    $response = $this->actingAs($user)
+        ->withSession(['onboarding_workspace_id' => $workspace->id])
+        ->get(route('onboarding'));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('onboarding/index')
+        ->where('hasWorkspace', true)
+        ->where('currentWorkspace.slug', $workspace->slug)
+    );
+});

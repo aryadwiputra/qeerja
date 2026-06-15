@@ -33,20 +33,13 @@ export function StepWorkspace({ onCreated }: StepWorkspaceProps) {
                     method="post"
                     className="flex flex-col gap-4"
                     onSuccess={(page) => {
-                        const workspace = (
-                            page.props as Record<string, unknown>
-                        ).flash as
-                            | {
-                                  workspace?: {
-                                      id: number;
-                                      name: string;
-                                      slug: string;
-                                  };
-                              }
+                        const wp = (page.props as Record<string, unknown>)
+                            .currentWorkspace as
+                            | { id: number; name: string; slug: string }
                             | undefined;
 
-                        if (workspace?.workspace) {
-                            onCreated(workspace.workspace);
+                        if (wp) {
+                            onCreated(wp);
                         } else {
                             window.location.reload();
                         }

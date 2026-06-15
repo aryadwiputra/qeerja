@@ -1,4 +1,3 @@
-import { router } from '@inertiajs/react';
 import { Plus, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -55,10 +54,23 @@ export function StepInvite({ workspaceSlug, onSkip, onDone }: StepInviteProps) {
         setSending(true);
 
         for (const invite of invites) {
-            router.post(
+            await fetch(
                 invitationStore.url({ workspace: workspaceSlug }),
-                { email: invite.email, role: invite.role },
-                { preserveScroll: true },
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-XSRF-TOKEN': decodeURIComponent(
+                            document.cookie
+                                .match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? '',
+                        ),
+                    },
+                    body: JSON.stringify({
+                        email: invite.email,
+                        role: invite.role,
+                    }),
+                },
             );
         }
 

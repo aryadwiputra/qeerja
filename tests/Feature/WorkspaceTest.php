@@ -11,7 +11,7 @@ test('authenticated users can create a workspace and become owner', function () 
             'slug' => 'engineering',
             'description' => 'Product engineering workspace.',
         ])
-        ->assertRedirect(route('workspaces.settings', 'engineering'));
+        ->assertRedirect(route('onboarding'));
 
     $workspace = $user->workspaces()->where('slug', 'engineering')->first();
 

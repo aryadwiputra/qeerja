@@ -65,9 +65,16 @@ class WorkspaceController extends Controller
 
         session()->put('current_workspace_id', $workspace->id);
 
+        Inertia::flash('workspace', [
+            'id' => $workspace->id,
+            'name' => $workspace->name,
+            'slug' => $workspace->slug,
+        ]);
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Workspace created.']);
 
-        return to_route('workspaces.settings', $workspace);
+        session()->put('onboarding_workspace_id', $workspace->id);
+
+        return to_route('onboarding');
     }
 
     public function show(Workspace $workspace): Response
