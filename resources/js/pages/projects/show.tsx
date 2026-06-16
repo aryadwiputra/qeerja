@@ -59,6 +59,7 @@ import {
     show as sprintShow,
 } from '@/routes/projects/sprints';
 import { update as taskUpdate } from '@/routes/projects/tasks';
+import { index as workloadIndex } from '@/routes/projects/workload';
 
 interface Member {
     id: number;
@@ -891,6 +892,19 @@ export default function ProjectShow({
                             Components
                         </TabsTrigger>
                         <TabsTrigger value="timeline">Timeline</TabsTrigger>
+                        <TabsTrigger
+                            value="workload"
+                            onClick={() =>
+                                router.visit(
+                                    workloadIndex.url({
+                                        workspace: workspace.slug,
+                                        project: project.slug,
+                                    }),
+                                )
+                            }
+                        >
+                            Workload
+                        </TabsTrigger>
                         <TabsTrigger value="files">Files</TabsTrigger>
                         <TabsTrigger value="reports">Reports</TabsTrigger>
                         <TabsTrigger value="activity">Activity</TabsTrigger>

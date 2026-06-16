@@ -31,6 +31,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskRelationController;
 use App\Http\Controllers\TaskSearchController;
 use App\Http\Controllers\TaskTypeController;
+use App\Http\Controllers\WorkloadController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\WorkspaceInvitationController;
 use App\Http\Controllers\WorkspaceMemberController;
@@ -123,6 +124,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/sla-policies', [SlaPolicyController::class, 'store'])->name('projects.sla-policies.store');
         Route::put('/workspaces/{workspace:slug}/projects/{project:slug}/sla-policies/{slaPolicy}', [SlaPolicyController::class, 'update'])->name('projects.sla-policies.update');
         Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/sla-policies/{slaPolicy}', [SlaPolicyController::class, 'destroy'])->name('projects.sla-policies.destroy');
+
+        Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/workload', [WorkloadController::class, 'index'])->name('projects.workload.index');
+        Route::put('/workspaces/{workspace:slug}/projects/{project:slug}/workload/capacity', [WorkloadController::class, 'updateCapacity'])->name('projects.workload.update-capacity');
 
         Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/epics', [EpicController::class, 'index'])->name('projects.epics.index');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/epics', [EpicController::class, 'store'])->name('projects.epics.store');
