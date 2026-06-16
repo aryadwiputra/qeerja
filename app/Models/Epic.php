@@ -39,4 +39,9 @@ class Epic extends Model
     {
         return $this->belongsToMany(Task::class, 'epic_tasks');
     }
+
+    public function goals(): BelongsToMany
+    {
+        return $this->belongsToMany(Goal::class, 'epic_goals');
+    }
 }

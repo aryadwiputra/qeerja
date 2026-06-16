@@ -61,6 +61,11 @@ class Workspace extends Model
         return $this->hasMany(Priority::class);
     }
 
+    public function goals(): HasMany
+    {
+        return $this->hasMany(Goal::class);
+    }
+
     public function settings(): HasMany
     {
         return $this->hasMany(WorkspaceSetting::class);

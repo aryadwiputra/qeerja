@@ -11,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EpicController;
 use App\Http\Controllers\GitHubAuthController;
 use App\Http\Controllers\GitHubWebhookController;
+use App\Http\Controllers\GoalController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\MyTasksController;
 use App\Http\Controllers\NotificationController;
@@ -87,6 +88,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/workspaces/{workspace:slug}/cross-project/timeline', [CrossProjectController::class, 'timeline'])->name('workspaces.cross-project.timeline');
         Route::get('/workspaces/{workspace:slug}/cross-project/board', [CrossProjectController::class, 'board'])->name('workspaces.cross-project.board');
+
+        Route::get('/workspaces/{workspace:slug}/goals', [GoalController::class, 'index'])->name('workspaces.goals.index');
+        Route::post('/workspaces/{workspace:slug}/goals', [GoalController::class, 'store'])->name('workspaces.goals.store');
+        Route::get('/workspaces/{workspace:slug}/goals/{goal}', [GoalController::class, 'show'])->name('workspaces.goals.show');
+        Route::put('/workspaces/{workspace:slug}/goals/{goal}', [GoalController::class, 'update'])->name('workspaces.goals.update');
+        Route::delete('/workspaces/{workspace:slug}/goals/{goal}', [GoalController::class, 'destroy'])->name('workspaces.goals.destroy');
+        Route::post('/workspaces/{workspace:slug}/goals/{goal}/key-results', [GoalController::class, 'storeKeyResult'])->name('workspaces.goals.key-results.store');
+        Route::put('/workspaces/{workspace:slug}/goals/{goal}/key-results/{keyResult}', [GoalController::class, 'updateKeyResult'])->name('workspaces.goals.key-results.update');
+        Route::delete('/workspaces/{workspace:slug}/goals/{goal}/key-results/{keyResult}', [GoalController::class, 'destroyKeyResult'])->name('workspaces.goals.key-results.destroy');
+        Route::post('/workspaces/{workspace:slug}/goals/{goal}/epics', [GoalController::class, 'addEpic'])->name('workspaces.goals.epics.store');
+        Route::delete('/workspaces/{workspace:slug}/goals/{goal}/epics/{epic}', [GoalController::class, 'removeEpic'])->name('workspaces.goals.epics.destroy');
 
         Route::post('/workspaces/{workspace:slug}/task-types', [TaskTypeController::class, 'store'])->name('workspaces.task-types.store');
         Route::put('/workspaces/{workspace:slug}/task-types/{taskType}', [TaskTypeController::class, 'update'])->name('workspaces.task-types.update');
