@@ -140,4 +140,9 @@ class Task extends Model
     {
         return $this->hasMany(TaskRelation::class, 'related_task_id');
     }
+
+    public function components(): BelongsToMany
+    {
+        return $this->belongsToMany(Component::class, 'component_task');
+    }
 }

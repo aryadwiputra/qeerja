@@ -5,6 +5,7 @@ use App\Http\Controllers\BacklogController;
 use App\Http\Controllers\BoardColumnController;
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\CommentTypingController;
+use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EpicController;
 use App\Http\Controllers\GitHubAuthController;
@@ -109,6 +110,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/labels/{label}', [LabelController::class, 'show'])->name('projects.labels.show');
         Route::put('/workspaces/{workspace:slug}/projects/{project:slug}/labels/{label}', [LabelController::class, 'update'])->name('projects.labels.update');
         Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/labels/{label}', [LabelController::class, 'destroy'])->name('projects.labels.destroy');
+
+        Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/components', [ComponentController::class, 'index'])->name('projects.components.index');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/components', [ComponentController::class, 'store'])->name('projects.components.store');
+        Route::put('/workspaces/{workspace:slug}/projects/{project:slug}/components/{component}', [ComponentController::class, 'update'])->name('projects.components.update');
+        Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/components/{component}', [ComponentController::class, 'destroy'])->name('projects.components.destroy');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/components/{component}/add-task', [ComponentController::class, 'addTask'])->name('projects.components.add-task');
+        Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/components/{component}/remove-task', [ComponentController::class, 'removeTask'])->name('projects.components.remove-task');
 
         Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/epics', [EpicController::class, 'index'])->name('projects.epics.index');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/epics', [EpicController::class, 'store'])->name('projects.epics.store');

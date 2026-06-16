@@ -47,6 +47,7 @@ import {
 } from '@/routes/projects';
 import { index as activityIndex } from '@/routes/projects/activity';
 import { index as backlogShow } from '@/routes/projects/backlog';
+import { index as componentIndex } from '@/routes/projects/components';
 import {
     destroy as destroyEpic,
     show as epicShow,
@@ -876,6 +877,19 @@ export default function ProjectShow({
                             Releases
                         </TabsTrigger>
                         <TabsTrigger value="labels">Labels</TabsTrigger>
+                        <TabsTrigger
+                            value="components"
+                            onClick={() =>
+                                router.visit(
+                                    componentIndex.url({
+                                        workspace: workspace.slug,
+                                        project: project.slug,
+                                    }),
+                                )
+                            }
+                        >
+                            Components
+                        </TabsTrigger>
                         <TabsTrigger value="timeline">Timeline</TabsTrigger>
                         <TabsTrigger value="files">Files</TabsTrigger>
                         <TabsTrigger value="reports">Reports</TabsTrigger>
