@@ -15,8 +15,20 @@ class SetPermissionsTeamId
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user() && $request->session()->has('current_workspace_id')) {
-            setPermissionsTeamId($request->session()->get('current_workspace_id'));
+        if ($request->user()) {
+            $workspaceId = $request->session()->get('current_workspace_id');
+
+            if (! $workspaceId) {
+                $workspaceId = $request->user()->workspaces()->first()?->id;
+
+                if ($workspaceId) {
+                    $request->session()->put('current_workspace_id', $workspaceId);
+                }
+            }
+
+            if ($workspaceId) {
+                setPermissionsTeamId($workspaceId);
+            }
         }
 
         return $next($request);
