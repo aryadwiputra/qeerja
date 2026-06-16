@@ -26,6 +26,7 @@ class StoreSprintRequest extends FormRequest
             'name' => ['required', 'string', 'max:150'],
             'goal' => ['nullable', 'string'],
             'status' => ['nullable', Rule::in(['planned', 'active', 'completed', 'cancelled'])],
+            'is_backlog' => ['nullable', 'boolean'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
         ];

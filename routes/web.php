@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\BacklogController;
 use App\Http\Controllers\BoardColumnController;
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\CommentTypingController;
@@ -11,11 +12,14 @@ use App\Http\Controllers\GitHubWebhookController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\MyTasksController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PriorityController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\ProjectSettingController;
+use App\Http\Controllers\ReleaseController;
 use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\SavedFilterController;
 use App\Http\Controllers\SprintController;
 use App\Http\Controllers\TaskAttachmentController;
 use App\Http\Controllers\TaskAttachmentPreviewController;
@@ -37,7 +41,7 @@ Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
-    Route::get('/onboarding', [\App\Http\Controllers\OnboardingController::class, 'show'])->name('onboarding');
+    Route::get('/onboarding', [OnboardingController::class, 'show'])->name('onboarding');
     Route::get('/my-tasks', [MyTasksController::class, 'index'])->name('my-tasks.index');
     Route::get('/tasks/search', [TaskSearchController::class, 'index'])->name('tasks.search');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('my-notifications.index');
@@ -122,9 +126,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/sprints/{sprint}/add-task', [SprintController::class, 'addTask'])->name('projects.sprints.add-task');
         Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/sprints/{sprint}/remove-task', [SprintController::class, 'removeTask'])->name('projects.sprints.remove-task');
 
+        Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/backlog', [BacklogController::class, 'index'])->name('projects.backlog.index');
+        Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/backlog/json', [BacklogController::class, 'indexJson'])->name('projects.backlog.index-json');
+        Route::put('/workspaces/{workspace:slug}/projects/{project:slug}/backlog/reorder', [BacklogController::class, 'reorder'])->name('projects.backlog.reorder');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/backlog/{sprint}/add-task', [BacklogController::class, 'addToSprint'])->name('projects.backlog.add-to-sprint');
+
         Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/activity', [ActivityLogController::class, 'index'])->name('projects.activity.index');
 
         Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/reports', [ReportsController::class, 'index'])->name('projects.reports.index');
+
+        Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/saved-filters', [SavedFilterController::class, 'index'])->name('projects.saved-filters.index');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/saved-filters', [SavedFilterController::class, 'store'])->name('projects.saved-filters.store');
+        Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/saved-filters/{savedFilter}', [SavedFilterController::class, 'destroy'])->name('projects.saved-filters.destroy');
+
+        Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/releases', [ReleaseController::class, 'index'])->name('projects.releases.index');
+        Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/releases/json', [ReleaseController::class, 'indexJson'])->name('projects.releases.index-json');
+        Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/releases/{release}', [ReleaseController::class, 'show'])->name('projects.releases.show');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/releases', [ReleaseController::class, 'store'])->name('projects.releases.store');
+        Route::put('/workspaces/{workspace:slug}/projects/{project:slug}/releases/{release}', [ReleaseController::class, 'update'])->name('projects.releases.update');
+        Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/releases/{release}', [ReleaseController::class, 'destroy'])->name('projects.releases.destroy');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/releases/{release}/add-task', [ReleaseController::class, 'addTask'])->name('projects.releases.add-task');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/releases/{release}/remove-task', [ReleaseController::class, 'removeTask'])->name('projects.releases.remove-task');
 
         Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/board', [BoardController::class, 'show'])->name('projects.board');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/boards', [BoardController::class, 'store'])->name('projects.boards.store');
