@@ -20,7 +20,7 @@ import {
     Settings,
     Upload,
 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CalendarView } from '@/components/calendar-view';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EpicDialog } from '@/components/epic-dialog';
@@ -57,6 +57,7 @@ import {
     destroy as destroySprint,
     show as sprintShow,
 } from '@/routes/projects/sprints';
+import { update as taskUpdate } from '@/routes/projects/tasks';
 
 interface Member {
     id: number;
@@ -309,6 +310,11 @@ export default function ProjectShow({
     const [timelineView, setTimelineView] = useState<'gantt' | 'calendar'>(
         'gantt',
     );
+    const [editingCell, setEditingCell] = useState<{
+        taskId: number;
+        field: string;
+    } | null>(null);
+    const editRef = useRef<HTMLDivElement>(null);
 
     useKeyboardShortcuts([
         {
@@ -341,6 +347,56 @@ export default function ProjectShow({
             description: 'Go to settings',
         },
     ]);
+
+    const updateTaskField = useCallback(
+        (taskId: number, field: string, value: unknown) => {
+            setLocalTasks((prev) =>
+                prev.map((t) => (t.id === taskId ? { ...t, [field]: value } : t)),
+            );
+
+            const url = taskUpdate.url({
+                workspace: workspace.slug,
+                project: project.slug,
+                task: taskId,
+            });
+
+            fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': decodeURIComponent(
+                        document.cookie
+                            .split('; ')
+                            .find((c) => c.startsWith('XSRF-TOKEN='))
+                            ?.split('=')[1] ?? '',
+                    ),
+                },
+                body: JSON.stringify({ [field]: value }),
+            }).catch(() => {
+                setLocalTasks(tasks);
+            });
+
+            setEditingCell(null);
+        },
+        [workspace.slug, project.slug, tasks],
+    );
+
+    useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (
+                editingCell &&
+                editRef.current &&
+                !editRef.current.contains(e.target as Node)
+            ) {
+                setEditingCell(null);
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [editingCell]);
 
     const filteredTasks = useMemo(
         () =>
@@ -387,56 +443,266 @@ export default function ProjectShow({
             {
                 accessorKey: 'board_column.name',
                 header: 'Status',
-                cell: ({ row }) => (
-                    <Badge variant="outline">
-                        {row.original.board_column.name}
-                    </Badge>
-                ),
+                cell: ({ row }) => {
+                    const task = row.original;
+                    const isEditing =
+                        editingCell?.taskId === task.id &&
+                        editingCell.field === 'board_column_id';
+
+                    if (isEditing) {
+                        return (
+                            <div ref={editRef}>
+                                <select
+                                    autoFocus
+                                    className="h-7 w-full rounded border bg-background px-1 text-sm"
+                                    defaultValue={String(task.board_column.id)}
+                                    onChange={(e) => {
+                                        const colId = Number(e.target.value);
+                                        const col = boardColumns.find(
+                                            (c) => c.id === colId,
+                                        );
+
+                                        if (col) {
+                                            updateTaskField(
+                                                task.id,
+                                                'board_column_id',
+                                                colId,
+                                            );
+                                        }
+                                    }}
+                                    onBlur={() => setEditingCell(null)}
+                                >
+                                    {boardColumns.map((col) => (
+                                        <option key={col.id} value={col.id}>
+                                            {col.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <Badge
+                            variant="outline"
+                            className="cursor-pointer hover:bg-muted"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingCell({
+                                    taskId: task.id,
+                                    field: 'board_column_id',
+                                });
+                            }}
+                        >
+                            {task.board_column.name}
+                        </Badge>
+                    );
+                },
             },
             {
                 accessorKey: 'priority.name',
                 header: 'Priority',
-                cell: ({ row }) =>
-                    row.original.priority ? (
-                        <Badge variant="secondary">
-                            {row.original.priority.name}
+                cell: ({ row }) => {
+                    const task = row.original;
+                    const isEditing =
+                        editingCell?.taskId === task.id &&
+                        editingCell.field === 'priority_id';
+
+                    if (isEditing) {
+                        return (
+                            <div ref={editRef}>
+                                <select
+                                    autoFocus
+                                    className="h-7 w-full rounded border bg-background px-1 text-sm"
+                                    defaultValue={String(
+                                        task.priority?.id ?? '',
+                                    )}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        updateTaskField(
+                                            task.id,
+                                            'priority_id',
+                                            val ? Number(val) : null,
+                                        );
+                                    }}
+                                    onBlur={() => setEditingCell(null)}
+                                >
+                                    <option value="">None</option>
+                                    {priorities.map((p) => (
+                                        <option key={p.id} value={p.id}>
+                                            {p.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        );
+                    }
+
+                    return task.priority ? (
+                        <Badge
+                            variant="secondary"
+                            className="cursor-pointer hover:bg-muted"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingCell({
+                                    taskId: task.id,
+                                    field: 'priority_id',
+                                });
+                            }}
+                        >
+                            {task.priority.name}
                         </Badge>
                     ) : (
-                        <span className="text-sm text-muted-foreground">
+                        <span
+                            className="cursor-pointer text-sm text-muted-foreground hover:text-foreground"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingCell({
+                                    taskId: task.id,
+                                    field: 'priority_id',
+                                });
+                            }}
+                        >
                             None
                         </span>
-                    ),
+                    );
+                },
             },
             {
                 accessorKey: 'assignees',
                 header: 'Assignees',
-                cell: ({ row }) =>
-                    row.original.assignees.length > 0 ? (
-                        <div className="flex flex-wrap gap-1">
-                            {row.original.assignees.map((assignee) => (
-                                <Badge
-                                    key={assignee.id}
-                                    variant="secondary"
-                                    className="text-xs"
+                cell: ({ row }) => {
+                    const task = row.original;
+                    const isEditing =
+                        editingCell?.taskId === task.id &&
+                        editingCell.field === 'assignee_ids';
+
+                    if (isEditing) {
+                        const currentIds = task.assignees.map((a) => a.id);
+
+                        return (
+                            <div ref={editRef} className="min-w-[180px]">
+                                <select
+                                    autoFocus
+                                    multiple
+                                    className="h-16 w-full rounded border bg-background px-1 text-sm"
+                                    defaultValue={currentIds.map(String)}
+                                    onChange={(e) => {
+                                        const selected = Array.from(
+                                            e.target.selectedOptions,
+                                            (opt) => Number(opt.value),
+                                        );
+                                        updateTaskField(
+                                            task.id,
+                                            'assignee_ids',
+                                            selected,
+                                        );
+                                    }}
+                                    onBlur={() => setEditingCell(null)}
                                 >
-                                    {assignee.name}
-                                </Badge>
-                            ))}
+                                    {members.map((m) => (
+                                        <option key={m.id} value={m.id}>
+                                            {m.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <div
+                            className="cursor-pointer"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingCell({
+                                    taskId: task.id,
+                                    field: 'assignee_ids',
+                                });
+                            }}
+                        >
+                            {task.assignees.length > 0 ? (
+                                <div className="flex flex-wrap gap-1">
+                                    {task.assignees.map((assignee) => (
+                                        <Badge
+                                            key={assignee.id}
+                                            variant="secondary"
+                                            className="text-xs"
+                                        >
+                                            {assignee.name}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            ) : (
+                                <span className="text-sm text-muted-foreground hover:text-foreground">
+                                    Unassigned
+                                </span>
+                            )}
                         </div>
-                    ) : (
-                        <span className="text-sm text-muted-foreground">
-                            Unassigned
-                        </span>
-                    ),
+                    );
+                },
                 enableSorting: false,
             },
             {
                 accessorKey: 'due_date',
                 header: 'Due',
-                cell: ({ row }) => formatDate(row.original.due_date),
+                cell: ({ row }) => {
+                    const task = row.original;
+                    const isEditing =
+                        editingCell?.taskId === task.id &&
+                        editingCell.field === 'due_date';
+
+                    if (isEditing) {
+                        return (
+                            <div ref={editRef}>
+                                <input
+                                    autoFocus
+                                    type="date"
+                                    className="h-7 w-full rounded border bg-background px-1 text-sm"
+                                    defaultValue={
+                                        task.due_date
+                                            ? new Date(task.due_date)
+                                                  .toISOString()
+                                                  .split('T')[0]
+                                            : ''
+                                    }
+                                    onChange={(e) => {
+                                        updateTaskField(
+                                            task.id,
+                                            'due_date',
+                                            e.target.value || null,
+                                        );
+                                    }}
+                                    onBlur={() => setEditingCell(null)}
+                                />
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <span
+                            className="cursor-pointer text-sm hover:text-foreground"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingCell({
+                                    taskId: task.id,
+                                    field: 'due_date',
+                                });
+                            }}
+                        >
+                            {formatDate(task.due_date)}
+                        </span>
+                    );
+                },
             },
         ],
-        [],
+        [
+            editingCell,
+            boardColumns,
+            priorities,
+            members,
+            updateTaskField,
+        ],
     );
 
     // eslint-disable-next-line react-hooks/incompatible-library

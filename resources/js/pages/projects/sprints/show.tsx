@@ -245,6 +245,7 @@ export default function SprintShow({
                                         if (!confirm('Complete this sprint?')) {
                                             return;
                                         }
+
                                         router.post(
                                             sprintClose({
                                                 workspace: workspace.slug,

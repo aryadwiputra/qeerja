@@ -359,8 +359,9 @@ function BurndownChart({ data }: { data: BurndownPoint[] }) {
                 strokeWidth={2}
             />
 
-            {data.filter((_, i) => i % labelStep === 0).map((d, i) => {
+            {data.filter((_, i) => i % labelStep === 0).map((d) => {
                 const idx = data.indexOf(d);
+
                 return (
                     <text
                         key={d.date}
