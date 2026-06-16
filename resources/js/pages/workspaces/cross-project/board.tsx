@@ -3,7 +3,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { show as workspaceShow } from '@/routes/workspaces';
 
 interface Column {
@@ -11,7 +11,13 @@ interface Column {
     name: string;
     status_key: string;
     color: string | null;
-    project: { id: number; name: string; key: string; slug: string; color: string | null };
+    project: {
+        id: number;
+        name: string;
+        key: string;
+        slug: string;
+        color: string | null;
+    };
 }
 
 interface TaskData {
@@ -20,11 +26,27 @@ interface TaskData {
     title: string;
     status: string;
     story_points: number | null;
-    priority: { id: number; name: string; key: string; color: string | null } | null;
-    board_column: { id: number; name: string; status_key: string; color: string | null };
+    priority: {
+        id: number;
+        name: string;
+        key: string;
+        color: string | null;
+    } | null;
+    board_column: {
+        id: number;
+        name: string;
+        status_key: string;
+        color: string | null;
+    };
     assignees: Array<{ id: number; name: string; avatar: string | null }>;
     epics: Array<{ id: number; name: string; color: string | null }>;
-    project: { id: number; name: string; key: string; slug: string; color: string | null };
+    project: {
+        id: number;
+        name: string;
+        key: string;
+        slug: string;
+        color: string | null;
+    };
 }
 
 interface Project {
@@ -201,17 +223,15 @@ export default function CrossProjectBoard({
                                                                 }
                                                             </span>
                                                         )}
-                                                        {task.assignees
-                                                            .length > 0 && (
+                                                        {task.assignees.length >
+                                                            0 && (
                                                             <span className="ml-auto text-[10px] text-muted-foreground">
                                                                 {task.assignees
                                                                     .map(
                                                                         (a) =>
                                                                             a.name,
                                                                     )
-                                                                    .join(
-                                                                        ', ',
-                                                                    )}
+                                                                    .join(', ')}
                                                             </span>
                                                         )}
                                                     </div>

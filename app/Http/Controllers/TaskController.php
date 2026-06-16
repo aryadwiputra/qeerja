@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateTaskRequest;
 use App\Models\BoardColumn;
 use App\Models\Project;
 use App\Models\Task;
+use App\Models\TaskActivity;
 use App\Models\Workspace;
 use App\Services\NotificationService;
 use App\Services\TaskActivityService;
@@ -180,10 +181,12 @@ class TaskController extends Controller
                 'children' => $children,
                 'parent' => $task->parent?->only('id', 'code', 'title'),
                 'relations' => $relations,
+                'github_branch' => $task->github_branch,
             ],
             'comments' => $comments,
             'attachments' => $attachments,
             'activities' => $activities,
+            'has_github_integration' => $project->integration()->where('provider', 'github')->exists(),
             'options' => [
                 'assignees' => $projectMembers,
                 'labels' => $project->labels()->orderBy('name')->get(['id', 'name', 'slug', 'color']),
@@ -450,5 +453,63 @@ class TaskController extends Controller
         ))->toOthers();
 
         return back(303);
+    }
+
+    public function createBranch(Workspace $workspace, Project $project, Task $task): JsonResponse
+    {
+        Gate::authorize('update', $task);
+
+        $integration = $project->integration()->where('provider', 'github')->first();
+
+        if (! $integration) {
+            return response()->json(['error' => 'GitHub integration not connected.'], 422);
+        }
+
+        try {
+            $github = $integration->githubApi();
+            $repo = $integration->metadata['repo'] ?? $project->metadata['github_repo'] ?? null;
+
+            if (! $repo) {
+                return response()->json(['error' => 'GitHub repository not configured.'], 422);
+            }
+
+            // Get default branch
+            $repoResponse = $github->get("repos/{$repo}");
+            $repoData = json_decode($repoResponse->getBody()->getContents(), true);
+            $defaultBranch = $repoData['default_branch'] ?? 'main';
+
+            // Create branch
+            $branchName = $task->github_branch;
+
+            // Get HEAD SHA of default branch
+            $headRef = $github->get("repos/{$repo}/git/ref/heads/{$defaultBranch}");
+            $headData = json_decode($headRef->getBody()->getContents(), true);
+            $sha = $headData['object']['sha'];
+
+            // Create new ref
+            $github->post("repos/{$repo}/git/refs", [
+                'json' => [
+                    'ref' => "refs/heads/{$branchName}",
+                    'sha' => $sha,
+                ],
+            ]);
+
+            // Log activity
+            TaskActivity::create([
+                'task_id' => $task->id,
+                'user_id' => request()->user()->id,
+                'action' => 'github_branch_created',
+                'field_name' => 'github',
+                'new_value' => $branchName,
+                'metadata' => ['repository' => $repo, 'branch' => $branchName],
+            ]);
+
+            return response()->json([
+                'branch' => $branchName,
+                'url' => "https://github.com/{$repo}/tree/{$branchName}",
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create branch: '.$e->getMessage()], 500);
+        }
     }
 }

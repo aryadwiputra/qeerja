@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Task extends Model
 {
@@ -146,5 +147,12 @@ class Task extends Model
     public function components(): BelongsToMany
     {
         return $this->belongsToMany(Component::class, 'component_task');
+    }
+
+    public function getGithubBranchAttribute(): string
+    {
+        $slug = Str::slug($this->title);
+
+        return strtolower($this->code.'-'.$slug);
     }
 }

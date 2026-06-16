@@ -23,11 +23,27 @@ interface TaskData {
     start_date: string;
     due_date: string;
     completed_at: string | null;
-    priority: { id: number; name: string; key: string; color: string | null } | null;
-    board_column: { id: number; name: string; status_key: string; color: string | null };
+    priority: {
+        id: number;
+        name: string;
+        key: string;
+        color: string | null;
+    } | null;
+    board_column: {
+        id: number;
+        name: string;
+        status_key: string;
+        color: string | null;
+    };
     assignees: Array<{ id: number; name: string; avatar: string | null }>;
     epics: Array<{ id: number; name: string; color: string | null }>;
-    project: { id: number; name: string; key: string; slug: string; color: string | null };
+    project: {
+        id: number;
+        name: string;
+        key: string;
+        slug: string;
+        color: string | null;
+    };
 }
 
 interface Workspace {
@@ -49,6 +65,7 @@ export default function CrossProjectTimeline({
 }: Props) {
     const handleTaskClick = (id: number) => {
         const task = tasks.find((t) => t.id === id);
+
         if (task) {
             window.open(
                 `/workspaces/${workspace.slug}/projects/${task.project.slug}/tasks/${task.id}`,
@@ -124,8 +141,8 @@ export default function CrossProjectTimeline({
                                 No scheduled tasks
                             </p>
                             <p className="text-sm text-muted-foreground">
-                                Tasks with start and due dates will appear on the
-                                timeline.
+                                Tasks with start and due dates will appear on
+                                the timeline.
                             </p>
                         </div>
                     )}

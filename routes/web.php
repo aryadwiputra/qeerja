@@ -191,6 +191,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}', [TaskController::class, 'update'])->name('projects.tasks.update');
         Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}', [TaskController::class, 'destroy'])->name('projects.tasks.destroy');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/move', [TaskController::class, 'moveColumn'])->name('projects.tasks.move');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/create-branch', [TaskController::class, 'createBranch'])->name('projects.tasks.create-branch');
 
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/comments', [TaskCommentController::class, 'store'])->name('projects.tasks.comments.store');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/comments/typing', [CommentTypingController::class, 'ping'])->name('projects.tasks.comments.typing');
