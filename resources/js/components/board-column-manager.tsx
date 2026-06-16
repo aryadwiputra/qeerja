@@ -17,6 +17,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { update as boardUpdate } from '@/routes/projects/boards';
 import {
     store as columnStore,
     update as columnUpdate,
@@ -30,12 +31,14 @@ interface ColumnData {
     color: string | null;
     position: number;
     is_done_column: boolean;
+    wip_limit: number | null;
 }
 
 interface Props {
     workspaceSlug: string;
     projectSlug: string;
     boardId: number;
+    boardSwimlaneField: string;
     columns: ColumnData[];
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -68,6 +71,7 @@ export function BoardColumnManager({
     workspaceSlug,
     projectSlug,
     boardId,
+    boardSwimlaneField,
     columns,
     open,
     onOpenChange,
@@ -76,9 +80,12 @@ export function BoardColumnManager({
     const [editName, setEditName] = useState('');
     const [editColor, setEditColor] = useState('');
     const [editIsDone, setEditIsDone] = useState(false);
+    const [editWipLimit, setEditWipLimit] = useState('');
     const [newName, setNewName] = useState('');
     const [newColor, setNewColor] = useState(COLOR_OPTIONS[0].value);
     const [newIsDone, setNewIsDone] = useState('false');
+    const [newWipLimit, setNewWipLimit] = useState('');
+    const [swimlaneField, setSwimlaneField] = useState(boardSwimlaneField);
     const [processing, setProcessing] = useState(false);
 
     const handleAdd = () => {
@@ -99,6 +106,7 @@ export function BoardColumnManager({
                 status_key: generateStatusKey(newName.trim()),
                 color: newColor,
                 is_done_column: newIsDone === 'true',
+                wip_limit: newWipLimit ? parseInt(newWipLimit, 10) : null,
             },
             {
                 preserveScroll: true,
@@ -121,6 +129,7 @@ export function BoardColumnManager({
         setEditName(column.name);
         setEditColor(column.color ?? COLOR_OPTIONS[0].value);
         setEditIsDone(column.is_done_column);
+        setEditWipLimit(column.wip_limit?.toString() ?? '');
     };
 
     const saveEdit = () => {
@@ -141,6 +150,7 @@ export function BoardColumnManager({
                 name: editName.trim(),
                 color: editColor,
                 is_done_column: editIsDone,
+                wip_limit: editWipLimit ? parseInt(editWipLimit, 10) : null,
             },
             {
                 preserveScroll: true,
@@ -172,6 +182,23 @@ export function BoardColumnManager({
         );
     };
 
+    const handleSwimlaneChange = (value: string) => {
+        setSwimlaneField(value);
+
+        router.put(
+            boardUpdate({
+                workspace: workspaceSlug,
+                project: projectSlug,
+                board: boardId,
+            }),
+            {
+                name: columns[0]?.name ?? 'Board',
+                swimlane_field: value,
+            },
+            { preserveScroll: true },
+        );
+    };
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-lg">
@@ -183,6 +210,35 @@ export function BoardColumnManager({
                 </DialogHeader>
 
                 <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between rounded-md border px-3 py-2">
+                        <div className="flex flex-col gap-0.5">
+                            <Label className="text-sm font-medium">
+                                Swimlanes
+                            </Label>
+                            <p className="text-xs text-muted-foreground">
+                                Group tasks within each column
+                            </p>
+                        </div>
+                        <Select
+                            value={swimlaneField}
+                            onValueChange={handleSwimlaneChange}
+                        >
+                            <SelectTrigger className="h-8 w-32">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="none">None</SelectItem>
+                                <SelectItem value="assignee">
+                                    Assignee
+                                </SelectItem>
+                                <SelectItem value="priority">
+                                    Priority
+                                </SelectItem>
+                                <SelectItem value="epic">Epic</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
                     {columns.length > 0 ? (
                         <div className="flex flex-col rounded-md border">
                             {columns.map((column) => (
@@ -263,29 +319,46 @@ export function BoardColumnManager({
                                                     />
                                                     Done column
                                                 </label>
-                                                <div className="flex gap-1">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            setEditingId(null)
+                                                <div className="flex items-center gap-2">
+                                                    <Label className="text-xs text-muted-foreground">
+                                                        WIP:
+                                                    </Label>
+                                                    <Input
+                                                        type="number"
+                                                        min="1"
+                                                        value={editWipLimit}
+                                                        onChange={(e) =>
+                                                            setEditWipLimit(
+                                                                e.target.value,
+                                                            )
                                                         }
-                                                        disabled={processing}
-                                                    >
-                                                        Cancel
-                                                    </Button>
-                                                    <Button
-                                                        variant="default"
-                                                        size="sm"
-                                                        onClick={saveEdit}
-                                                        disabled={
-                                                            !editName.trim() ||
-                                                            processing
-                                                        }
-                                                    >
-                                                        Save
-                                                    </Button>
+                                                        placeholder="∞"
+                                                        className="h-8 w-16 text-sm"
+                                                    />
                                                 </div>
+                                            </div>
+                                            <div className="flex justify-end gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        setEditingId(null)
+                                                    }
+                                                    disabled={processing}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                                <Button
+                                                    variant="default"
+                                                    size="sm"
+                                                    onClick={saveEdit}
+                                                    disabled={
+                                                        !editName.trim() ||
+                                                        processing
+                                                    }
+                                                >
+                                                    Save
+                                                </Button>
                                             </div>
                                         </div>
                                     ) : (
@@ -439,6 +512,16 @@ export function BoardColumnManager({
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
+                                <Input
+                                    type="number"
+                                    min="1"
+                                    value={newWipLimit}
+                                    onChange={(e) =>
+                                        setNewWipLimit(e.target.value)
+                                    }
+                                    placeholder="WIP ∞"
+                                    className="h-8 w-20 text-sm"
+                                />
                             </div>
                             <div className="flex justify-end">
                                 <Button

@@ -28,6 +28,7 @@ class BoardColumnController extends Controller
             'color' => $validated['color'] ?? null,
             'position' => $validated['position'] ?? ($maxPosition + 1),
             'is_done_column' => $validated['is_done_column'] ?? false,
+            'wip_limit' => $validated['wip_limit'] ?? null,
         ]);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Column added.']);
@@ -44,6 +45,7 @@ class BoardColumnController extends Controller
             'color' => $validated['color'] ?? $boardColumn->color,
             'position' => $validated['position'] ?? $boardColumn->position,
             'is_done_column' => $validated['is_done_column'] ?? $boardColumn->is_done_column,
+            'wip_limit' => $validated['wip_limit'] ?? $boardColumn->wip_limit,
         ]);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Column updated.']);

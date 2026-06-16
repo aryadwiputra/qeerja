@@ -18,6 +18,7 @@ class UpdateBoardColumnRequest extends FormRequest
             'color' => ['nullable', 'string', 'max:30'],
             'position' => ['nullable', 'integer', 'min:0'],
             'is_done_column' => ['nullable', 'boolean'],
+            'wip_limit' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }

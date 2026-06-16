@@ -34,6 +34,8 @@ class BoardController extends Controller
                 'color' => $col->color,
                 'position' => $col->position,
                 'is_done_column' => $col->is_done_column,
+                'wip_limit' => $col->wip_limit,
+                'task_count' => $col->tasks()->count(),
                 'tasks' => $col->tasks()
                     ->with(['assignees:id,name,avatar', 'priority:id,name,key,level,color', 'taskType:id,name,key,icon,color', 'epics:id,name,color,status', 'sprints:id,name,status,start_date,end_date'])
                     ->orderBy('position')
@@ -95,6 +97,7 @@ class BoardController extends Controller
                 'id' => $board->id,
                 'name' => $board->name,
                 'type' => $board->type,
+                'swimlane_field' => $board->swimlane_field,
             ],
             'allBoards' => $project->boards()->orderBy('name')->get(['id', 'name', 'type']),
             'columns' => $columns,
@@ -139,6 +142,7 @@ class BoardController extends Controller
         $board->update([
             'name' => $validated['name'],
             'type' => $validated['type'] ?? $board->type,
+            'swimlane_field' => $validated['swimlane_field'] ?? $board->swimlane_field,
         ]);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Board updated.']);

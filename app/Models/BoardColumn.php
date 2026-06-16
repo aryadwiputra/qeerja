@@ -18,12 +18,14 @@ class BoardColumn extends Model
         'color',
         'position',
         'is_done_column',
+        'wip_limit',
     ];
 
     protected function casts(): array
     {
         return [
             'is_done_column' => 'boolean',
+            'wip_limit' => 'integer',
         ];
     }
 

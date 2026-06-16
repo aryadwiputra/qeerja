@@ -17,6 +17,7 @@ class Board extends Model
         'name',
         'type',
         'is_default',
+        'swimlane_field',
     ];
 
     protected function casts(): array

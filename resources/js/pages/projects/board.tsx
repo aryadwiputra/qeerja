@@ -27,7 +27,7 @@ import {
     Settings2,
     Users,
 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BoardColumnManager } from '@/components/board-column-manager';
 import { TaskCard } from '@/components/task-card';
 import { TaskCreateDialog } from '@/components/task-create-dialog';
@@ -61,6 +61,7 @@ interface TaskItem {
     status: string;
     position: number;
     due_date: string | null;
+    story_points: number | null;
     priority: {
         id: number;
         name: string;
@@ -96,6 +97,8 @@ interface Column {
     color: string | null;
     position: number;
     is_done_column: boolean;
+    wip_limit: number | null;
+    task_count: number;
     tasks: TaskItem[];
 }
 
@@ -116,6 +119,7 @@ interface BoardData {
     id: number;
     name: string;
     type: string;
+    swimlane_field: string;
 }
 
 interface BoardOption {
@@ -150,6 +154,12 @@ interface Props {
         start_date: string | null;
         end_date: string | null;
     }>;
+}
+
+function getCsrfToken(): string {
+    return decodeURIComponent(
+        document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? '',
+    );
 }
 
 function getInitials(name: string): string {
@@ -215,6 +225,21 @@ function PresenceAvatars({
             </div>
         </div>
     );
+}
+
+function getSwimlaneKey(task: TaskItem, field: string): string {
+    switch (field) {
+        case 'assignee':
+            return task.assignees.length > 0
+                ? task.assignees[0].name
+                : 'Unassigned';
+        case 'priority':
+            return task.priority?.name ?? 'No priority';
+        case 'epic':
+            return task.epics?.[0]?.name ?? 'No epic';
+        default:
+            return '';
+    }
 }
 
 function SortableTask({
@@ -383,11 +408,11 @@ function BoardClient({
             return;
         }
 
-        ch.here((users: Array<{ id: number; name: string }>) => {
+        const hereHandler = (users: Array<{ id: number; name: string }>) => {
             setPresenceUsers(users);
-        });
+        };
 
-        ch.joining((user: { id: number; name: string }) => {
+        const joiningHandler = (user: { id: number; name: string }) => {
             setPresenceUsers((prev) => {
                 if (prev.some((u) => u.id === user.id)) {
                     return prev;
@@ -395,33 +420,48 @@ function BoardClient({
 
                 return [...prev, user];
             });
-        });
+        };
 
-        ch.leaving((user: { id: number; name: string }) => {
+        const leavingHandler = (user: { id: number; name: string }) => {
             setPresenceUsers((prev) => prev.filter((u) => u.id !== user.id));
-        });
+        };
+
+        ch.here(hereHandler);
+        ch.joining(joiningHandler);
+        ch.leaving(leavingHandler);
+
+        return () => {
+            ch.here(() => {});
+            ch.joining(() => {});
+            ch.leaving(() => {});
+        };
     }, [presence]);
 
-    useKeyboardShortcuts([
-        {
-            key: 'n',
-            handler: () => setNewTaskOpen(true),
-            enabled: !newTaskOpen,
-            description: 'New task',
-        },
-        {
-            sequence: ['g', 's'],
-            handler: () => {
-                router.visit(
-                    projectBoard({
-                        workspace: workspace.slug,
-                        project: project.slug,
-                    }),
-                );
+    const shortcuts = useMemo(
+        () => [
+            {
+                key: 'n',
+                handler: () => setNewTaskOpen(true),
+                enabled: !newTaskOpen,
+                description: 'New task',
             },
-            description: 'Go to settings',
-        },
-    ]);
+            {
+                sequence: ['g', 's'],
+                handler: () => {
+                    router.visit(
+                        projectBoard({
+                            workspace: workspace.slug,
+                            project: project.slug,
+                        }),
+                    );
+                },
+                description: 'Go to settings',
+            },
+        ],
+        [newTaskOpen, workspace.slug, project.slug],
+    );
+
+    useKeyboardShortcuts(shortcuts);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -616,7 +656,9 @@ function BoardClient({
         [activeTask],
     );
 
-    useEcho(`private-project.${project.id}`, '.task.moved', handleTaskMoved);
+    useEcho(`private-project.${project.id}`, '.task.moved', handleTaskMoved, [
+        activeTask,
+    ]);
 
     interface ColumnsReorderedEvent {
         columns: Array<{ id: number; position: number }>;
@@ -650,6 +692,7 @@ function BoardClient({
         `private-project.${project.id}`,
         '.columns.reordered',
         handleColumnsReordered,
+        [activeColumn],
     );
 
     const handleDragEnd = (event: DragEndEvent) => {
@@ -684,20 +727,29 @@ function BoardClient({
                 prev.map((col, idx) => ({ ...col, position: idx })),
             );
 
-            router.post(
+            const updatedColumns = columns.map((col, idx) => ({
+                id: col.id,
+                position: idx,
+            }));
+
+            fetch(
                 reorderColumns({
                     workspace: workspace.slug,
                     project: project.slug,
                     board: board.id,
-                }),
+                }).url,
                 {
-                    columns: columns.map((col, idx) => ({
-                        id: col.id,
-                        position: idx,
-                    })),
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-XSRF-TOKEN': getCsrfToken(),
+                    },
+                    body: JSON.stringify({ columns: updatedColumns }),
                 },
-                { preserveScroll: true },
-            );
+            ).catch(() => {
+                setColumns(columnsSnapshotRef.current);
+            });
 
             return;
         }
@@ -763,20 +815,27 @@ function BoardClient({
             position = Math.max(0, position);
         }
 
-        router.post(
+        fetch(
             moveTask({
                 workspace: workspace.slug,
                 project: project.slug,
                 task: taskId,
-            }),
+            }).url,
             {
-                board_column_id: toColumn.id,
-                position,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': getCsrfToken(),
+                },
+                body: JSON.stringify({
+                    board_column_id: toColumn.id,
+                    position,
+                }),
             },
-            {
-                preserveScroll: true,
-            },
-        );
+        ).catch(() => {
+            setColumns(columnsSnapshotRef.current);
+        });
     };
 
     return (
@@ -909,10 +968,18 @@ function BoardClient({
                                                 {column.name}
                                             </h3>
                                             <Badge
-                                                variant="secondary"
+                                                variant={
+                                                    column.wip_limit !== null &&
+                                                    column.tasks.length >
+                                                        column.wip_limit
+                                                        ? 'destructive'
+                                                        : 'secondary'
+                                                }
                                                 className="px-1.5 py-0 text-[10px]"
                                             >
                                                 {column.tasks.length}
+                                                {column.wip_limit !== null &&
+                                                    `/${column.wip_limit}`}
                                             </Badge>
                                         </div>
                                         <GripVertical className="size-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
@@ -929,22 +996,86 @@ function BoardClient({
                                                     'hidden',
                                             )}
                                         >
-                                            {column.tasks.map((task) => (
-                                                <SortableTask
-                                                    key={task.id}
-                                                    task={task}
-                                                    isDragging={
-                                                        activeTask?.id ===
-                                                        task.id
-                                                    }
-                                                    onClick={() => {
-                                                        setDrawerTaskId(
-                                                            task.id,
-                                                        );
-                                                        setDrawerOpen(true);
-                                                    }}
-                                                />
-                                            ))}
+                                            {board.swimlane_field !== 'none'
+                                                ? (() => {
+                                                      const grouped = new Map<
+                                                          string,
+                                                          TaskItem[]
+                                                      >();
+
+                                                      for (const task of column.tasks) {
+                                                          const key =
+                                                              getSwimlaneKey(
+                                                                  task,
+                                                                  board.swimlane_field,
+                                                              );
+                                                          const arr =
+                                                              grouped.get(
+                                                                  key,
+                                                              ) ?? [];
+                                                          arr.push(task);
+                                                          grouped.set(key, arr);
+                                                      }
+
+                                                      return Array.from(
+                                                          grouped.entries(),
+                                                      ).map(
+                                                          ([group, tasks]) => (
+                                                              <div
+                                                                  key={group}
+                                                                  className="flex flex-col gap-1"
+                                                              >
+                                                                  <div className="px-1 py-1 text-[10px] font-medium text-muted-foreground uppercase">
+                                                                      {group}
+                                                                  </div>
+                                                                  {tasks.map(
+                                                                      (
+                                                                          task,
+                                                                      ) => (
+                                                                          <SortableTask
+                                                                              key={
+                                                                                  task.id
+                                                                              }
+                                                                              task={
+                                                                                  task
+                                                                              }
+                                                                              isDragging={
+                                                                                  activeTask?.id ===
+                                                                                  task.id
+                                                                              }
+                                                                              onClick={() => {
+                                                                                  setDrawerTaskId(
+                                                                                      task.id,
+                                                                                  );
+                                                                                  setDrawerOpen(
+                                                                                      true,
+                                                                                  );
+                                                                              }}
+                                                                          />
+                                                                      ),
+                                                                  )}
+                                                              </div>
+                                                          ),
+                                                      );
+                                                  })()
+                                                : column.tasks.map((task) => (
+                                                      <SortableTask
+                                                          key={task.id}
+                                                          task={task}
+                                                          isDragging={
+                                                              activeTask?.id ===
+                                                              task.id
+                                                          }
+                                                          onClick={() => {
+                                                              setDrawerTaskId(
+                                                                  task.id,
+                                                              );
+                                                              setDrawerOpen(
+                                                                  true,
+                                                              );
+                                                          }}
+                                                      />
+                                                  ))}
                                         </div>
                                     </SortableContext>
                                 </DroppableColumn>
@@ -990,6 +1121,7 @@ function BoardClient({
                     workspaceSlug={workspace.slug}
                     projectSlug={project.slug}
                     boardId={board.id}
+                    boardSwimlaneField={board.swimlane_field}
                     columns={columns}
                     open={columnManagerOpen}
                     onOpenChange={setColumnManagerOpen}

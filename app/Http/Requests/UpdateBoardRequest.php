@@ -16,6 +16,7 @@ class UpdateBoardRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:100'],
             'type' => ['nullable', 'string', 'in:kanban,scrum'],
+            'swimlane_field' => ['nullable', 'string', 'in:none,assignee,priority,epic'],
         ];
     }
 }
