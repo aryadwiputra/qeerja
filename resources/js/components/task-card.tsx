@@ -27,6 +27,7 @@ interface TaskData {
         key: string;
         color: string | null;
     };
+    story_points?: number | null;
     assignees: Assignee[];
     epics?: Array<{
         id: number;
@@ -75,12 +76,19 @@ export function TaskCard({
                 <span className="font-mono text-xs text-muted-foreground">
                     {task.code}
                 </span>
-                <div
-                    className={cn(
-                        'size-2 shrink-0 rounded-full',
-                        priorityColor,
+                <div className="flex items-center gap-2">
+                    {task.story_points != null && (
+                        <span className="inline-flex size-5 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-muted-foreground">
+                            {task.story_points}
+                        </span>
                     )}
-                />
+                    <div
+                        className={cn(
+                            'size-2 shrink-0 rounded-full',
+                            priorityColor,
+                        )}
+                    />
+                </div>
             </div>
 
             <p className="line-clamp-2 text-sm leading-snug font-medium">

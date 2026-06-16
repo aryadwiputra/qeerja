@@ -1,5 +1,6 @@
 import { Loader2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { VelocityChart } from '@/components/charts/velocity-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { index as reportsIndex } from '@/routes/projects/reports';
@@ -42,6 +43,14 @@ interface ReportData {
         };
         data: BurndownPoint[];
     } | null;
+    velocity: {
+        sprints: Array<{
+            name: string;
+            committed: number | null;
+            completed: number;
+        }>;
+        avg_velocity: number;
+    };
 }
 
 interface ReportsTabProps {
@@ -216,6 +225,27 @@ export function ReportsTab({ workspaceSlug, projectSlug }: ReportsTabProps) {
                     </Card>
                 )}
             </div>
+
+            {data.velocity.sprints.length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="text-sm font-semibold">
+                                Velocity
+                            </CardTitle>
+                            <span className="text-xs text-muted-foreground">
+                                Avg: {data.velocity.avg_velocity} pts/sprint
+                            </span>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <VelocityChart
+                            sprints={data.velocity.sprints}
+                            avgVelocity={data.velocity.avg_velocity}
+                        />
+                    </CardContent>
+                </Card>
+            )}
         </div>
     );
 }

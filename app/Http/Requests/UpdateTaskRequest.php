@@ -21,6 +21,7 @@ class UpdateTaskRequest extends FormRequest
             'priority_id' => ['nullable', Rule::exists('priorities', 'id')->where('workspace_id', $this->workspace->id)],
             'board_column_id' => ['sometimes', 'required', Rule::exists('board_columns', 'id')->whereIn('board_id', $this->project->boards()->select('id'))],
             'status' => ['nullable', 'string', 'max:50'],
+            'story_points' => ['nullable', 'integer', 'min:0', 'max:100'],
             'start_date' => ['nullable', 'date'],
             'due_date' => ['nullable', 'date'],
             'assignee_ids' => ['nullable', 'array'],

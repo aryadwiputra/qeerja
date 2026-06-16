@@ -74,6 +74,7 @@ interface TaskDetail {
     status: string;
     due_date: string | null;
     start_date: string | null;
+    story_points: number | null;
     completed_at: string | null;
     parent_id: number | null;
     project_id: number;
@@ -1235,6 +1236,32 @@ export function TaskDetailDrawer({
                                             )}
                                         </SelectContent>
                                     </Select>
+                                </div>
+
+                                <div className="flex flex-col gap-2">
+                                    <Label className="text-xs tracking-wider text-muted-foreground uppercase">
+                                        Story points
+                                    </Label>
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        value={task.story_points ?? ''}
+                                        placeholder="—"
+                                        onChange={(event) => {
+                                            const value =
+                                                event.target.value === ''
+                                                    ? null
+                                                    : parseInt(
+                                                          event.target.value,
+                                                          10,
+                                                      );
+                                            updateTaskDraft({
+                                                story_points: value,
+                                            });
+                                            patchTask({ story_points: value });
+                                        }}
+                                    />
                                 </div>
 
                                 <div className="flex flex-col gap-2">

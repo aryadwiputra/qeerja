@@ -22,6 +22,7 @@ class SprintController extends Controller
 
         return response()->json([
             'sprints' => $project->sprints()
+                ->where('is_backlog', false)
                 ->withCount('tasks')
                 ->orderByRaw("CASE status WHEN 'active' THEN 0 WHEN 'planned' THEN 1 WHEN 'completed' THEN 2 ELSE 3 END")
                 ->orderByDesc('start_date')
@@ -78,7 +79,7 @@ class SprintController extends Controller
                 'color' => $project->color,
             ],
             'sprint' => array_merge(
-                $sprint->only('id', 'name', 'goal', 'status', 'start_date', 'end_date', 'completed_at', 'tasks_count'),
+                $sprint->only('id', 'name', 'goal', 'status', 'start_date', 'end_date', 'committed_points', 'completed_at', 'tasks_count'),
                 ['completed_tasks_count' => $completedCount],
             ),
             'sprintTasks' => $sprint->tasks,
@@ -128,6 +129,7 @@ class SprintController extends Controller
             'name' => $validated['name'],
             'goal' => $validated['goal'] ?? null,
             'status' => $validated['status'] ?? 'planned',
+            'is_backlog' => $validated['is_backlog'] ?? false,
             'start_date' => $validated['start_date'] ?? null,
             'end_date' => $validated['end_date'] ?? null,
             'completed_at' => ($validated['status'] ?? null) === 'completed' ? now() : null,

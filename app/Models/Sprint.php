@@ -16,14 +16,17 @@ class Sprint extends Model
         'name',
         'goal',
         'status',
+        'is_backlog',
         'start_date',
         'end_date',
+        'committed_points',
         'completed_at',
     ];
 
     protected function casts(): array
     {
         return [
+            'is_backlog' => 'boolean',
             'start_date' => 'date',
             'end_date' => 'date',
             'completed_at' => 'datetime',

@@ -36,6 +36,7 @@ interface TaskData {
     status: string;
     due_date: string | null;
     completed_at: string | null;
+    story_points: number | null;
     priority: {
         id: number;
         name: string;
@@ -60,6 +61,7 @@ interface SprintData {
     status: string;
     start_date: string | null;
     end_date: string | null;
+    committed_points: number | null;
     completed_at: string | null;
     tasks_count: number;
     completed_tasks_count: number;
@@ -118,6 +120,14 @@ export default function SprintShow({
         sprint;
     const percent =
         totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+
+    const completedPoints = sprintTasks
+        .filter((t) => t.completed_at !== null)
+        .reduce((sum, t) => sum + (t.story_points ?? 0), 0);
+    const totalPoints = sprintTasks.reduce(
+        (sum, t) => sum + (t.story_points ?? 0),
+        0,
+    );
 
     const handleRemoveTask = (taskId: number) => {
         if (!confirm('Remove this task from the sprint?')) {
@@ -196,6 +206,11 @@ export default function SprintShow({
                                 <Badge variant="secondary">
                                     {completedTasks}/{totalTasks} tasks
                                 </Badge>
+                                {totalPoints > 0 && (
+                                    <Badge variant="secondary">
+                                        {completedPoints}/{totalPoints} pts
+                                    </Badge>
+                                )}
                             </div>
                         </div>
                         <Link
@@ -315,6 +330,12 @@ export default function SprintShow({
                                                     >
                                                         {task.task_type.name}
                                                     </Badge>
+                                                    {task.story_points !=
+                                                        null && (
+                                                        <span className="inline-flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-muted-foreground">
+                                                            {task.story_points}
+                                                        </span>
+                                                    )}
                                                     {task.priority && (
                                                         <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                                                             <div

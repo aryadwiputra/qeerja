@@ -114,6 +114,27 @@ class ReportsController extends Controller
             ];
         }
 
+        $completedSprints = $project->sprints()
+            ->where('status', 'completed')
+            ->orderBy('completed_at')
+            ->get();
+
+        $velocity = $completedSprints->map(function ($sprint) {
+            $completedPoints = $sprint->tasks()
+                ->whereNotNull('completed_at')
+                ->sum('story_points');
+
+            return [
+                'name' => $sprint->name,
+                'committed' => $sprint->committed_points,
+                'completed' => $completedPoints,
+            ];
+        });
+
+        $avgVelocity = $velocity->isNotEmpty()
+            ? round($velocity->avg('completed'), 1)
+            : 0;
+
         return response()->json([
             'summary' => [
                 'total' => $totalTasks,
@@ -125,6 +146,10 @@ class ReportsController extends Controller
             ],
             'assignee_workload' => $assigneeWorkload,
             'burndown' => $burndown,
+            'velocity' => [
+                'sprints' => $velocity,
+                'avg_velocity' => $avgVelocity,
+            ],
         ]);
     }
 }

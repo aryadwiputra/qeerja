@@ -159,6 +159,7 @@ class TaskController extends Controller
                 'status' => $task->status,
                 'due_date' => $task->due_date,
                 'start_date' => $task->start_date,
+                'story_points' => $task->story_points,
                 'completed_at' => $task->completed_at,
                 'parent_id' => $task->parent_id,
                 'project_id' => $task->project_id,
@@ -263,6 +264,7 @@ class TaskController extends Controller
             'task_type_id',
             'priority_id',
             'board_column_id',
+            'story_points',
             'start_date',
             'due_date',
             'parent_id',
@@ -332,7 +334,7 @@ class TaskController extends Controller
         }
 
         $fieldChanges = [];
-        foreach (['title', 'description', 'priority_id', 'board_column_id', 'start_date', 'due_date'] as $field) {
+        foreach (['title', 'description', 'priority_id', 'board_column_id', 'story_points', 'start_date', 'due_date'] as $field) {
             if (array_key_exists($field, $validated) && ($before[$field] ?? '') !== ($task->{$field} ?? '')) {
                 $fieldChanges[$field] = $task->{$field};
             }
@@ -368,6 +370,19 @@ class TaskController extends Controller
         $position = (int) $validated['position'];
 
         $oldColumnId = $task->board_column_id;
+        $isSameColumn = $oldColumnId === $targetColumn->id;
+
+        if (! $isSameColumn && $targetColumn->wip_limit !== null) {
+            $currentCount = $targetColumn->tasks()->where('id', '!=', $task->id)->count();
+            if ($currentCount >= $targetColumn->wip_limit) {
+                Inertia::flash('toast', [
+                    'type' => 'warning',
+                    'message' => "WIP limit reached for \"{$targetColumn->name}\" ({$currentCount}/{$targetColumn->wip_limit}).",
+                ]);
+
+                return back(303);
+            }
+        }
 
         DB::transaction(function () use ($task, $targetColumn, $position, $oldColumnId) {
             $task->update([

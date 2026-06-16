@@ -28,6 +28,7 @@ class UpdateSprintRequest extends FormRequest
             'status' => ['required', Rule::in(['planned', 'active', 'completed', 'cancelled'])],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'committed_points' => ['nullable', 'integer', 'min:0'],
         ];
     }
 }

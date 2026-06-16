@@ -27,6 +27,8 @@ class Task extends Model
         'description',
         'status',
         'position',
+        'story_points',
+        'release_id',
         'start_date',
         'due_date',
         'completed_at',
@@ -102,6 +104,11 @@ class Task extends Model
     public function sprints(): BelongsToMany
     {
         return $this->belongsToMany(Sprint::class, 'sprint_tasks');
+    }
+
+    public function release(): BelongsTo
+    {
+        return $this->belongsTo(Release::class);
     }
 
     public function comments(): HasMany
