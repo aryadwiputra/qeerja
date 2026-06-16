@@ -27,6 +27,7 @@ import { EpicDialog } from '@/components/epic-dialog';
 import { GanttChart } from '@/components/gantt-chart';
 import { LabelDialog } from '@/components/label-dialog';
 import { ReportsTab } from '@/components/reports-tab';
+import { SavedFilterDropdown } from '@/components/saved-filter-dropdown';
 import { SprintDialog } from '@/components/sprint-dialog';
 import { TaskBulkDialog } from '@/components/task-bulk-dialog';
 import { TaskBulkToolbar } from '@/components/task-bulk-toolbar';
@@ -45,11 +46,13 @@ import {
     settings as projectSettings,
 } from '@/routes/projects';
 import { index as activityIndex } from '@/routes/projects/activity';
+import { index as backlogShow } from '@/routes/projects/backlog';
 import {
     destroy as destroyEpic,
     show as epicShow,
 } from '@/routes/projects/epics';
 import { destroy as destroyLabel } from '@/routes/projects/labels';
+import { index as releaseIndex } from '@/routes/projects/releases';
 import {
     destroy as destroySprint,
     show as sprintShow,
@@ -580,6 +583,32 @@ export default function ProjectShow({
                         <TabsTrigger value="list">List</TabsTrigger>
                         <TabsTrigger value="epics">Epics</TabsTrigger>
                         <TabsTrigger value="sprints">Sprints</TabsTrigger>
+                        <TabsTrigger
+                            value="backlog"
+                            onClick={() =>
+                                router.visit(
+                                    backlogShow.url({
+                                        workspace: workspace.slug,
+                                        project: project.slug,
+                                    }),
+                                )
+                            }
+                        >
+                            Backlog
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="releases"
+                            onClick={() =>
+                                router.visit(
+                                    releaseIndex.url({
+                                        workspace: workspace.slug,
+                                        project: project.slug,
+                                    }),
+                                )
+                            }
+                        >
+                            Releases
+                        </TabsTrigger>
                         <TabsTrigger value="labels">Labels</TabsTrigger>
                         <TabsTrigger value="timeline">Timeline</TabsTrigger>
                         <TabsTrigger value="files">Files</TabsTrigger>
@@ -591,17 +620,42 @@ export default function ProjectShow({
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between gap-4">
                                 <CardTitle>Tasks</CardTitle>
-                                <div className="relative w-full max-w-xs">
-                                    <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-                                    <Input
-                                        value={search}
-                                        onChange={(event) => {
-                                            setSearch(event.target.value);
-                                            setPage(0);
+                                <div className="flex items-center gap-2">
+                                    <SavedFilterDropdown
+                                        workspaceSlug={workspace.slug}
+                                        projectSlug={project.slug}
+                                        currentFilters={{}}
+                                        currentSort={{
+                                            field: sorting[0]?.id ?? 'position',
+                                            direction: sorting[0]?.desc
+                                                ? 'desc'
+                                                : 'asc',
                                         }}
-                                        placeholder="Search tasks..."
-                                        className="pl-9"
+                                        onLoad={(filter) => {
+                                            if (filter.sort_field) {
+                                                setSorting([
+                                                    {
+                                                        id: filter.sort_field,
+                                                        desc:
+                                                            filter.sort_direction ===
+                                                            'desc',
+                                                    },
+                                                ]);
+                                            }
+                                        }}
                                     />
+                                    <div className="relative w-full max-w-xs">
+                                        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                                        <Input
+                                            value={search}
+                                            onChange={(event) => {
+                                                setSearch(event.target.value);
+                                                setPage(0);
+                                            }}
+                                            placeholder="Search tasks..."
+                                            className="pl-9"
+                                        />
+                                    </div>
                                 </div>
                             </CardHeader>
                             <CardContent>
