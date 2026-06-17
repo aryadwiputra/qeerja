@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\AutomationRuleController;
 use App\Http\Controllers\BacklogController;
 use App\Http\Controllers\BoardColumnController;
 use App\Http\Controllers\BoardController;
@@ -204,6 +205,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}', [TaskController::class, 'destroy'])->name('projects.tasks.destroy');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/move', [TaskController::class, 'moveColumn'])->name('projects.tasks.move');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/create-branch', [TaskController::class, 'createBranch'])->name('projects.tasks.create-branch');
+
+        Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/automation', [AutomationRuleController::class, 'index'])->name('projects.automation.index');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/automation', [AutomationRuleController::class, 'store'])->name('projects.automation.store');
+        Route::put('/workspaces/{workspace:slug}/projects/{project:slug}/automation/{rule}', [AutomationRuleController::class, 'update'])->name('projects.automation.update');
+        Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/automation/{rule}', [AutomationRuleController::class, 'destroy'])->name('projects.automation.destroy');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/automation/{rule}/test', [AutomationRuleController::class, 'test'])->name('projects.automation.test');
 
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/comments', [TaskCommentController::class, 'store'])->name('projects.tasks.comments.store');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/comments/typing', [CommentTypingController::class, 'ping'])->name('projects.tasks.comments.typing');

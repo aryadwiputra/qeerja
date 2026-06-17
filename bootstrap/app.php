@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withSchedule(function ($schedule): void {
         $schedule->job(new CheckSlaBreachesJob)->hourly();
+        $schedule->command('automation:check-due-dates')->daily();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([

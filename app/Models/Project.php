@@ -91,6 +91,11 @@ class Project extends Model
         return $this->hasMany(Integration::class);
     }
 
+    public function automationRules(): HasMany
+    {
+        return $this->hasMany(AutomationRule::class);
+    }
+
     public function integration(): HasOne
     {
         return $this->hasOne(Integration::class);

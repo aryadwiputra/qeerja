@@ -353,7 +353,9 @@ export default function ProjectShow({
     const updateTaskField = useCallback(
         (taskId: number, field: string, value: unknown) => {
             setLocalTasks((prev) =>
-                prev.map((t) => (t.id === taskId ? { ...t, [field]: value } : t)),
+                prev.map((t) =>
+                    t.id === taskId ? { ...t, [field]: value } : t,
+                ),
             );
 
             const url = taskUpdate.url({
@@ -397,7 +399,8 @@ export default function ProjectShow({
 
         document.addEventListener('mousedown', handleClickOutside);
 
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        return () =>
+            document.removeEventListener('mousedown', handleClickOutside);
     }, [editingCell]);
 
     const filteredTasks = useMemo(
@@ -698,13 +701,7 @@ export default function ProjectShow({
                 },
             },
         ],
-        [
-            editingCell,
-            boardColumns,
-            priorities,
-            members,
-            updateTaskField,
-        ],
+        [editingCell, boardColumns, priorities, members, updateTaskField],
     );
 
     // eslint-disable-next-line react-hooks/incompatible-library
@@ -908,6 +905,16 @@ export default function ProjectShow({
                         <TabsTrigger value="files">Files</TabsTrigger>
                         <TabsTrigger value="reports">Reports</TabsTrigger>
                         <TabsTrigger value="activity">Activity</TabsTrigger>
+                        <TabsTrigger
+                            value="automation"
+                            onClick={() =>
+                                router.visit(
+                                    `/workspaces/${workspace.slug}/projects/${project.slug}/automation`,
+                                )
+                            }
+                        >
+                            Automation
+                        </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="list">
@@ -1018,7 +1025,9 @@ export default function ProjectShow({
                                                     key={row.id}
                                                     className="cursor-pointer border-t transition-colors hover:bg-muted/40"
                                                     onClick={() => {
-                                                        setDrawerTaskId(row.original.id);
+                                                        setDrawerTaskId(
+                                                            row.original.id,
+                                                        );
                                                         setDrawerOpen(true);
                                                     }}
                                                 >
