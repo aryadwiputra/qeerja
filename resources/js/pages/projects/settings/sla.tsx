@@ -156,8 +156,8 @@ export default function SlaSettings({
                                 SLA Policies
                             </h1>
                             <p className="mt-1 text-sm text-muted-foreground">
-                                Set response and resolution time targets per task
-                                type.
+                                Set response and resolution time targets per
+                                task type.
                             </p>
                         </div>
                         <Button
@@ -184,8 +184,10 @@ export default function SlaSettings({
                                                 policy.task_type.color
                                                     ? {
                                                           borderColor:
-                                                              policy.task_type.color,
-                                                          color: policy.task_type.color,
+                                                              policy.task_type
+                                                                  .color,
+                                                          color: policy
+                                                              .task_type.color,
                                                       }
                                                     : undefined
                                             }
@@ -242,9 +244,7 @@ export default function SlaSettings({
                                             type="button"
                                             className="rounded p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                                             title="Delete policy"
-                                            onClick={() =>
-                                                setDeleting(policy)
-                                            }
+                                            onClick={() => setDeleting(policy)}
                                         >
                                             <Trash2 className="size-3.5" />
                                         </button>
@@ -259,8 +259,8 @@ export default function SlaSettings({
                                     No SLA policies yet
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    Add policies to track response and resolution
-                                    time targets.
+                                    Add policies to track response and
+                                    resolution time targets.
                                 </p>
                             </div>
                             <Button
@@ -317,9 +317,7 @@ export default function SlaSettings({
                                     min={1}
                                     value={responseHours}
                                     onChange={(e) =>
-                                        setResponseHours(
-                                            Number(e.target.value),
-                                        )
+                                        setResponseHours(Number(e.target.value))
                                     }
                                 />
                             </div>

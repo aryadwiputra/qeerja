@@ -155,10 +155,7 @@ function SortableTaskRow({
                 <GripVertical className="size-4" />
             </button>
 
-            <div
-                onClick={onClick}
-                className="min-w-0 flex-1 cursor-pointer"
-            >
+            <div onClick={onClick} className="min-w-0 flex-1 cursor-pointer">
                 <div className="flex items-center gap-2">
                     <span className="font-mono text-xs text-muted-foreground">
                         {task.code}
@@ -488,7 +485,9 @@ export default function BacklogIndex({
                                                         handleMoveToSprint
                                                     }
                                                     onClick={() => {
-                                                        setDrawerTaskId(task.id);
+                                                        setDrawerTaskId(
+                                                            task.id,
+                                                        );
                                                         setDrawerOpen(true);
                                                     }}
                                                 />

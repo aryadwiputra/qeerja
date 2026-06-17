@@ -154,7 +154,7 @@ export default function LabelShow({
                                                 setDrawerTaskId(task.id);
                                                 setDrawerOpen(true);
                                             }}
-                                            className="flex items-center gap-3 border-b px-3 py-3 transition-colors last:border-0 hover:bg-muted/40 cursor-pointer"
+                                            className="flex cursor-pointer items-center gap-3 border-b px-3 py-3 transition-colors last:border-0 hover:bg-muted/40"
                                         >
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex items-center gap-2">

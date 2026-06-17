@@ -96,9 +96,7 @@ export default function WorkloadPage({
             }),
             {
                 user_id: editingMember.id,
-                capacity_hours: capacityInput
-                    ? Number(capacityInput)
-                    : null,
+                capacity_hours: capacityInput ? Number(capacityInput) : null,
             },
             {
                 preserveScroll: true,
@@ -218,8 +216,8 @@ export default function WorkloadPage({
                                             <div className="mb-3">
                                                 <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                                                     <span>
-                                                        {member.completed_tasks}/
-                                                        {member.total_tasks}{' '}
+                                                        {member.completed_tasks}
+                                                        /{member.total_tasks}{' '}
                                                         completed
                                                     </span>
                                                     <span>{percent}%</span>
@@ -333,9 +331,7 @@ export default function WorkloadPage({
                             min={0}
                             placeholder="e.g. 40"
                             value={capacityInput}
-                            onChange={(e) =>
-                                setCapacityInput(e.target.value)
-                            }
+                            onChange={(e) => setCapacityInput(e.target.value)}
                         />
                         <p className="text-xs text-muted-foreground">
                             Leave empty for no capacity limit.

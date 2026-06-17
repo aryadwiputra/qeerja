@@ -1,13 +1,7 @@
 'use no memo';
 
 import { Head, Link } from '@inertiajs/react';
-import {
-    ArrowLeft,
-    CalendarDays,
-    Plus,
-    Rocket,
-    Trash2,
-} from 'lucide-react';
+import { ArrowLeft, CalendarDays, Plus, Rocket, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -225,7 +219,13 @@ export default function ReleasesIndex({
             setReleases((prev) =>
                 prev.map((r) =>
                     r.id === releaseId
-                        ? { ...r, status: 'released', release_date: r.release_date ?? new Date().toISOString().slice(0, 10) }
+                        ? {
+                              ...r,
+                              status: 'released',
+                              release_date:
+                                  r.release_date ??
+                                  new Date().toISOString().slice(0, 10),
+                          }
                         : r,
                 ),
             );
@@ -325,8 +325,10 @@ export default function ReleasesIndex({
                                                         </span>
                                                     )}
                                                     <span>
-                                                        {release.completed_tasks_count}/
-                                                        {release.tasks_count}{' '}
+                                                        {
+                                                            release.completed_tasks_count
+                                                        }
+                                                        /{release.tasks_count}{' '}
                                                         tasks
                                                     </span>
                                                 </div>
@@ -428,12 +430,12 @@ export default function ReleasesIndex({
                             <textarea
                                 id="release-desc"
                                 value={newDescription}
-                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                                    setNewDescription(e.target.value)
-                                }
+                                onChange={(
+                                    e: React.ChangeEvent<HTMLTextAreaElement>,
+                                ) => setNewDescription(e.target.value)}
                                 placeholder="What's in this release..."
                                 rows={3}
-                                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                             />
                         </div>
                         <div className="flex flex-col gap-2">

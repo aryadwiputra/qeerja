@@ -131,10 +131,7 @@ export default function SprintReport({
                             label="Tasks"
                             value={`${sprint.completed_tasks_count}/${sprint.tasks_count}`}
                         />
-                        <SummaryCard
-                            label="Completion"
-                            value={`${percent}%`}
-                        />
+                        <SummaryCard label="Completion" value={`${percent}%`} />
                         <SummaryCard
                             label="Story Points"
                             value={
@@ -184,7 +181,10 @@ export default function SprintReport({
                                                 className="flex items-center justify-between"
                                             >
                                                 <span className="text-sm capitalize">
-                                                    {item.key.replace(/_/g, ' ')}
+                                                    {item.key.replace(
+                                                        /_/g,
+                                                        ' ',
+                                                    )}
                                                 </span>
                                                 <Badge variant="secondary">
                                                     {item.count}
@@ -209,23 +209,28 @@ export default function SprintReport({
                                     <div className="flex flex-col gap-3">
                                         {byAssignee.map((item) => (
                                             <div
-                                                key={item.user?.id ?? 'unassigned'}
+                                                key={
+                                                    item.user?.id ??
+                                                    'unassigned'
+                                                }
                                                 className="flex items-center justify-between"
                                             >
                                                 <span className="text-sm">
-                                                    {item.user?.name ?? 'Unassigned'}
+                                                    {item.user?.name ??
+                                                        'Unassigned'}
                                                 </span>
                                                 <div className="flex items-center gap-3">
                                                     <span className="text-xs text-muted-foreground">
-                                                        {item.completed}/{item.total}{' '}
-                                                        completed
+                                                        {item.completed}/
+                                                        {item.total} completed
                                                     </span>
                                                     <div className="h-2 w-24 overflow-hidden rounded-full bg-muted">
                                                         <div
                                                             className="h-full rounded-full bg-primary"
                                                             style={{
                                                                 width: `${
-                                                                    item.total === 0
+                                                                    item.total ===
+                                                                    0
                                                                         ? 0
                                                                         : Math.round(
                                                                               (item.completed /
@@ -276,7 +281,11 @@ function BurndownChart({ data }: { data: BurndownPoint[] }) {
     const chartW = width - padding.left - padding.right;
     const chartH = height - padding.top - padding.bottom;
 
-    const maxVal = Math.max(...data.map((d) => d.remaining), ...data.map((d) => d.ideal), 1);
+    const maxVal = Math.max(
+        ...data.map((d) => d.remaining),
+        ...data.map((d) => d.ideal),
+        1,
+    );
 
     const xScale = (index: number) =>
         padding.left + (index / Math.max(data.length - 1, 1)) * chartW;
@@ -359,22 +368,24 @@ function BurndownChart({ data }: { data: BurndownPoint[] }) {
                 strokeWidth={2}
             />
 
-            {data.filter((_, i) => i % labelStep === 0).map((d) => {
-                const idx = data.indexOf(d);
+            {data
+                .filter((_, i) => i % labelStep === 0)
+                .map((d) => {
+                    const idx = data.indexOf(d);
 
-                return (
-                    <text
-                        key={d.date}
-                        x={xScale(idx)}
-                        y={padding.top + chartH + 16}
-                        textAnchor="middle"
-                        className="fill-muted-foreground"
-                        fontSize={8}
-                    >
-                        {d.date.slice(5)}
-                    </text>
-                );
-            })}
+                    return (
+                        <text
+                            key={d.date}
+                            x={xScale(idx)}
+                            y={padding.top + chartH + 16}
+                            textAnchor="middle"
+                            className="fill-muted-foreground"
+                            fontSize={8}
+                        >
+                            {d.date.slice(5)}
+                        </text>
+                    );
+                })}
         </svg>
     );
 }

@@ -975,11 +975,17 @@ export function TaskDetailDrawer({
                                             size="icon"
                                             className="text-muted-foreground hover:text-foreground"
                                             onClick={() => {
-                                                if (workspaceSlug && projectSlug && task) {
+                                                if (
+                                                    workspaceSlug &&
+                                                    projectSlug &&
+                                                    task
+                                                ) {
                                                     window.open(
                                                         showTask.url({
-                                                            workspace: workspaceSlug,
-                                                            project: projectSlug,
+                                                            workspace:
+                                                                workspaceSlug,
+                                                            project:
+                                                                projectSlug,
                                                             task: task.id,
                                                         }),
                                                         '_blank',

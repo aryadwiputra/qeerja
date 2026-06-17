@@ -1,12 +1,7 @@
 'use no memo';
 
 import { Head, Link, router } from '@inertiajs/react';
-import {
-    ArrowLeft,
-    Plus,
-    Trash2,
-    Users,
-} from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
@@ -256,15 +251,11 @@ export default function ComponentsIndex({
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="component-desc">
-                                Description
-                            </Label>
+                            <Label htmlFor="component-desc">Description</Label>
                             <Input
                                 id="component-desc"
                                 value={description}
-                                onChange={(e) =>
-                                    setDescription(e.target.value)
-                                }
+                                onChange={(e) => setDescription(e.target.value)}
                                 placeholder="Optional description"
                             />
                         </div>
@@ -297,10 +288,7 @@ export default function ComponentsIndex({
                         >
                             Cancel
                         </Button>
-                        <Button
-                            onClick={handleSubmit}
-                            disabled={!name.trim()}
-                        >
+                        <Button onClick={handleSubmit} disabled={!name.trim()}>
                             {editing ? 'Save' : 'Create'}
                         </Button>
                     </DialogFooter>

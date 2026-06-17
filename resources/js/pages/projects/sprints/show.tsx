@@ -1,5 +1,13 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, CalendarDays, Check, Play, Plus, SquareChartGantt, X } from 'lucide-react';
+import {
+    ArrowLeft,
+    CalendarDays,
+    Check,
+    Play,
+    Plus,
+    SquareChartGantt,
+    X,
+} from 'lucide-react';
 import { useState } from 'react';
 import { TaskDetailDrawer } from '@/components/task-detail-drawer';
 import { Badge } from '@/components/ui/badge';

@@ -173,11 +173,13 @@ export default function MyTasks({ tasks, projects, filters }: Props) {
                                     key={task.id}
                                     onClick={() => {
                                         setDrawerTaskId(task.id);
-                                        setDrawerWorkspaceSlug(task.workspace.slug);
+                                        setDrawerWorkspaceSlug(
+                                            task.workspace.slug,
+                                        );
                                         setDrawerProjectSlug(task.project.slug);
                                         setDrawerOpen(true);
                                     }}
-                                    className="rounded-lg border bg-card p-4 shadow-sm transition-colors hover:bg-muted/50 cursor-pointer"
+                                    className="cursor-pointer rounded-lg border bg-card p-4 shadow-sm transition-colors hover:bg-muted/50"
                                 >
                                     <div className="flex items-start justify-between gap-3">
                                         <div className="min-w-0">
@@ -266,8 +268,12 @@ export default function MyTasks({ tasks, projects, filters }: Props) {
                                             className="cursor-pointer border-b transition-colors hover:bg-muted/50"
                                             onClick={() => {
                                                 setDrawerTaskId(task.id);
-                                                setDrawerWorkspaceSlug(task.workspace.slug);
-                                                setDrawerProjectSlug(task.project.slug);
+                                                setDrawerWorkspaceSlug(
+                                                    task.workspace.slug,
+                                                );
+                                                setDrawerProjectSlug(
+                                                    task.project.slug,
+                                                );
                                                 setDrawerOpen(true);
                                             }}
                                         >
