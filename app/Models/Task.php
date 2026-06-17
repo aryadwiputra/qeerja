@@ -149,6 +149,11 @@ class Task extends Model
         return $this->belongsToMany(Component::class, 'component_task');
     }
 
+    public function approvals(): HasMany
+    {
+        return $this->hasMany(TaskApproval::class);
+    }
+
     public function getGithubBranchAttribute(): string
     {
         $slug = Str::slug($this->title);

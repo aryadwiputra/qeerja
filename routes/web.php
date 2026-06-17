@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\ApprovalFlowController;
 use App\Http\Controllers\AutomationRuleController;
 use App\Http\Controllers\BacklogController;
 use App\Http\Controllers\BoardColumnController;
@@ -211,6 +212,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/workspaces/{workspace:slug}/projects/{project:slug}/automation/{rule}', [AutomationRuleController::class, 'update'])->name('projects.automation.update');
         Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/automation/{rule}', [AutomationRuleController::class, 'destroy'])->name('projects.automation.destroy');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/automation/{rule}/test', [AutomationRuleController::class, 'test'])->name('projects.automation.test');
+
+        Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/approvals', [ApprovalFlowController::class, 'index'])->name('projects.approvals.index');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/approvals', [ApprovalFlowController::class, 'store'])->name('projects.approvals.store');
+        Route::put('/workspaces/{workspace:slug}/projects/{project:slug}/approvals/{flow}', [ApprovalFlowController::class, 'update'])->name('projects.approvals.update');
+        Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/approvals/{flow}', [ApprovalFlowController::class, 'destroy'])->name('projects.approvals.destroy');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/approve', [ApprovalFlowController::class, 'approve'])->name('projects.tasks.approve');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/reject', [ApprovalFlowController::class, 'reject'])->name('projects.tasks.reject');
 
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/comments', [TaskCommentController::class, 'store'])->name('projects.tasks.comments.store');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/comments/typing', [CommentTypingController::class, 'ping'])->name('projects.tasks.comments.typing');

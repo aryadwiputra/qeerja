@@ -96,6 +96,11 @@ class Project extends Model
         return $this->hasMany(AutomationRule::class);
     }
 
+    public function approvalFlows(): HasMany
+    {
+        return $this->hasMany(ApprovalFlow::class);
+    }
+
     public function integration(): HasOne
     {
         return $this->hasOne(Integration::class);

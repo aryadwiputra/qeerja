@@ -11,6 +11,7 @@ use App\Models\BoardColumn;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\TaskActivity;
+use App\Models\TaskApproval;
 use App\Models\Workspace;
 use App\Services\NotificationService;
 use App\Services\TaskActivityService;
@@ -409,6 +410,58 @@ class TaskController extends Controller
             }
         }
 
+        // Check for approval flows on the target column
+        if (! $isSameColumn) {
+            $approvalFlow = $project->approvalFlows()
+                ->where('column_id', $targetColumn->id)
+                ->where('enabled', true)
+                ->first();
+
+            if ($approvalFlow) {
+                // Check if task already has pending approval for this flow
+                $existingApproval = $task->approvals()
+                    ->where('approval_flow_id', $approvalFlow->id)
+                    ->where('status', 'pending')
+                    ->first();
+
+                if (! $existingApproval) {
+                    // Create approval requests
+                    $approvers = $this->resolveApprovers($approvalFlow->required_approvers, $workspace);
+
+                    foreach ($approvers as $approverId) {
+                        TaskApproval::create([
+                            'task_id' => $task->id,
+                            'approval_flow_id' => $approvalFlow->id,
+                            'approver_id' => $approverId,
+                            'status' => 'pending',
+                        ]);
+                    }
+
+                    Inertia::flash('toast', [
+                        'type' => 'info',
+                        'message' => "Approval required to move to \"{$targetColumn->name}\". Requests sent to approvers.",
+                    ]);
+
+                    return back(303);
+                }
+
+                // Check if enough approvals exist
+                $approvedCount = $task->approvals()
+                    ->where('approval_flow_id', $approvalFlow->id)
+                    ->where('status', 'approved')
+                    ->count();
+
+                if ($approvedCount < $approvalFlow->min_approvals) {
+                    Inertia::flash('toast', [
+                        'type' => 'warning',
+                        'message' => "Awaiting approval ({$approvedCount}/{$approvalFlow->min_approvals}).",
+                    ]);
+
+                    return back(303);
+                }
+            }
+        }
+
         DB::transaction(function () use ($task, $targetColumn, $position, $oldColumnId) {
             $task->update([
                 'board_column_id' => $targetColumn->id,
@@ -453,6 +506,28 @@ class TaskController extends Controller
         ))->toOthers();
 
         return back(303);
+    }
+
+    protected function resolveApprovers(array $requiredApprovers, Workspace $workspace): array
+    {
+        $approverIds = [];
+
+        foreach ($requiredApprovers as $approver) {
+            $type = $approver['type'] ?? '';
+            $value = $approver['value'] ?? null;
+
+            if ($type === 'user') {
+                $approverIds[] = (int) str_replace('user:', '', $value);
+            } elseif ($type === 'role') {
+                $roleMembers = $workspace->members()
+                    ->where('role', $value)
+                    ->pluck('user_id')
+                    ->all();
+                $approverIds = array_merge($approverIds, $roleMembers);
+            }
+        }
+
+        return array_unique($approverIds);
     }
 
     public function createBranch(Workspace $workspace, Project $project, Task $task): JsonResponse
