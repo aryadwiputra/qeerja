@@ -7,6 +7,7 @@ import {
     Search,
     Settings,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import AppLogo from '@/components/app-logo';
 import { ConnectionStatus } from '@/components/connection-status';
 import { NavFooter } from '@/components/nav-footer';
@@ -36,34 +37,35 @@ import { search as taskSearch } from '@/routes/tasks';
 import type { NavItem } from '@/types';
 import type { CurrentWorkspaceProps } from '@/types/dashboard';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'My Tasks',
-        href: myTasksIndex(),
-        icon: CheckSquare,
-    },
-    {
-        title: 'Search',
-        href: taskSearch(),
-        icon: Search,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Settings',
-        href: profileEdit(),
-        icon: Settings,
-    },
-];
-
 export function AppSidebar() {
+    const { t } = useTranslation();
     const { props } = usePage();
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: t('sidebar.dashboard'),
+            href: dashboard(),
+            icon: LayoutGrid,
+        },
+        {
+            title: t('sidebar.my_tasks'),
+            href: myTasksIndex(),
+            icon: CheckSquare,
+        },
+        {
+            title: t('sidebar.search'),
+            href: taskSearch(),
+            icon: Search,
+        },
+    ];
+
+    const footerNavItems: NavItem[] = [
+        {
+            title: t('sidebar.settings'),
+            href: profileEdit(),
+            icon: Settings,
+        },
+    ];
 
     const currentWorkspace =
         props.currentWorkspace as CurrentWorkspaceProps | null;
@@ -94,12 +96,12 @@ export function AppSidebar() {
                         <SidebarMenuItem>
                             <div className="flex items-center justify-between px-2 py-1">
                                 <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                                    Projects
+                                    {t('sidebar.projects')}
                                 </span>
                                 <button
                                     type="button"
                                     className="rounded-sm p-0.5 text-muted-foreground transition-colors hover:text-foreground"
-                                    aria-label="New project"
+                                    aria-label={t('sidebar.new_project')}
                                     onClick={() =>
                                         router.visit(
                                             projectCreate.url({
@@ -165,7 +167,7 @@ export function AppSidebar() {
                                 <div className="flex flex-col items-center gap-2 rounded-md border border-dashed px-3 py-4">
                                     <FolderKanban className="size-6 text-muted-foreground/40" />
                                     <p className="text-center text-xs text-muted-foreground">
-                                        No projects yet
+                                        {t('sidebar.no_projects')}
                                     </p>
                                     <button
                                         type="button"
@@ -179,7 +181,7 @@ export function AppSidebar() {
                                             )
                                         }
                                     >
-                                        Create your first project
+                                        {t('sidebar.create_first_project')}
                                     </button>
                                 </div>
                             )}
@@ -190,8 +192,7 @@ export function AppSidebar() {
                 {!currentWorkspace && (
                     <div className="px-4 py-3">
                         <p className="text-xs text-muted-foreground">
-                            Create a workspace to get started with projects and
-                            tasks.
+                            {t('sidebar.create_workspace_prompt')}
                         </p>
                     </div>
                 )}

@@ -1,6 +1,7 @@
 import { useConnectionStatus } from '@laravel/echo-react';
 import { Wifi, WifiOff } from 'lucide-react';
 import { useSyncExternalStore } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const emptySubscribe = () => () => {};
 
@@ -19,6 +20,7 @@ export function ConnectionStatus() {
 }
 
 function ConnectionStatusInner() {
+    const { t } = useTranslation();
     const status = useConnectionStatus();
 
     if (status === 'connected') {
@@ -30,12 +32,12 @@ function ConnectionStatusInner() {
             {status === 'disconnected' || status === 'failed' ? (
                 <>
                     <WifiOff className="size-3 text-destructive" />
-                    <span>Disconnected</span>
+                    <span>{t('connection.disconnected')}</span>
                 </>
             ) : (
                 <>
                     <Wifi className="size-3 text-amber-500" />
-                    <span>Reconnecting...</span>
+                    <span>{t('connection.reconnecting')}</span>
                 </>
             )}
         </div>

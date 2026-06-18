@@ -1,5 +1,6 @@
 import { router, usePage } from '@inertiajs/react';
 import { Check, ChevronDown, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -30,6 +31,7 @@ function switchWorkspace(workspaceSlug: string) {
 }
 
 export function WorkspaceSwitcher() {
+    const { t } = useTranslation();
     const { props } = usePage();
     const workspaces = (props.workspaces as WorkspaceProps[]) ?? [];
     const currentWorkspace =
@@ -45,7 +47,7 @@ export function WorkspaceSwitcher() {
                     className="max-w-[14rem] min-w-0 justify-start border-sidebar-border/60 sm:max-w-[18rem]"
                 >
                     <span className="truncate">
-                        {currentWorkspace?.name ?? 'Select workspace'}
+                        {currentWorkspace?.name ?? t('workspace.select_workspace')}
                     </span>
                     <ChevronDown className="shrink-0 text-muted-foreground" />
                 </Button>
@@ -83,7 +85,7 @@ export function WorkspaceSwitcher() {
                         onClick={() => router.visit(workspaceCreate())}
                     >
                         <Plus />
-                        <span>Create workspace</span>
+                        <span>{t('workspace.create_workspace')}</span>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
             </DropdownMenuContent>
