@@ -12,6 +12,7 @@ import {
     X,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { GithubSettingsTab } from '@/components/github-settings-tab';
 import { ProjectMemberDialog } from '@/components/project-member-dialog';
 import { Badge } from '@/components/ui/badge';
@@ -181,6 +182,7 @@ export default function ProjectSettings({
     boards,
     integration,
 }: Props) {
+    const { t } = useTranslation();
     const [addMemberOpen, setAddMemberOpen] = useState(false);
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [editingLabel, setEditingLabel] = useState<ProjectLabel | null>(null);
@@ -401,7 +403,7 @@ export default function ProjectSettings({
                     </Link>
                     <Separator orientation="vertical" className="h-4" />
                     <h1 className="text-2xl font-semibold tracking-tight">
-                        Settings
+                        {t('settings.title')}
                     </h1>
                 </div>
 
@@ -409,10 +411,10 @@ export default function ProjectSettings({
                     <Tabs defaultValue="general">
                         <TabsList className="mb-6">
                             <TabsTrigger value="general">General</TabsTrigger>
-                            <TabsTrigger value="settings">Settings</TabsTrigger>
+                            <TabsTrigger value="settings">{t('settings.title')}</TabsTrigger>
                             <TabsTrigger value="members">Members</TabsTrigger>
-                            <TabsTrigger value="labels">Labels</TabsTrigger>
-                            <TabsTrigger value="board">Board</TabsTrigger>
+                            <TabsTrigger value="labels">{t('task.labels')}</TabsTrigger>
+                            <TabsTrigger value="board">{t('board.board')}</TabsTrigger>
                             <TabsTrigger value="epics">Epics</TabsTrigger>
                             <TabsTrigger value="sprints">Sprints</TabsTrigger>
                             <TabsTrigger value="github">GitHub</TabsTrigger>
@@ -539,7 +541,7 @@ export default function ProjectSettings({
                                                     disabled={processing}
                                                 >
                                                     {processing
-                                                        ? 'Saving...'
+                                                        ? t('common.saving')
                                                         : 'Save changes'}
                                                 </Button>
                                             </>
@@ -688,7 +690,7 @@ export default function ProjectSettings({
                                                     className="w-fit"
                                                 >
                                                     {processing
-                                                        ? 'Saving...'
+                                                        ? t('common.saving')
                                                         : 'Save changes'}
                                                 </Button>
                                             </>

@@ -1,6 +1,7 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -21,11 +22,12 @@ interface Props {
 }
 
 export default function ProjectsCreate({ workspace }: Props) {
+    const { t } = useTranslation();
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
     return (
         <>
-            <Head title={`${workspace.name} — Create project`} />
+            <Head title={`${workspace.name} — ${t('project.create_project')}`} />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Link
@@ -33,13 +35,13 @@ export default function ProjectsCreate({ workspace }: Props) {
                     className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <ArrowLeft className="size-4" />
-                    <span>Back to projects</span>
+                    <span>{t('common.back')} to {t('sidebar.projects')}</span>
                 </Link>
 
                 <div className="mx-auto w-full max-w-lg">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Create project</CardTitle>
+                            <CardTitle>{t('project.create_project')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <Form
@@ -54,12 +56,12 @@ export default function ProjectsCreate({ workspace }: Props) {
                                     <>
                                         <div className="flex flex-col gap-2">
                                             <Label htmlFor="name">
-                                                Project name
+                                                {t('onboarding.project_name')}
                                             </Label>
                                             <Input
                                                 id="name"
                                                 name="name"
-                                                placeholder="My Project"
+                                                placeholder={t('onboarding.project_name_placeholder')}
                                                 onChange={(e) => {
                                                     if (!slugManuallyEdited) {
                                                         const slugInput =
@@ -116,11 +118,11 @@ export default function ProjectsCreate({ workspace }: Props) {
                                         </div>
 
                                         <div className="flex flex-col gap-2">
-                                            <Label htmlFor="key">Key</Label>
+                                            <Label htmlFor="key">{t('onboarding.project_key')}</Label>
                                             <Input
                                                 id="key"
                                                 name="key"
-                                                placeholder="PROJ"
+                                                placeholder={t('onboarding.project_key_placeholder')}
                                                 maxLength={6}
                                                 className="font-mono uppercase"
                                                 onFocus={(e) => {
@@ -142,11 +144,11 @@ export default function ProjectsCreate({ workspace }: Props) {
                                         </div>
 
                                         <div className="flex flex-col gap-2">
-                                            <Label htmlFor="slug">Slug</Label>
+                                            <Label htmlFor="slug">{t('onboarding.project_slug')}</Label>
                                             <Input
                                                 id="slug"
                                                 name="slug"
-                                                placeholder="my-project"
+                                                placeholder={t('onboarding.project_slug_placeholder')}
                                                 onFocus={() =>
                                                     setSlugManuallyEdited(true)
                                                 }
@@ -174,8 +176,8 @@ export default function ProjectsCreate({ workspace }: Props) {
                                             className="w-full"
                                         >
                                             {processing
-                                                ? 'Creating...'
-                                                : 'Create project'}
+                                                ? t('common.creating')
+                                                : t('project.create_project')}
                                         </Button>
                                     </>
                                 )}

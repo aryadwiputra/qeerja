@@ -19,6 +19,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, CalendarDays, GripVertical, Layers } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FeatureGuide } from '@/components/feature-guide';
 import { TaskDetailDrawer } from '@/components/task-detail-drawer';
 import { Badge } from '@/components/ui/badge';
@@ -97,56 +98,51 @@ interface ProjectData {
     color: string | null;
 }
 
-const backlogGuide = {
-    title: 'Backlog Management',
-    description:
-        'Organize and prioritize tasks that are not yet assigned to a sprint.',
-    sections: [
-        {
-            title: 'What is the Backlog?',
-            content:
-                "The backlog is a holding area for all tasks that haven't been assigned to a sprint. It's your project's task inbox where you can triage, prioritize, and organize work before committing it to a sprint.",
-        },
-        {
-            title: 'Sprint Planning from Backlog',
-            content:
-                'When planning a sprint, drag tasks from the backlog into a sprint to commit them to that iteration. Tasks in the backlog are visible but not actively worked on.',
-        },
-    ],
-    items: [
-        {
-            heading: 'Backlog Features',
-            data: [
-                {
-                    term: 'Drag & Drop Reorder',
-                    description:
-                        'Drag tasks within the backlog to reorder them by priority. Tasks at the top are typically worked on first.',
-                },
-                {
-                    term: 'Add to Sprint',
-                    description:
-                        'Click the sprint dropdown on a task to assign it to a specific sprint. The task moves from backlog to that sprint.',
-                },
-                {
-                    term: 'Sprint Overview',
-                    description:
-                        'See all sprints and their task counts in the Sprints section. Click a sprint name to view its details.',
-                },
-                {
-                    term: 'Task Details',
-                    description:
-                        'Click a task to open the detail drawer. From there you can edit properties, add comments, or move it to a sprint.',
-                },
-            ],
-        },
-    ],
-    tips: [
-        'Keep the backlog groomed — regularly review and reprioritize tasks.',
-        'Use story points to estimate effort before adding tasks to sprints.',
-        'Tasks at the top of the backlog are highest priority.',
-        "Create tasks directly from the backlog if you're not ready to assign them to a sprint.",
-    ],
-};
+function useBacklogGuide(t: (key: string) => string) {
+    return {
+        title: t('guide.backlog.title'),
+        description: t('guide.backlog.description'),
+        sections: [
+            {
+                title: t('guide.backlog.section_what'),
+                content: t('guide.backlog.content_what'),
+            },
+            {
+                title: t('guide.backlog.section_planning'),
+                content: t('guide.backlog.content_planning'),
+            },
+        ],
+        items: [
+            {
+                heading: t('guide.backlog.heading_features'),
+                data: [
+                    {
+                        term: t('guide.backlog.drag_reorder'),
+                        description: t('guide.backlog.drag_reorder_desc'),
+                    },
+                    {
+                        term: t('guide.backlog.add_to_sprint'),
+                        description: t('guide.backlog.add_to_sprint_desc'),
+                    },
+                    {
+                        term: t('guide.backlog.sprint_overview'),
+                        description: t('guide.backlog.sprint_overview_desc'),
+                    },
+                    {
+                        term: t('guide.backlog.task_details'),
+                        description: t('guide.backlog.task_details_desc'),
+                    },
+                ],
+            },
+        ],
+        tips: [
+            t('guide.backlog.tip_1'),
+            t('guide.backlog.tip_2'),
+            t('guide.backlog.tip_3'),
+            t('guide.backlog.tip_4'),
+        ],
+    };
+}
 
 interface Props {
     workspace: Workspace;
@@ -175,6 +171,7 @@ function SortableTaskRow({
     onMoveToSprint: (taskId: number, sprintId: number) => void;
     onClick: () => void;
 }) {
+    const { t } = useTranslation();
     const {
         attributes,
         listeners,
@@ -257,7 +254,7 @@ function SortableTaskRow({
                 }}
             >
                 <SelectTrigger className="h-8 w-40 text-xs">
-                    <SelectValue placeholder="Move to sprint" />
+                    <SelectValue placeholder={t('sprint.add_task')} />
                 </SelectTrigger>
                 <SelectContent>
                     {sprints
@@ -282,6 +279,8 @@ export default function BacklogIndex({
     sprints,
     backlogTasks: initialTasks,
 }: Props) {
+    const { t } = useTranslation();
+    const backlogGuide = useBacklogGuide(t);
     const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
     const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
     const [drawerTaskId, setDrawerTaskId] = useState<number | null>(null);

@@ -3,6 +3,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, CalendarDays, Plus, Rocket, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -69,6 +70,7 @@ export default function ReleasesIndex({
     project,
     releases: initialReleases,
 }: Props) {
+    const { t } = useTranslation();
     const [releases, setReleases] = useState(initialReleases);
     const [createOpen, setCreateOpen] = useState(false);
     const [newName, setNewName] = useState('');
@@ -234,7 +236,7 @@ export default function ReleasesIndex({
 
     return (
         <>
-            <Head title={`Releases — ${project.name}`} />
+            <Head title={`${t('release.title')} — ${project.name}`} />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex items-center gap-4">
@@ -249,14 +251,14 @@ export default function ReleasesIndex({
                         <span>{project.name}</span>
                     </Link>
                     <span className="text-sm text-muted-foreground">/</span>
-                    <span className="text-sm font-medium">Releases</span>
+                    <span className="text-sm font-medium">{t('release.title')}</span>
                 </div>
 
                 <div className="mx-auto w-full max-w-4xl">
                     <div className="mb-6 flex items-start justify-between gap-4">
                         <div>
                             <h1 className="text-2xl font-semibold tracking-tight">
-                                Releases
+                                {t('release.title')}
                             </h1>
                             <p className="mt-1 text-sm text-muted-foreground">
                                 {releases.length} release

@@ -21,6 +21,7 @@ import {
     Upload,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CalendarView } from '@/components/calendar-view';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EpicDialog } from '@/components/epic-dialog';
@@ -254,6 +255,7 @@ export default function ProjectShow({
 }: Props) {
     'use no memo';
 
+    const { t } = useTranslation();
     const [search, setSearch] = useState('');
     const [activeTab, setActiveTab] = useState('list');
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -767,7 +769,7 @@ export default function ProjectShow({
                         className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                         <ArrowLeft className="size-4" />
-                        <span>Projects</span>
+                        <span>{t('sidebar.projects')}</span>
                     </Link>
                 </div>
 
@@ -820,7 +822,7 @@ export default function ProjectShow({
                     >
                         <Button variant="outline" size="sm">
                             <Settings className="size-4" />
-                            <span>Settings</span>
+                            <span>{t('settings.title')}</span>
                         </Button>
                     </Link>
                 </div>
@@ -843,7 +845,7 @@ export default function ProjectShow({
                             }
                         >
                             <LayoutGrid className="size-4" />
-                            <span>Board</span>
+                            <span>{t('board.board')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="list">List</TabsTrigger>
                         <TabsTrigger value="epics">Epics</TabsTrigger>
@@ -872,9 +874,9 @@ export default function ProjectShow({
                                 )
                             }
                         >
-                            Releases
+                            {t('release.title')}
                         </TabsTrigger>
-                        <TabsTrigger value="labels">Labels</TabsTrigger>
+                        <TabsTrigger value="labels">{t('task.labels')}</TabsTrigger>
                         <TabsTrigger
                             value="components"
                             onClick={() =>
@@ -886,7 +888,7 @@ export default function ProjectShow({
                                 )
                             }
                         >
-                            Components
+                            {t('component.title')}
                         </TabsTrigger>
                         <TabsTrigger value="timeline">Timeline</TabsTrigger>
                         <TabsTrigger
@@ -903,8 +905,8 @@ export default function ProjectShow({
                             Workload
                         </TabsTrigger>
                         <TabsTrigger value="files">Files</TabsTrigger>
-                        <TabsTrigger value="reports">Reports</TabsTrigger>
-                        <TabsTrigger value="activity">Activity</TabsTrigger>
+                        <TabsTrigger value="reports">{t('reports.title')}</TabsTrigger>
+                        <TabsTrigger value="activity">{t('task.activity')}</TabsTrigger>
                         <TabsTrigger
                             value="automation"
                             onClick={() =>
@@ -953,7 +955,7 @@ export default function ProjectShow({
                                                 setSearch(event.target.value);
                                                 setPage(0);
                                             }}
-                                            placeholder="Search tasks..."
+                                            placeholder={t('task.search_code_title_desc')}
                                             className="pl-9"
                                         />
                                     </div>
@@ -1073,8 +1075,7 @@ export default function ProjectShow({
                                                         }
                                                         className="px-3 py-12 text-center text-sm text-muted-foreground"
                                                     >
-                                                        No tasks match your
-                                                        search.
+                                                        {t('common.no_results')}
                                                     </td>
                                                 </tr>
                                             )}
@@ -1138,7 +1139,7 @@ export default function ProjectShow({
                                     }}
                                 >
                                     <Flag className="size-3.5" />
-                                    <span>Create epic</span>
+                                    <span>{t('epic.create_epic')}</span>
                                 </Button>
                             </CardHeader>
                             <CardContent>
@@ -1290,7 +1291,7 @@ export default function ProjectShow({
                                     }}
                                 >
                                     <CalendarDays className="size-3.5" />
-                                    <span>Create sprint</span>
+                                    <span>{t('sprint.create_sprint')}</span>
                                 </Button>
                             </CardHeader>
                             <CardContent>
@@ -1458,7 +1459,7 @@ export default function ProjectShow({
                                             d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"
                                         />
                                     </svg>
-                                    <span>Create label</span>
+                                    <span>{t('label.create_label')}</span>
                                 </Button>
                             </CardHeader>
                             <CardContent>
@@ -1695,7 +1696,7 @@ export default function ProjectShow({
                                     })}
                                 >
                                     <Button variant="outline" size="sm">
-                                        View all
+                                        {t('common.view')}
                                     </Button>
                                 </Link>
                             </CardHeader>

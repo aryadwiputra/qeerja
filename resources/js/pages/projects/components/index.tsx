@@ -3,6 +3,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Plus, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -69,6 +70,7 @@ export default function ComponentsIndex({
     components,
     members,
 }: Props) {
+    const { t } = useTranslation();
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editing, setEditing] = useState<ComponentData | null>(null);
     const [deleting, setDeleting] = useState<ComponentData | null>(null);
@@ -123,7 +125,7 @@ export default function ComponentsIndex({
 
     return (
         <>
-            <Head title={`Components — ${project.name}`} />
+            <Head title={`${t('component.title')} — ${project.name}`} />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex items-center gap-4">
@@ -139,7 +141,7 @@ export default function ComponentsIndex({
                     </Link>
                     <span className="text-sm text-muted-foreground">/</span>
                     <span className="text-sm text-muted-foreground">
-                        Components
+                        {t('component.title')}
                     </span>
                 </div>
 
@@ -147,7 +149,7 @@ export default function ComponentsIndex({
                     <div className="mb-6 flex items-start justify-between gap-4">
                         <div>
                             <h1 className="text-2xl font-semibold tracking-tight">
-                                Components
+                                {t('component.title')}
                             </h1>
                             <p className="mt-1 text-sm text-muted-foreground">
                                 Categorize tasks by UI or backend components.
@@ -155,7 +157,7 @@ export default function ComponentsIndex({
                         </div>
                         <Button size="sm" onClick={openCreate}>
                             <Plus className="size-3" />
-                            Create component
+                            {t('component.create_component')}
                         </Button>
                     </div>
 
@@ -217,16 +219,15 @@ export default function ComponentsIndex({
                             <Users className="size-8 text-muted-foreground" />
                             <div>
                                 <p className="text-sm font-medium">
-                                    No components yet
+                                    {t('component.no_components')}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    Create components to categorize tasks by
-                                    area of the product.
+                                    {t('component.create_first')}
                                 </p>
                             </div>
                             <Button size="sm" onClick={openCreate}>
                                 <Plus className="size-3" />
-                                Create component
+                                {t('component.create_component')}
                             </Button>
                         </div>
                     )}
@@ -237,12 +238,12 @@ export default function ComponentsIndex({
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>
-                            {editing ? 'Edit component' : 'Create component'}
+                            {editing ? t('component.edit_component') : t('component.create_component')}
                         </DialogTitle>
                     </DialogHeader>
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="component-name">Name</Label>
+                            <Label htmlFor="component-name">{t('component.name')}</Label>
                             <Input
                                 id="component-name"
                                 value={name}
@@ -251,7 +252,7 @@ export default function ComponentsIndex({
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="component-desc">Description</Label>
+                            <Label htmlFor="component-desc">{t('component.description')}</Label>
                             <Input
                                 id="component-desc"
                                 value={description}
@@ -260,7 +261,7 @@ export default function ComponentsIndex({
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <Label>Lead</Label>
+                            <Label>{t('component.lead')}</Label>
                             <Select value={leadId} onValueChange={setLeadId}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Assign a lead..." />
@@ -286,10 +287,10 @@ export default function ComponentsIndex({
                             variant="outline"
                             onClick={() => setDialogOpen(false)}
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button onClick={handleSubmit} disabled={!name.trim()}>
-                            {editing ? 'Save' : 'Create'}
+                            {editing ? t('common.save') : t('common.create')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

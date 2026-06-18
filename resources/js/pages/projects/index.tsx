@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, FolderKanban, Plus, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -35,12 +36,13 @@ interface Props {
 }
 
 export default function ProjectsIndex({ workspace, projects }: Props) {
+    const { t } = useTranslation();
     const activeProjects = projects.filter((p) => !p.deleted_at);
     const hasProjects = projects.length > 0;
 
     return (
         <>
-            <Head title={`${workspace.name} — Projects`} />
+            <Head title={`${workspace.name} — ${t('sidebar.projects')}`} />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex items-center gap-4">
@@ -49,7 +51,7 @@ export default function ProjectsIndex({ workspace, projects }: Props) {
                         className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                         <ArrowLeft className="size-4" />
-                        <span>Workspaces</span>
+                        <span>{t('project.workspaces')}</span>
                     </Link>
                 </div>
 
@@ -59,7 +61,7 @@ export default function ProjectsIndex({ workspace, projects }: Props) {
                             {workspace.name}
                         </h1>
                         <p className="text-sm text-muted-foreground">
-                            Projects in this workspace.
+                            {t('project.projects_in_workspace')}
                         </p>
                     </div>
                     <Link
@@ -70,7 +72,7 @@ export default function ProjectsIndex({ workspace, projects }: Props) {
                         )}
                     >
                         <Plus className="size-4" />
-                        <span>New project</span>
+                        <span>{t('sidebar.new_project')}</span>
                     </Link>
                 </div>
 
@@ -79,11 +81,10 @@ export default function ProjectsIndex({ workspace, projects }: Props) {
                         <FolderKanban className="size-12 text-muted-foreground/40" />
                         <div className="text-center">
                             <p className="text-lg font-medium">
-                                No projects yet
+                                {t('project.no_projects')}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                                Create your first project to start tracking
-                                tasks.
+                                {t('project.create_first')}
                             </p>
                         </div>
                         <Link
@@ -94,7 +95,7 @@ export default function ProjectsIndex({ workspace, projects }: Props) {
                             )}
                         >
                             <Plus className="size-4" />
-                            <span>Create project</span>
+                            <span>{t('project.create_project')}</span>
                         </Link>
                     </div>
                 )}

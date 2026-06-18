@@ -3,6 +3,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Users } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -74,6 +75,7 @@ export default function WorkloadPage({
     members,
     sprints,
 }: Props) {
+    const { t } = useTranslation();
     const [editingMember, setEditingMember] = useState<MemberWorkload | null>(
         null,
     );
@@ -342,9 +344,9 @@ export default function WorkloadPage({
                             variant="outline"
                             onClick={() => setEditingMember(null)}
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
-                        <Button onClick={saveCapacity}>Save</Button>
+                        <Button onClick={saveCapacity}>{t('common.save')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

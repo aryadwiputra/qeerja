@@ -2,6 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { Activity, ArrowLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -84,6 +85,7 @@ export default function ActivityIndex({
     actions,
     members,
 }: Props) {
+    const { t } = useTranslation();
     const [activities, setActivities] = useState(initialActivities);
 
     useEffect(() => {
@@ -151,7 +153,7 @@ export default function ActivityIndex({
 
     return (
         <>
-            <Head title={`Activity — ${project.name}`} />
+            <Head title={`${t('task.activity')} — ${project.name}`} />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex items-center gap-4">
@@ -166,7 +168,7 @@ export default function ActivityIndex({
                         <span>{project.name}</span>
                     </Link>
                     <span className="text-sm text-muted-foreground">/</span>
-                    <span className="text-sm">Activity</span>
+                    <span className="text-sm">{t('task.activity')}</span>
                 </div>
 
                 <div className="mx-auto w-full max-w-2xl">
@@ -240,7 +242,7 @@ export default function ActivityIndex({
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Activity className="size-5" />
-                                Activity
+                                {t('task.activity')}
                                 <span className="text-sm font-normal text-muted-foreground">
                                     ({activities.total} total)
                                 </span>
