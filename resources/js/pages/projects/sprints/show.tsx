@@ -26,6 +26,7 @@ import {
 import { cn } from '@/lib/utils';
 import {
     show as projectShow,
+    board as projectBoard,
     settings as projectSettings,
 } from '@/routes/projects';
 import {
@@ -346,6 +347,21 @@ export default function SprintShow({
                                     </Button>
                                 </Link>
                             )}
+                            <Link
+                                href={projectBoard.url(
+                                    {
+                                        workspace: workspace.slug,
+                                        project: project.slug,
+                                    },
+                                    {
+                                        query: { sprint_id: sprint.id },
+                                    },
+                                )}
+                            >
+                                <Button variant="outline" size="sm">
+                                    {t('sprint_page.open_board')}
+                                </Button>
+                            </Link>
                             <Link
                                 href={projectSettings({
                                     workspace: workspace.slug,

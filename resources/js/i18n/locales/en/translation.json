@@ -258,6 +258,8 @@
         "regular": "Regular",
         "board": "Board",
         "board_label": "Board:",
+        "sprint_label": "Sprint:",
+        "all_sprints": "All sprints",
         "drop_here": "Drop here",
         "no_tasks": "No tasks"
     },
@@ -935,6 +937,7 @@
         "complete_sprint": "Complete sprint",
         "complete_confirm": "Complete this sprint?",
         "view_report": "View report",
+        "open_board": "Open Board",
         "edit_sprint": "Edit sprint",
         "tasks_card_title": "Tasks",
         "add_existing_task": "Add existing task...",

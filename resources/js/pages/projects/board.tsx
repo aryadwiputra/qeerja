@@ -204,6 +204,7 @@ interface Props {
         start_date: string | null;
         end_date: string | null;
     }>;
+    activeSprintId: number | null;
 }
 
 function getCsrfToken(): string {
@@ -287,6 +288,8 @@ function getSwimlaneKey(task: TaskItem, field: string): string {
             return task.priority?.name ?? 'No priority';
         case 'epic':
             return task.epics?.[0]?.name ?? 'No epic';
+        case 'sprint':
+            return task.sprints?.[0]?.name ?? 'No sprint';
         default:
             return '';
     }
@@ -438,6 +441,7 @@ function BoardClient({
     priorities,
     epics,
     sprints,
+    activeSprintId,
 }: Props) {
     const { t } = useTranslation();
     const boardGuide = useBoardGuide(t);
@@ -922,19 +926,24 @@ function BoardClient({
                                 <Select
                                     value={String(board.id)}
                                     onValueChange={(value) => {
-                                        router.visit(
-                                            projectBoard.url(
-                                                {
-                                                    workspace: workspace.slug,
-                                                    project: project.slug,
+                                        const url = projectBoard.url(
+                                            {
+                                                workspace: workspace.slug,
+                                                project: project.slug,
+                                            },
+                                            {
+                                                query: {
+                                                    board_id: value,
+                                                    ...(activeSprintId
+                                                        ? {
+                                                              sprint_id:
+                                                                  activeSprintId,
+                                                          }
+                                                        : {}),
                                                 },
-                                                {
-                                                    query: {
-                                                        board_id: value,
-                                                    },
-                                                },
-                                            ),
+                                            },
                                         );
+                                        router.visit(url);
                                     }}
                                 >
                                     <SelectTrigger className="h-8 w-44">
@@ -947,6 +956,68 @@ function BoardClient({
                                                 value={String(b.id)}
                                             >
                                                 {b.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+
+                        {sprints.length > 0 && (
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-muted-foreground">
+                                    {t('board.sprint_label')}
+                                </span>
+                                <Select
+                                    value={
+                                        activeSprintId
+                                            ? String(activeSprintId)
+                                            : 'all'
+                                    }
+                                    onValueChange={(value) => {
+                                        const query: Record<string, string> =
+                                            {};
+
+                                        if (value !== 'all') {
+                                            query.sprint_id = value;
+                                        }
+
+                                        if (board.id) {
+                                            query.board_id = String(board.id);
+                                        }
+
+                                        router.visit(
+                                            projectBoard.url(
+                                                {
+                                                    workspace: workspace.slug,
+                                                    project: project.slug,
+                                                },
+                                                { query },
+                                            ),
+                                        );
+                                    }}
+                                >
+                                    <SelectTrigger className="h-8 w-44">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">
+                                            {t('board.all_sprints')}
+                                        </SelectItem>
+                                        {sprints.map((s) => (
+                                            <SelectItem
+                                                key={s.id}
+                                                value={String(s.id)}
+                                            >
+                                                {s.name}
+                                                {s.status === 'active' && (
+                                                    <Badge
+                                                        variant="default"
+                                                        className="ml-2 px-1 py-0 text-[10px]"
+                                                    >
+                                                        {t('sprint.active')}
+                                                    </Badge>
+                                                )}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

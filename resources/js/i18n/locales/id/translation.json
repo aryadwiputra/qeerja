@@ -255,7 +255,12 @@
         "priority": "Prioritas",
         "epic": "Epic",
         "regular": "Biasa",
-        "board": "Papan"
+        "board": "Papan",
+        "board_label": "Papan:",
+        "sprint_label": "Sprint:",
+        "all_sprints": "Semua sprint",
+        "drop_here": "Jatuhkan di sini",
+        "no_tasks": "Tidak ada tugas"
     },
     "sprint": {
         "create_sprint": "Buat sprint",
@@ -711,6 +716,21 @@
         "something_went_wrong": "Terjadi kesalahan.",
         "unexpected_error": "Terjadi error yang tidak terduga.",
         "preview_not_available": "Pratinjau tidak tersedia untuk jenis file ini."
+    },
+    "sprint_page": {
+        "sprints": "Sprint",
+        "start_sprint": "Mulai sprint",
+        "complete_sprint": "Selesaikan sprint",
+        "complete_confirm": "Selesaikan sprint ini?",
+        "view_report": "Lihat Laporan",
+        "open_board": "Buka Papan",
+        "edit_sprint": "Edit sprint",
+        "tasks_card_title": "Tugas",
+        "add_existing_task": "Tambah tugas yang sudah ada...",
+        "no_tasks": "Tidak ada tugas dalam sprint ini",
+        "no_tasks_description": "Tambahkan tugas untuk mulai melacak kemajuan.",
+        "remove_task_confirm": "Hapus tugas ini dari sprint?",
+        "not_set": "Belum diatur"
     },
     "welcome": {
         "title": "Laravel",

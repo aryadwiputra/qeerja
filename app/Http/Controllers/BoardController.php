@@ -24,6 +24,8 @@ class BoardController extends Controller
 
         Gate::authorize('view', $board);
 
+        $sprintId = $request->query('sprint_id');
+
         $columns = $board->columns()
             ->orderBy('position')
             ->get()
@@ -35,8 +37,11 @@ class BoardController extends Controller
                 'position' => $col->position,
                 'is_done_column' => $col->is_done_column,
                 'wip_limit' => $col->wip_limit,
-                'task_count' => $col->tasks()->count(),
+                'task_count' => $col->tasks()
+                    ->when($sprintId, fn ($q) => $q->whereHas('sprints', fn ($sq) => $sq->where('sprints.id', $sprintId)))
+                    ->count(),
                 'tasks' => $col->tasks()
+                    ->when($sprintId, fn ($q) => $q->whereHas('sprints', fn ($sq) => $sq->where('sprints.id', $sprintId)))
                     ->with(['assignees:id,name,avatar', 'priority:id,name,key,level,color', 'taskType:id,name,key,icon,color', 'epics:id,name,color,status', 'sprints:id,name,status,start_date,end_date'])
                     ->orderBy('position')
                     ->get()
@@ -105,6 +110,7 @@ class BoardController extends Controller
             'priorities' => $workspace->priorities()->select('id', 'name', 'key', 'level')->get(),
             'epics' => $project->epics()->orderBy('name')->get(['id', 'name', 'color', 'status']),
             'sprints' => $project->sprints()->orderByRaw("CASE status WHEN 'active' THEN 0 WHEN 'planned' THEN 1 WHEN 'completed' THEN 2 ELSE 3 END")->orderByDesc('start_date')->get(['id', 'name', 'status', 'start_date', 'end_date']),
+            'activeSprintId' => $sprintId ? (int) $sprintId : null,
         ]);
     }
 
