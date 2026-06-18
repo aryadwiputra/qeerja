@@ -100,11 +100,17 @@ export default function AdminWorkspaceShow({ workspace, members }: Props) {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                    <TableHead>{t('admin.name')}</TableHead>
-                                    <TableHead>{t('admin.email')}</TableHead>
-                                    <TableHead>{t('admin.role')}</TableHead>
-                                    <TableHead>{t('admin.status')}</TableHead>
-                                    <TableHead>{t('admin.joined')}</TableHead>
+                                        <TableHead>{t('admin.name')}</TableHead>
+                                        <TableHead>
+                                            {t('admin.email')}
+                                        </TableHead>
+                                        <TableHead>{t('admin.role')}</TableHead>
+                                        <TableHead>
+                                            {t('admin.status')}
+                                        </TableHead>
+                                        <TableHead>
+                                            {t('admin.joined')}
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>

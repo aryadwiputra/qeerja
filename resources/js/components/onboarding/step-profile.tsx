@@ -146,7 +146,9 @@ export function StepProfile({ onSkip, onDone }: StepProfileProps) {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="timezone">{t('onboarding.timezone')}</Label>
+                        <Label htmlFor="timezone">
+                            {t('onboarding.timezone')}
+                        </Label>
                         <Select
                             defaultValue={auth.user.timezone ?? 'Asia/Jakarta'}
                             name="timezone"
@@ -165,7 +167,9 @@ export function StepProfile({ onSkip, onDone }: StepProfileProps) {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="locale">{t('onboarding.language')}</Label>
+                        <Label htmlFor="locale">
+                            {t('onboarding.language')}
+                        </Label>
                         <Select
                             defaultValue={auth.user.locale ?? 'id'}
                             name="locale"
@@ -200,7 +204,9 @@ export function StepProfile({ onSkip, onDone }: StepProfileProps) {
                             disabled={processing}
                             className="flex-1"
                         >
-                            {processing ? t('common.saving') : t('onboarding.save_profile')}
+                            {processing
+                                ? t('common.saving')
+                                : t('onboarding.save_profile')}
                         </Button>
                     </div>
                 </form>

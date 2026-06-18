@@ -1,5 +1,6 @@
 import { HelpCircle } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
     Sheet,
@@ -34,6 +35,7 @@ export interface GuideContent {
         data: GuideItem[];
     }[];
     tips?: string[];
+    tipsHeading?: string;
 }
 
 interface FeatureGuideProps {
@@ -41,6 +43,7 @@ interface FeatureGuideProps {
 }
 
 export function FeatureGuide({ content }: FeatureGuideProps) {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
 
     return (
@@ -105,7 +108,8 @@ export function FeatureGuide({ content }: FeatureGuideProps) {
                             {content.tips && content.tips.length > 0 && (
                                 <div>
                                     <h3 className="mb-2 text-sm font-semibold">
-                                        Tips
+                                        {content.tipsHeading ??
+                                            t('guide.tips_title')}
                                     </h3>
                                     <ul className="space-y-1.5">
                                         {content.tips.map((tip, i) => (

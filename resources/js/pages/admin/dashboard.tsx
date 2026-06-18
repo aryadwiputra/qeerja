@@ -51,7 +51,8 @@ export default function AdminDashboard({ stats }: Props) {
                             href="/admin/users"
                             className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
                         >
-                            {t('admin.view_all')} <ArrowRight className="size-3" />
+                            {t('admin.view_all')}{' '}
+                            <ArrowRight className="size-3" />
                         </Link>
                     </CardContent>
                 </Card>
@@ -71,7 +72,8 @@ export default function AdminDashboard({ stats }: Props) {
                             href="/admin/workspaces"
                             className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
                         >
-                            {t('admin.view_all')} <ArrowRight className="size-3" />
+                            {t('admin.view_all')}{' '}
+                            <ArrowRight className="size-3" />
                         </Link>
                     </CardContent>
                 </Card>

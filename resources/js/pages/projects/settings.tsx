@@ -411,10 +411,16 @@ export default function ProjectSettings({
                     <Tabs defaultValue="general">
                         <TabsList className="mb-6">
                             <TabsTrigger value="general">General</TabsTrigger>
-                            <TabsTrigger value="settings">{t('settings.title')}</TabsTrigger>
+                            <TabsTrigger value="settings">
+                                {t('settings.title')}
+                            </TabsTrigger>
                             <TabsTrigger value="members">Members</TabsTrigger>
-                            <TabsTrigger value="labels">{t('task.labels')}</TabsTrigger>
-                            <TabsTrigger value="board">{t('board.board')}</TabsTrigger>
+                            <TabsTrigger value="labels">
+                                {t('task.labels')}
+                            </TabsTrigger>
+                            <TabsTrigger value="board">
+                                {t('board.board')}
+                            </TabsTrigger>
                             <TabsTrigger value="epics">Epics</TabsTrigger>
                             <TabsTrigger value="sprints">Sprints</TabsTrigger>
                             <TabsTrigger value="github">GitHub</TabsTrigger>

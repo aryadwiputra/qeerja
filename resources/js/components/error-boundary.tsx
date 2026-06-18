@@ -14,7 +14,13 @@ interface State {
     error: Error | null;
 }
 
-function ErrorFallbackContent({ error, onRetry }: { error: Error | null; onRetry: () => void }) {
+function ErrorFallbackContent({
+    error,
+    onRetry,
+}: {
+    error: Error | null;
+    onRetry: () => void;
+}) {
     const { t } = useTranslation();
 
     return (
@@ -26,8 +32,7 @@ function ErrorFallbackContent({ error, onRetry }: { error: Error | null; onRetry
                 {t('error.something_went_wrong')}
             </h2>
             <p className="max-w-md text-sm text-muted-foreground">
-                {error?.message ||
-                    t('error.unexpected_error')}
+                {error?.message || t('error.unexpected_error')}
             </p>
             <Button variant="outline" onClick={onRetry}>
                 {t('common.try_again')}
@@ -56,7 +61,12 @@ export class ErrorBoundary extends Component<Props, State> {
                 return this.props.fallback;
             }
 
-            return <ErrorFallbackContent error={this.state.error} onRetry={this.handleRetry} />;
+            return (
+                <ErrorFallbackContent
+                    error={this.state.error}
+                    onRetry={this.handleRetry}
+                />
+            );
         }
 
         return this.props.children;

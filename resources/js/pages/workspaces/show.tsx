@@ -90,7 +90,9 @@ export default function WorkspaceShow({ workspace, projects }: Props) {
                             )}
                         >
                             <Target className="size-4" />
-                            <span className="hidden sm:inline">{t('workspace.goals')}</span>
+                            <span className="hidden sm:inline">
+                                {t('workspace.goals')}
+                            </span>
                         </Link>
                         <Link
                             href={crossProjectTimeline({
@@ -102,7 +104,9 @@ export default function WorkspaceShow({ workspace, projects }: Props) {
                             )}
                         >
                             <GanttChart className="size-4" />
-                            <span className="hidden sm:inline">{t('workspace.timeline')}</span>
+                            <span className="hidden sm:inline">
+                                {t('workspace.timeline')}
+                            </span>
                         </Link>
                         <Link
                             href={crossProjectBoard({
@@ -114,7 +118,9 @@ export default function WorkspaceShow({ workspace, projects }: Props) {
                             )}
                         >
                             <LayoutGrid className="size-4" />
-                            <span className="hidden sm:inline">{t('workspace.board')}</span>
+                            <span className="hidden sm:inline">
+                                {t('workspace.board')}
+                            </span>
                         </Link>
                         <Link
                             href={workspaceSettings({
@@ -126,7 +132,9 @@ export default function WorkspaceShow({ workspace, projects }: Props) {
                             )}
                         >
                             <Settings className="size-4" />
-                            <span className="hidden sm:inline">{t('workspace.settings')}</span>
+                            <span className="hidden sm:inline">
+                                {t('workspace.settings')}
+                            </span>
                         </Link>
                         <Link
                             href={projectCreate({ workspace: workspace.slug })}

@@ -77,7 +77,8 @@ export default function TwoFactorRecoveryCodes({
                             className="size-4"
                             aria-hidden="true"
                         />
-                        {codesAreVisible ? t('common.hide') : t('common.view')} recovery codes
+                        {codesAreVisible ? t('common.hide') : t('common.view')}{' '}
+                        recovery codes
                     </Button>
 
                     {canRegenerateCodes && (
@@ -94,7 +95,8 @@ export default function TwoFactorRecoveryCodes({
                                     disabled={processing}
                                     aria-describedby="regenerate-warning"
                                 >
-                                    <RefreshCw /> {t('security.regenerate_codes')}
+                                    <RefreshCw />{' '}
+                                    {t('security.regenerate_codes')}
                                 </Button>
                             )}
                         </Form>

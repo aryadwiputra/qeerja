@@ -9,6 +9,7 @@ import {
     X,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FeatureGuide } from '@/components/feature-guide';
 import type { GuideContent } from '@/components/feature-guide';
 import { TaskDetailDrawer } from '@/components/task-detail-drawer';
@@ -35,61 +36,56 @@ import {
     start as sprintStart,
 } from '@/routes/projects/sprints';
 
-const sprintGuide: GuideContent = {
-    title: 'Sprint Planning',
-    description:
-        'Manage time-boxed iterations to organize and track work in focused cycles.',
-    sections: [
-        {
-            title: 'What is a Sprint?',
-            content:
-                'A Sprint is a fixed time period (usually 1-4 weeks) where the team commits to completing a set of tasks. Sprints help you plan work, track progress, and deliver incrementally.',
-        },
-        {
-            title: 'Sprint Lifecycle',
-            content:
-                '1. Planned → Create a sprint and add tasks from the backlog.\n2. Active → Start the sprint. Team works on the tasks.\n3. Completed → Close the sprint when the time period ends.\n\nOnly one sprint can be active at a time.',
-        },
-    ],
-    items: [
-        {
-            heading: 'Sprint Actions',
-            data: [
-                {
-                    term: 'Start Sprint',
-                    description:
-                        'Moves the sprint to "active" status. Only available when no other sprint is active. Sets the start date to today.',
-                },
-                {
-                    term: 'Close Sprint',
-                    description:
-                        'Moves the sprint to "completed" status. Sets the completion date. Incomplete tasks remain in the sprint but are no longer actively tracked.',
-                },
-                {
-                    term: 'Add Task',
-                    description:
-                        'Adds an existing task to this sprint. Tasks can be added from the Backlog page or from the task detail view.',
-                },
-                {
-                    term: 'Remove Task',
-                    description:
-                        'Removes a task from the sprint. The task is not deleted — it goes back to the backlog.',
-                },
-                {
-                    term: 'View Report',
-                    description:
-                        'Opens the sprint report showing burndown chart, velocity, and completion stats.',
-                },
-            ],
-        },
-    ],
-    tips: [
-        'Plan your sprint by adding tasks from the Backlog before starting it.',
-        'Use story points to estimate effort and track velocity across sprints.',
-        'Check the sprint report after closing to see how the team performed.',
-        'Incomplete tasks can be moved to the next sprint or left in the backlog.',
-    ],
-};
+function useSprintGuide(t: (key: string) => string): GuideContent {
+    return {
+        title: t('guide.sprint.title'),
+        description: t('guide.sprint.description'),
+        sections: [
+            {
+                title: t('guide.sprint.section_what'),
+                content: t('guide.sprint.content_what'),
+            },
+            {
+                title: t('guide.sprint.section_lifecycle'),
+                content: t('guide.sprint.content_lifecycle'),
+            },
+        ],
+        items: [
+            {
+                heading: t('guide.sprint.heading_features'),
+                data: [
+                    {
+                        term: t('guide.sprint.start_sprint'),
+                        description: t('guide.sprint.start_sprint_desc'),
+                    },
+                    {
+                        term: t('guide.sprint.close_sprint'),
+                        description: t('guide.sprint.close_sprint_desc'),
+                    },
+                    {
+                        term: t('guide.sprint.add_task'),
+                        description: t('guide.sprint.add_task_desc'),
+                    },
+                    {
+                        term: t('guide.sprint.remove_task'),
+                        description: t('guide.sprint.remove_task_desc'),
+                    },
+                    {
+                        term: t('guide.sprint.view_report'),
+                        description: t('guide.sprint.view_report_desc'),
+                    },
+                ],
+            },
+        ],
+        tips: [
+            t('guide.sprint.tip_1'),
+            t('guide.sprint.tip_2'),
+            t('guide.sprint.tip_3'),
+            t('guide.sprint.tip_4'),
+        ],
+        tipsHeading: t('guide.sprint.tips_title'),
+    };
+}
 
 interface UserRef {
     id: number;
@@ -181,6 +177,8 @@ export default function SprintShow({
     sprintTasks,
     availableTasks,
 }: Props) {
+    const { t } = useTranslation();
+    const sprintGuide = useSprintGuide(t);
     const [addTaskId, setAddTaskId] = useState<string>('none');
     const [drawerTaskId, setDrawerTaskId] = useState<number | null>(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -199,7 +197,7 @@ export default function SprintShow({
     );
 
     const handleRemoveTask = (taskId: number) => {
-        if (!confirm('Remove this task from the sprint?')) {
+        if (!confirm(t('sprint_page.remove_task_confirm'))) {
             return;
         }
 
@@ -253,7 +251,7 @@ export default function SprintShow({
                     </Link>
                     <span className="text-sm text-muted-foreground">/</span>
                     <span className="text-sm text-muted-foreground">
-                        Sprints
+                        {t('sprint_page.sprints')}
                     </span>
                 </div>
 
@@ -301,7 +299,7 @@ export default function SprintShow({
                                     }
                                 >
                                     <Play className="size-3" />
-                                    Start sprint
+                                    {t('sprint_page.start_sprint')}
                                 </Button>
                             )}
                             {sprint.status === 'active' && (
@@ -309,7 +307,13 @@ export default function SprintShow({
                                     variant="default"
                                     size="sm"
                                     onClick={() => {
-                                        if (!confirm('Complete this sprint?')) {
+                                        if (
+                                            !confirm(
+                                                t(
+                                                    'sprint_page.complete_confirm',
+                                                ),
+                                            )
+                                        ) {
                                             return;
                                         }
 
@@ -325,7 +329,7 @@ export default function SprintShow({
                                     }}
                                 >
                                     <Check className="size-3" />
-                                    Complete sprint
+                                    {t('sprint_page.complete_sprint')}
                                 </Button>
                             )}
                             {sprint.status === 'completed' && (
@@ -338,7 +342,7 @@ export default function SprintShow({
                                 >
                                     <Button variant="outline" size="sm">
                                         <SquareChartGantt className="size-3" />
-                                        View report
+                                        {t('sprint_page.view_report')}
                                     </Button>
                                 </Link>
                             )}
@@ -349,7 +353,7 @@ export default function SprintShow({
                                 })}
                             >
                                 <Button variant="outline" size="sm">
-                                    Edit sprint
+                                    {t('sprint_page.edit_sprint')}
                                 </Button>
                             </Link>
                         </div>
@@ -380,7 +384,9 @@ export default function SprintShow({
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between gap-4">
-                            <CardTitle>Tasks</CardTitle>
+                            <CardTitle>
+                                {t('sprint_page.tasks_card_title')}
+                            </CardTitle>
                             {availableTasks.length > 0 && (
                                 <div className="flex items-center gap-2">
                                     <Select
@@ -388,7 +394,11 @@ export default function SprintShow({
                                         onValueChange={setAddTaskId}
                                     >
                                         <SelectTrigger className="h-8 w-56 text-xs">
-                                            <SelectValue placeholder="Add existing task..." />
+                                            <SelectValue
+                                                placeholder={t(
+                                                    'sprint_page.add_existing_task',
+                                                )}
+                                            />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="none">
@@ -412,7 +422,7 @@ export default function SprintShow({
                                         onClick={handleAddTask}
                                     >
                                         <Plus className="size-3" />
-                                        <span>Add</span>
+                                        <span>{t('common.add')}</span>
                                     </Button>
                                 </div>
                             )}
@@ -521,11 +531,12 @@ export default function SprintShow({
                                     <Check className="size-8 text-muted-foreground" />
                                     <div>
                                         <p className="text-sm font-medium">
-                                            No tasks in this sprint
+                                            {t('sprint_page.no_tasks')}
                                         </p>
                                         <p className="text-sm text-muted-foreground">
-                                            Add tasks to start tracking
-                                            progress.
+                                            {t(
+                                                'sprint_page.no_tasks_description',
+                                            )}
                                         </p>
                                     </div>
                                 </div>

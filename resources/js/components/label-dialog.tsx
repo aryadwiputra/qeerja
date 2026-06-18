@@ -128,9 +128,7 @@ export function LabelDialog({
 
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="label-name">
-                            {t('label.name')}
-                        </Label>
+                        <Label htmlFor="label-name">{t('label.name')}</Label>
                         <Input
                             id="label-name"
                             value={name}

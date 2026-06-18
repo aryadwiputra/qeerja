@@ -190,7 +190,9 @@ export function TaskBulkDialog({
                             onValueChange={setBoardColumnId}
                         >
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder={t('task_bulk.select_column')} />
+                                <SelectValue
+                                    placeholder={t('task_bulk.select_column')}
+                                />
                             </SelectTrigger>
                             <SelectContent>
                                 {boardColumns.map((column) => (
@@ -218,7 +220,9 @@ export function TaskBulkDialog({
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="add">{t('task_bulk.add')}</SelectItem>
+                                    <SelectItem value="add">
+                                        {t('task_bulk.add')}
+                                    </SelectItem>
                                     <SelectItem value="remove">
                                         {t('task_bulk.remove')}
                                     </SelectItem>
@@ -235,7 +239,11 @@ export function TaskBulkDialog({
                                 onValueChange={setAssigneeId}
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder={t('task_bulk.select_member')} />
+                                    <SelectValue
+                                        placeholder={t(
+                                            'task_bulk.select_member',
+                                        )}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {members.map((member) => (
@@ -291,7 +299,9 @@ export function TaskBulkDialog({
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="add">{t('task_bulk.add')}</SelectItem>
+                                    <SelectItem value="add">
+                                        {t('task_bulk.add')}
+                                    </SelectItem>
                                     <SelectItem value="remove">
                                         {t('task_bulk.remove')}
                                     </SelectItem>
@@ -305,7 +315,11 @@ export function TaskBulkDialog({
                             <Label>{t('task.labels')}</Label>
                             <Select value={labelId} onValueChange={setLabelId}>
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder={t('task_bulk.select_label')} />
+                                    <SelectValue
+                                        placeholder={t(
+                                            'task_bulk.select_label',
+                                        )}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {labels.map((label) => (

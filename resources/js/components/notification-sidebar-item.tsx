@@ -55,7 +55,10 @@ export function NotificationSidebarItem() {
 
     return (
         <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={{ children: t('sidebar.notifications') }}>
+            <SidebarMenuButton
+                asChild
+                tooltip={{ children: t('sidebar.notifications') }}
+            >
                 <Link href={notificationsIndex()} prefetch className="relative">
                     <Bell />
                     <span>{t('sidebar.notifications')}</span>

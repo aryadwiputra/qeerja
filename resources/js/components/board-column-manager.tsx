@@ -230,14 +230,18 @@ export function BoardColumnManager({
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="none">{t('board.none')}</SelectItem>
+                                <SelectItem value="none">
+                                    {t('board.none')}
+                                </SelectItem>
                                 <SelectItem value="assignee">
                                     {t('board.assignee')}
                                 </SelectItem>
                                 <SelectItem value="priority">
                                     {t('board.priority')}
                                 </SelectItem>
-                                <SelectItem value="epic">{t('board.epic')}</SelectItem>
+                                <SelectItem value="epic">
+                                    {t('board.epic')}
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -379,9 +383,9 @@ export function BoardColumnManager({
                                                     {column.name}
                                                 </span>
                                                 {column.is_done_column && (
-                                                 <span className="rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-medium text-green-700 dark:bg-green-900 dark:text-green-300">
-                                                         {t('common.done')}
-                                                     </span>
+                                                    <span className="rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-medium text-green-700 dark:bg-green-900 dark:text-green-300">
+                                                        {t('common.done')}
+                                                    </span>
                                                 )}
                                                 <span className="font-mono text-xs text-muted-foreground">
                                                     pos {column.position}
@@ -445,7 +449,9 @@ export function BoardColumnManager({
                     )}
 
                     <div className="border-t pt-4">
-                        <h4 className="mb-3 text-sm font-medium">{t('board.add_column')}</h4>
+                        <h4 className="mb-3 text-sm font-medium">
+                            {t('board.add_column')}
+                        </h4>
                         <div className="flex flex-col gap-3">
                             <div className="flex items-center gap-2">
                                 <div className="flex-1">

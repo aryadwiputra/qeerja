@@ -1,4 +1,5 @@
 import { useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 interface TaskSummary {
@@ -47,6 +48,7 @@ interface GanttChartProps {
 }
 
 export function GanttChart({ tasks, onTaskClick }: GanttChartProps) {
+    const { t } = useTranslation();
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const { rangeStart, rangeEnd, totalDays, todayOffset } = useMemo(() => {
@@ -147,7 +149,7 @@ export function GanttChart({ tasks, onTaskClick }: GanttChartProps) {
                         className="flex items-end border-b px-3 font-medium text-muted-foreground"
                         style={{ height: HEADER_HEIGHT }}
                     >
-                        <span className="text-xs">Tasks</span>
+                        <span className="text-xs">{t('gantt.tasks')}</span>
                     </div>
                     {rows.map((task) => (
                         <button
@@ -251,7 +253,7 @@ export function GanttChart({ tasks, onTaskClick }: GanttChartProps) {
             </div>
             {rows.length === 0 && (
                 <div className="py-12 text-center text-sm text-muted-foreground">
-                    No tasks with dates to display on the Gantt chart.
+                    {t('gantt.no_tasks')}
                 </div>
             )}
         </div>

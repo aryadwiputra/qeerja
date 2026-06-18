@@ -173,10 +173,7 @@ export function TaskSearchFilters({ filters, options }: Props) {
                     </SelectTrigger>
                     <SelectContent>
                         {stateOptions.map((option) => (
-                            <SelectItem
-                                key={option.value}
-                                value={option.value}
-                            >
+                            <SelectItem key={option.value} value={option.value}>
                                 {option.value === 'all'
                                     ? t('task_search.all_states')
                                     : t(`task_search.${option.value}`)}
@@ -211,9 +208,7 @@ export function TaskSearchFilters({ filters, options }: Props) {
 
                 <Select
                     value={selectedProjectId ?? ALL_FILTERS_VALUE}
-                    onValueChange={(value) =>
-                        updateFilter('project_id', value)
-                    }
+                    onValueChange={(value) => updateFilter('project_id', value)}
                 >
                     <SelectTrigger>
                         <SelectValue placeholder="Project" />
@@ -242,10 +237,7 @@ export function TaskSearchFilters({ filters, options }: Props) {
                     </SelectTrigger>
                     <SelectContent>
                         {statusOptions.map((option) => (
-                            <SelectItem
-                                key={option.value}
-                                value={option.value}
-                            >
+                            <SelectItem key={option.value} value={option.value}>
                                 {option.value === ALL_FILTERS_VALUE
                                     ? t('task_search.all_statuses')
                                     : t(`task_search.${option.value}`)}
@@ -255,9 +247,7 @@ export function TaskSearchFilters({ filters, options }: Props) {
                 </Select>
 
                 <Select
-                    value={
-                        filters.priority_id?.toString() ?? ALL_FILTERS_VALUE
-                    }
+                    value={filters.priority_id?.toString() ?? ALL_FILTERS_VALUE}
                     onValueChange={(value) =>
                         updateFilter('priority_id', value)
                     }
@@ -281,12 +271,8 @@ export function TaskSearchFilters({ filters, options }: Props) {
                 </Select>
 
                 <Select
-                    value={
-                        filters.label_id?.toString() ?? ALL_FILTERS_VALUE
-                    }
-                    onValueChange={(value) =>
-                        updateFilter('label_id', value)
-                    }
+                    value={filters.label_id?.toString() ?? ALL_FILTERS_VALUE}
+                    onValueChange={(value) => updateFilter('label_id', value)}
                 >
                     <SelectTrigger>
                         <SelectValue placeholder="Label" />
@@ -307,9 +293,7 @@ export function TaskSearchFilters({ filters, options }: Props) {
                 </Select>
 
                 <Select
-                    value={
-                        filters.assignee_id?.toString() ?? ALL_FILTERS_VALUE
-                    }
+                    value={filters.assignee_id?.toString() ?? ALL_FILTERS_VALUE}
                     onValueChange={(value) =>
                         updateFilter('assignee_id', value)
                     }
@@ -333,9 +317,7 @@ export function TaskSearchFilters({ filters, options }: Props) {
                 </Select>
 
                 <Select
-                    value={
-                        filters.reporter_id?.toString() ?? ALL_FILTERS_VALUE
-                    }
+                    value={filters.reporter_id?.toString() ?? ALL_FILTERS_VALUE}
                     onValueChange={(value) =>
                         updateFilter('reporter_id', value)
                     }

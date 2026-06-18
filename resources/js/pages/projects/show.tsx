@@ -876,7 +876,9 @@ export default function ProjectShow({
                         >
                             {t('release.title')}
                         </TabsTrigger>
-                        <TabsTrigger value="labels">{t('task.labels')}</TabsTrigger>
+                        <TabsTrigger value="labels">
+                            {t('task.labels')}
+                        </TabsTrigger>
                         <TabsTrigger
                             value="components"
                             onClick={() =>
@@ -905,8 +907,12 @@ export default function ProjectShow({
                             Workload
                         </TabsTrigger>
                         <TabsTrigger value="files">Files</TabsTrigger>
-                        <TabsTrigger value="reports">{t('reports.title')}</TabsTrigger>
-                        <TabsTrigger value="activity">{t('task.activity')}</TabsTrigger>
+                        <TabsTrigger value="reports">
+                            {t('reports.title')}
+                        </TabsTrigger>
+                        <TabsTrigger value="activity">
+                            {t('task.activity')}
+                        </TabsTrigger>
                         <TabsTrigger
                             value="automation"
                             onClick={() =>
@@ -955,7 +961,9 @@ export default function ProjectShow({
                                                 setSearch(event.target.value);
                                                 setPage(0);
                                             }}
-                                            placeholder={t('task.search_code_title_desc')}
+                                            placeholder={t(
+                                                'task.search_code_title_desc',
+                                            )}
                                             className="pl-9"
                                         />
                                     </div>

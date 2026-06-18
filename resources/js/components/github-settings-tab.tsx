@@ -1,5 +1,6 @@
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -41,12 +42,13 @@ export function GithubSettingsTab({
     projectSlug,
     integration,
 }: Props) {
+    const { t } = useTranslation();
     const [disconnecting, setDisconnecting] = useState(false);
     const isConnected = integration !== null;
     const meta = integration?.metadata ?? null;
 
     function handleDisconnect() {
-        if (!confirm('Disconnect GitHub from this project?')) {
+        if (!confirm(t('github.disconnect_confirm'))) {
             return;
         }
 
@@ -69,10 +71,9 @@ export function GithubSettingsTab({
                 <div className="flex items-center gap-3">
                     <GitHubIcon className="size-8" />
                     <div>
-                        <CardTitle>GitHub</CardTitle>
+                        <CardTitle>{t('github.title')}</CardTitle>
                         <CardDescription>
-                            Connect your project to GitHub to link commits and
-                            pull requests to tasks.
+                            {t('github.setup_description')}
                         </CardDescription>
                     </div>
                 </div>
@@ -92,7 +93,7 @@ export function GithubSettingsTab({
                                 <p className="text-sm font-medium">
                                     {meta?.name ??
                                         meta?.nickname ??
-                                        'Connected'}
+                                        t('github.connected')}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
                                     @{meta?.nickname ?? 'unknown'}
@@ -101,14 +102,14 @@ export function GithubSettingsTab({
                             <div className="flex items-center gap-1.5">
                                 <div className="size-2 rounded-full bg-emerald-500" />
                                 <span className="text-xs text-emerald-600 dark:text-emerald-400">
-                                    Connected
+                                    {t('github.connected')}
                                 </span>
                             </div>
                         </div>
 
                         <div className="rounded-md border p-3">
                             <p className="mb-2 text-xs font-medium text-muted-foreground">
-                                Webhook URL
+                                {t('github.webhook_url')}
                             </p>
                             <code className="block rounded bg-muted px-2 py-1.5 text-xs break-all">
                                 {`${window.location.origin}/workspaces/${workspaceSlug}/projects/${projectSlug}/github/webhook`}
@@ -117,7 +118,7 @@ export function GithubSettingsTab({
                                 Add this URL to your GitHub repository webhooks
                                 with the secret configured in your
                                 <code className="mx-1 rounded bg-muted px-1">
-                                    GITHUB_WEBHOOK_SECRET
+                                    {t('github.webhook_secret')}
                                 </code>
                                 environment variable.
                             </p>
@@ -125,12 +126,12 @@ export function GithubSettingsTab({
 
                         <div className="rounded-md border p-3">
                             <p className="mb-2 text-xs font-medium text-muted-foreground">
-                                How it works
+                                {t('github.how_it_works')}
                             </p>
                             <ul className="flex flex-col gap-1.5 text-xs text-muted-foreground">
                                 <li className="flex items-start gap-2">
                                     <span className="mt-1 size-1 shrink-0 rounded-full bg-muted-foreground" />
-                                    Push commits to your default branch with{' '}
+                                    {t('github.push_commits')}{' '}
                                     <code className="rounded bg-muted px-1">
                                         {workspaceSlug}-N
                                     </code>{' '}
@@ -138,16 +139,11 @@ export function GithubSettingsTab({
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <span className="mt-1 size-1 shrink-0 rounded-full bg-muted-foreground" />
-                                    Use{' '}
-                                    <code className="rounded bg-muted px-1">
-                                        closes PROJ-N
-                                    </code>{' '}
-                                    in commit messages to auto-complete tasks.
+                                    {t('github.auto_complete')}
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <span className="mt-1 size-1 shrink-0 rounded-full bg-muted-foreground" />
-                                    Mention task codes in PR titles to link pull
-                                    requests.
+                                    {t('github.pr_linking')}
                                 </li>
                             </ul>
                         </div>
@@ -161,8 +157,8 @@ export function GithubSettingsTab({
                                 onClick={handleDisconnect}
                             >
                                 {disconnecting
-                                    ? 'Disconnecting...'
-                                    : 'Disconnect GitHub'}
+                                    ? t('common.disconnecting')
+                                    : t('github.disconnect_github')}
                             </Button>
                         </div>
                     </div>
@@ -177,7 +173,7 @@ export function GithubSettingsTab({
                                 className="inline-flex items-center gap-2"
                             >
                                 <GitHubIcon className="size-4" />
-                                <span>Connect GitHub</span>
+                                <span>{t('github.connect_github')}</span>
                             </a>
                         </Button>
                     </div>

@@ -109,7 +109,9 @@ export function ProjectMemberDialog({
 
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="pm-search">{t('members.search_users')}</Label>
+                        <Label htmlFor="pm-search">
+                            {t('members.search_users')}
+                        </Label>
                         <Input
                             id="pm-search"
                             value={searchTerm}
@@ -165,14 +167,18 @@ export function ProjectMemberDialog({
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="lead">{t('members.lead')}</SelectItem>
+                                    <SelectItem value="lead">
+                                        {t('members.lead')}
+                                    </SelectItem>
                                     <SelectItem value="manager">
                                         {t('members.manager')}
                                     </SelectItem>
                                     <SelectItem value="developer">
                                         {t('members.developer')}
                                     </SelectItem>
-                                    <SelectItem value="qa">{t('members.qa')}</SelectItem>
+                                    <SelectItem value="qa">
+                                        {t('members.qa')}
+                                    </SelectItem>
                                     <SelectItem value="member">
                                         {t('members.member')}
                                     </SelectItem>

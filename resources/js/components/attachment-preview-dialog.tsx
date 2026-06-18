@@ -1,4 +1,5 @@
 import { Download, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
@@ -21,6 +22,8 @@ export function AttachmentPreviewDialog({
     isImage,
     isPdf,
 }: Props) {
+    const { t } = useTranslation();
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-4xl">
@@ -37,7 +40,7 @@ export function AttachmentPreviewDialog({
                             onClick={() => window.open(downloadUrl, '_blank')}
                         >
                             <Download className="size-4" />
-                            <span>Download</span>
+                            <span>{t('attachment.download')}</span>
                         </Button>
                         <Button
                             type="button"
@@ -67,7 +70,7 @@ export function AttachmentPreviewDialog({
                     {!isImage && !isPdf && (
                         <div className="flex flex-col items-center gap-4 py-20">
                             <p className="text-sm text-muted-foreground">
-                                Preview not available for this file type.
+                                {t('attachment.preview_not_available')}
                             </p>
                             <Button
                                 type="button"
@@ -77,7 +80,7 @@ export function AttachmentPreviewDialog({
                                 }
                             >
                                 <Download className="size-4" />
-                                <span>Download file</span>
+                                <span>{t('attachment.download_file')}</span>
                             </Button>
                         </div>
                     )}

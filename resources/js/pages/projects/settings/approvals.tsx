@@ -10,7 +10,9 @@ import {
     ToggleRight,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FeatureGuide } from '@/components/feature-guide';
+import type { GuideContent } from '@/components/feature-guide';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -81,56 +83,52 @@ interface Props {
     };
 }
 
-const approvalGuide = {
-    title: 'Approval Flows',
-    description:
-        'Set up approval gates that require team sign-off before tasks can move to certain columns.',
-    sections: [
-        {
-            title: 'What are Approval Flows?',
-            content:
-                'Approval flows create mandatory review steps in your workflow. When a task reaches a column with an active approval flow, it cannot proceed until the required number of approvals are received.',
-        },
-        {
-            title: 'How Approvals Work',
-            content:
-                'When someone tries to move a task to a column with an approval flow, the system creates pending approval requests for the designated approvers. The task can only move once the minimum number of approvals is met.',
-        },
-    ],
-    items: [
-        {
-            heading: 'Approval Features',
-            data: [
-                {
-                    term: 'Column Trigger',
-                    description:
-                        'Each flow is tied to a specific board column. When a task is moved to that column, the approval process begins automatically.',
-                },
-                {
-                    term: 'Approvers',
-                    description:
-                        'Specify who can approve — individual users by email, or roles like "QA Lead" or "Project Manager". Role-based approvers resolve to all users with that role.',
-                },
-                {
-                    term: 'Minimum Approvals',
-                    description:
-                        'Set how many approvals are required before the task can proceed. For example, require 2 out of 3 designated approvers to sign off.',
-                },
-                {
-                    term: 'Enable/Disable',
-                    description:
-                        'Toggle flows on or off without deleting them. Disabled flows are ignored when tasks move to the column.',
-                },
-            ],
-        },
-    ],
-    tips: [
-        'Use approval flows for quality-critical columns like "Ready for QA" or "Needs Review".',
-        'Combine with WIP limits to control both quality and throughput.',
-        'Role-based approvers are more flexible than user-based — new team members automatically become eligible.',
-        'Keep approval flows lightweight — too many gates can slow down your workflow.',
-    ],
-};
+function useApprovalGuide(t: (key: string) => string): GuideContent {
+    return {
+        title: t('guide.approval.title'),
+        description: t('guide.approval.description'),
+        sections: [
+            {
+                title: t('guide.approval.section_what'),
+                content: t('guide.approval.content_what'),
+            },
+            {
+                title: t('guide.approval.section_how'),
+                content: t('guide.approval.content_how'),
+            },
+        ],
+        items: [
+            {
+                heading: t('guide.approval.heading_features'),
+                data: [
+                    {
+                        term: t('guide.approval.column_trigger'),
+                        description: t('guide.approval.column_trigger_desc'),
+                    },
+                    {
+                        term: t('guide.approval.approvers'),
+                        description: t('guide.approval.approvers_desc'),
+                    },
+                    {
+                        term: t('guide.approval.min_approvals'),
+                        description: t('guide.approval.min_approvals_desc'),
+                    },
+                    {
+                        term: t('guide.approval.enable_disable'),
+                        description: t('guide.approval.enable_disable_desc'),
+                    },
+                ],
+            },
+        ],
+        tips: [
+            t('guide.approval.tip_1'),
+            t('guide.approval.tip_2'),
+            t('guide.approval.tip_3'),
+            t('guide.approval.tip_4'),
+        ],
+        tipsHeading: t('guide.approval.tips_title'),
+    };
+}
 
 export default function ApprovalsSettings({
     workspace,
@@ -138,6 +136,8 @@ export default function ApprovalsSettings({
     flows: initialFlows,
     options,
 }: Props) {
+    const { t } = useTranslation();
+    const approvalGuide = useApprovalGuide(t);
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [newFlow, setNewFlow] = useState({
         name: '',
@@ -180,7 +180,7 @@ export default function ApprovalsSettings({
     };
 
     const handleDeleteFlow = (flowId: number) => {
-        if (!confirm('Delete this approval flow?')) {
+        if (!confirm(t('approvals_page.delete_confirm'))) {
             return;
         }
 
@@ -237,17 +237,18 @@ export default function ApprovalsSettings({
                         <span>{project.name}</span>
                     </Link>
                     <span className="text-sm text-muted-foreground">/</span>
-                    <span className="text-sm font-medium">Approval Flows</span>
+                    <span className="text-sm font-medium">
+                        {t('approvals_page.title')}
+                    </span>
                 </div>
 
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-semibold tracking-tight">
-                            Approval Flows
+                            {t('approvals_page.title')}
                         </h1>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            Require approval before tasks can move to certain
-                            columns
+                            {t('approvals_page.description')}
                         </p>
                     </div>
 
@@ -260,13 +261,13 @@ export default function ApprovalsSettings({
                             <DialogTrigger asChild>
                                 <Button>
                                     <Plus className="mr-2 size-4" />
-                                    New Flow
+                                    {t('approvals_page.new_flow')}
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="max-w-2xl">
                                 <DialogHeader>
                                     <DialogTitle>
-                                        Create Approval Flow
+                                        {t('approvals_page.create_flow')}
                                     </DialogTitle>
                                 </DialogHeader>
                                 <form
@@ -274,7 +275,9 @@ export default function ApprovalsSettings({
                                     className="space-y-4"
                                 >
                                     <div>
-                                        <Label>Flow Name</Label>
+                                        <Label>
+                                            {t('approvals_page.flow_name')}
+                                        </Label>
                                         <Input
                                             value={newFlow.name}
                                             onChange={(e) =>
@@ -283,13 +286,17 @@ export default function ApprovalsSettings({
                                                     name: e.target.value,
                                                 })
                                             }
-                                            placeholder="e.g., QA Approval"
+                                            placeholder={t(
+                                                'approvals_page.flow_name_placeholder',
+                                            )}
                                             required
                                         />
                                     </div>
 
                                     <div>
-                                        <Label>Target Column</Label>
+                                        <Label>
+                                            {t('approvals_page.target_column')}
+                                        </Label>
                                         <Select
                                             value={newFlow.column_id}
                                             onValueChange={(value) =>
@@ -300,7 +307,11 @@ export default function ApprovalsSettings({
                                             }
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select column..." />
+                                                <SelectValue
+                                                    placeholder={t(
+                                                        'approvals_page.select_column',
+                                                    )}
+                                                />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {options.columns.map((col) => (
@@ -326,7 +337,11 @@ export default function ApprovalsSettings({
                                     </div>
 
                                     <div>
-                                        <Label>Required Approvers</Label>
+                                        <Label>
+                                            {t(
+                                                'approvals_page.required_approvers',
+                                            )}
+                                        </Label>
                                         <div className="mt-2 space-y-2">
                                             {newFlow.required_approvers.map(
                                                 (approver, index) => (
@@ -366,7 +381,11 @@ export default function ApprovalsSettings({
                                                     }
                                                 >
                                                     <SelectTrigger className="w-48">
-                                                        <SelectValue placeholder="Add user..." />
+                                                        <SelectValue
+                                                            placeholder={t(
+                                                                'approvals_page.add_user',
+                                                            )}
+                                                        />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         {options.members.map(
@@ -397,7 +416,11 @@ export default function ApprovalsSettings({
                                                     }
                                                 >
                                                     <SelectTrigger className="w-48">
-                                                        <SelectValue placeholder="Add role..." />
+                                                        <SelectValue
+                                                            placeholder={t(
+                                                                'approvals_page.add_role',
+                                                            )}
+                                                        />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         {options.roles.map(
@@ -422,7 +445,9 @@ export default function ApprovalsSettings({
 
                                     <div>
                                         <Label>
-                                            Minimum Approvals Required
+                                            {t(
+                                                'approvals_page.minimum_approvals',
+                                            )}
                                         </Label>
                                         <Input
                                             type="number"
@@ -448,7 +473,7 @@ export default function ApprovalsSettings({
                                                 setShowCreateDialog(false)
                                             }
                                         >
-                                            Cancel
+                                            {t('common.cancel')}
                                         </Button>
                                         <Button
                                             type="submit"
@@ -459,7 +484,9 @@ export default function ApprovalsSettings({
                                                     .length === 0
                                             }
                                         >
-                                            Create Flow
+                                            {t(
+                                                'approvals_page.create_flow_button',
+                                            )}
                                         </Button>
                                     </div>
                                 </form>
@@ -559,16 +586,15 @@ export default function ApprovalsSettings({
                             <Shield className="size-12 text-muted-foreground/40" />
                             <div className="text-center">
                                 <p className="text-lg font-medium">
-                                    No approval flows
+                                    {t('approvals_page.no_flows')}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    Create flows to require approval before
-                                    tasks move to certain columns.
+                                    {t('approvals_page.no_flows_description')}
                                 </p>
                             </div>
                             <Button onClick={() => setShowCreateDialog(true)}>
                                 <Plus className="mr-2 size-4" />
-                                New Flow
+                                {t('approvals_page.new_flow')}
                             </Button>
                         </div>
                     )}

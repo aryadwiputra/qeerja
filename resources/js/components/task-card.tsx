@@ -158,7 +158,10 @@ export function TaskCard({
     );
 }
 
-function formatDueDate(date: string, t: (key: string, options?: Record<string, unknown>) => string): string {
+function formatDueDate(
+    date: string,
+    t: (key: string, options?: Record<string, unknown>) => string,
+): string {
     const d = new Date(date);
     const now = new Date();
     const diff = d.getTime() - now.getTime();

@@ -233,9 +233,7 @@ export function EpicDialog({
                                 id="epic-start"
                                 type="date"
                                 value={startDate}
-                                onChange={(e) =>
-                                    setStartDate(e.target.value)
-                                }
+                                onChange={(e) => setStartDate(e.target.value)}
                             />
                         </div>
 

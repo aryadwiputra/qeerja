@@ -88,7 +88,9 @@ export function StepInvite({ workspaceSlug, onSkip, onDone }: StepInviteProps) {
                 <div className="flex flex-col gap-4">
                     <div className="flex gap-2">
                         <Input
-                            placeholder={t('onboarding.invite_email_placeholder')}
+                            placeholder={t(
+                                'onboarding.invite_email_placeholder',
+                            )}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             onKeyDown={(e) => {
@@ -103,11 +105,19 @@ export function StepInvite({ workspaceSlug, onSkip, onDone }: StepInviteProps) {
                             <SelectTrigger className="w-32">
                                 <SelectValue />
                             </SelectTrigger>
-                                <SelectContent>
-                                <SelectItem value="admin">{t('onboarding.admin')}</SelectItem>
-                                <SelectItem value="manager">{t('onboarding.manager')}</SelectItem>
-                                <SelectItem value="member">{t('onboarding.member')}</SelectItem>
-                                <SelectItem value="viewer">{t('onboarding.viewer')}</SelectItem>
+                            <SelectContent>
+                                <SelectItem value="admin">
+                                    {t('onboarding.admin')}
+                                </SelectItem>
+                                <SelectItem value="manager">
+                                    {t('onboarding.manager')}
+                                </SelectItem>
+                                <SelectItem value="member">
+                                    {t('onboarding.member')}
+                                </SelectItem>
+                                <SelectItem value="viewer">
+                                    {t('onboarding.viewer')}
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                         <Button
@@ -167,7 +177,9 @@ export function StepInvite({ workspaceSlug, onSkip, onDone }: StepInviteProps) {
                         >
                             {sending
                                 ? t('common.sending')
-                                : t('onboarding.send_invites', { count: invites.length })}
+                                : t('onboarding.send_invites', {
+                                      count: invites.length,
+                                  })}
                         </Button>
                     </div>
                 </div>

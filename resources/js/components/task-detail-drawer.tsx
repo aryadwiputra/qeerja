@@ -1652,9 +1652,9 @@ export function TaskDetailDrawer({
                             </div>
 
                             <div>
-                                    <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                        {t('task.created')}
-                                    </Label>
+                                <Label className="text-xs tracking-wider text-muted-foreground uppercase">
+                                    {t('task.created')}
+                                </Label>
                                 <p className="mt-1 text-sm">
                                     {new Date(
                                         task.created_at,
@@ -2033,13 +2033,25 @@ function formatAction(
         case 'created':
             return t('task_activity.created');
         case 'status_changed':
-            return t('task_activity.changed_status', { from: oldVal, to: newVal });
+            return t('task_activity.changed_status', {
+                from: oldVal,
+                to: newVal,
+            });
         case 'priority_changed':
-            return t('task_activity.changed_priority', { from: oldVal, to: newVal });
+            return t('task_activity.changed_priority', {
+                from: oldVal,
+                to: newVal,
+            });
         case 'due_date_changed':
-            return t('task_activity.changed_due_date', { from: oldVal, to: newVal });
+            return t('task_activity.changed_due_date', {
+                from: oldVal,
+                to: newVal,
+            });
         case 'parent_changed':
-            return t('task_activity.changed_parent', { from: oldVal ?? 'none', to: newVal ?? 'none' });
+            return t('task_activity.changed_parent', {
+                from: oldVal ?? 'none',
+                to: newVal ?? 'none',
+            });
         case 'assigned':
             return `${t('task_activity.assigned')} ${newVal}`;
         case 'unassigned':
@@ -2053,11 +2065,19 @@ function formatAction(
         case 'relation_removed':
             return t('task_activity.removed_relation');
         case 'epic_changed':
-            return t('task_activity.changed_epic', { from: oldVal ?? 'none', to: newVal ?? 'none' });
+            return t('task_activity.changed_epic', {
+                from: oldVal ?? 'none',
+                to: newVal ?? 'none',
+            });
         case 'sprint_changed':
-            return t('task_activity.changed_sprint', { from: oldVal ?? 'none', to: newVal ?? 'none' });
+            return t('task_activity.changed_sprint', {
+                from: oldVal ?? 'none',
+                to: newVal ?? 'none',
+            });
         case 'updated':
-            return field ? `${t('task_activity.updated')} ${field}` : t('task_activity.updated');
+            return field
+                ? `${t('task_activity.updated')} ${field}`
+                : t('task_activity.updated');
         default:
             return action.replace(/_/g, ' ');
     }

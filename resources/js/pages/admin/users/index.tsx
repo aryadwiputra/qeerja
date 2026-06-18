@@ -162,7 +162,9 @@ function UserFormDialog({
                                 setData('is_super_admin', v)
                             }
                         />
-                        <Label htmlFor="is_super_admin">{t('admin.super_admin')}</Label>
+                        <Label htmlFor="is_super_admin">
+                            {t('admin.super_admin')}
+                        </Label>
                     </div>
                     <Button
                         type="submit"
@@ -268,7 +270,9 @@ export default function AdminUsersIndex({ users, filters }: Props) {
                                     <TableHead>{t('admin.name')}</TableHead>
                                     <TableHead>{t('admin.email')}</TableHead>
                                     <TableHead>{t('admin.role')}</TableHead>
-                                    <TableHead>{t('admin.workspaces')}</TableHead>
+                                    <TableHead>
+                                        {t('admin.workspaces')}
+                                    </TableHead>
                                     <TableHead>{t('admin.status')}</TableHead>
                                     <TableHead>{t('admin.joined')}</TableHead>
                                     <TableHead className="w-24" />

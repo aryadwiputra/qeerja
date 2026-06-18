@@ -3,6 +3,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Plus, Zap, Trash2, Play, Pause } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FeatureGuide, InlineTooltip } from '@/components/feature-guide';
 import type { GuideContent } from '@/components/feature-guide';
 import { Badge } from '@/components/ui/badge';
@@ -26,146 +27,145 @@ import {
 } from '@/components/ui/select';
 import { show as projectShow } from '@/routes/projects';
 
-const automationGuide: GuideContent = {
-    title: 'Automation Rules',
-    description:
-        'Automate task management by creating rules that trigger actions when specific events occur.',
-    sections: [
-        {
-            title: 'How it works',
-            content:
-                'Each rule has three parts: a trigger event (when it fires), optional conditions (filter which tasks), and actions (what to do). Rules run in priority order (highest first).',
-        },
-        {
-            title: 'Creating a rule',
-            content:
-                '1. Give your rule a descriptive name.\n2. Choose a trigger event — this determines when the rule fires.\n3. Add conditions (optional) — the rule only runs on tasks matching all conditions.\n4. Add one or more actions — what happens to matching tasks.\n5. Click "Create Rule" to save.',
-        },
-    ],
-    items: [
-        {
-            heading: 'Trigger Events',
-            data: [
-                {
-                    term: 'Task Created',
-                    description:
-                        'Fires when a new task is created in this project.',
-                },
-                {
-                    term: 'Status Changed',
-                    description:
-                        'Fires when a task is moved to a different board column.',
-                },
-                {
-                    term: 'Priority Changed',
-                    description: "Fires when a task's priority is updated.",
-                },
-                {
-                    term: 'Assignee Added',
-                    description: 'Fires when someone is assigned to a task.',
-                },
-                {
-                    term: 'Due Date Passed',
-                    description:
-                        'Fires when a task passes its due date (checked hourly).',
-                },
-            ],
-        },
-        {
-            heading: 'Condition Fields',
-            data: [
-                {
-                    term: 'Status',
-                    description:
-                        'The task\'s current board column status key (e.g., "in_progress", "done").',
-                },
-                {
-                    term: 'Priority',
-                    description:
-                        'The task\'s current priority key (e.g., "high", "low").',
-                },
-                {
-                    term: 'Assignee',
-                    description:
-                        'User ID(s) assigned to the task. Use "contains" to check if a specific user is assigned.',
-                },
-                {
-                    term: 'Label',
-                    description:
-                        'Label ID(s) attached to the task. Use "contains" to check if a specific label is attached.',
-                },
-                {
-                    term: 'Story Points',
-                    description:
-                        'The task\'s story point value. Use "greater_than" or "less_than" for numeric comparisons.',
-                },
-            ],
-        },
-        {
-            heading: 'Condition Operators',
-            data: [
-                {
-                    term: 'Equals / Not Equals',
-                    description: 'Exact match or non-match.',
-                },
-                {
-                    term: 'Contains / Not Contains',
-                    description: 'Partial string match or non-match.',
-                },
-                {
-                    term: 'Greater Than / Less Than',
-                    description: 'Numeric comparison.',
-                },
-                {
-                    term: 'In / Not In',
-                    description:
-                        'Value is in (or not in) a comma-separated list.',
-                },
-            ],
-        },
-        {
-            heading: 'Action Types & Value Formats',
-            data: [
-                {
-                    term: 'Assign User',
-                    description: 'Format: user:{ID} — Example: user:5',
-                },
-                {
-                    term: 'Add Label',
-                    description: 'Format: label:{ID} — Example: label:3',
-                },
-                {
-                    term: 'Remove Label',
-                    description: 'Format: label:{ID} — Example: label:3',
-                },
-                {
-                    term: 'Set Priority',
-                    description: 'Format: priority:{ID} — Example: priority:2',
-                },
-                {
-                    term: 'Move to Column',
-                    description: 'Format: column:{ID} — Example: column:4',
-                },
-                {
-                    term: 'Send Notification',
-                    description:
-                        'The message text sent to task assignees (or reporter if unassigned).',
-                },
-                {
-                    term: 'Add Comment',
-                    description:
-                        'A comment posted by Automation Bot on the task.',
-                },
-            ],
-        },
-    ],
-    tips: [
-        'Use the "Test" button on any rule to preview how many tasks currently match its conditions.',
-        'Higher priority rules run first. Adjust priority to control execution order.',
-        "Disabled rules won't fire. Toggle them on/off with the play/pause button.",
-        'Conditions are optional — a rule with no conditions matches all tasks for the chosen trigger.',
-    ],
-};
+function useAutomationGuide(t: (key: string) => string): GuideContent {
+    return {
+        title: t('guide.automation.title'),
+        description: t('guide.automation.description'),
+        sections: [
+            {
+                title: t('automation.how_it_works'),
+                content: t('automation.how_it_works_content'),
+            },
+            {
+                title: t('automation.creating_rule'),
+                content: t('automation.creating_rule_content'),
+            },
+        ],
+        items: [
+            {
+                heading: t('guide.automation.section_triggers'),
+                data: [
+                    {
+                        term: t('automation.trigger_task_created'),
+                        description: t('automation.trigger_task_created_desc'),
+                    },
+                    {
+                        term: t('automation.trigger_status_changed'),
+                        description: t(
+                            'automation.trigger_status_changed_desc',
+                        ),
+                    },
+                    {
+                        term: t('automation.trigger_priority_changed'),
+                        description: t(
+                            'automation.trigger_priority_changed_desc',
+                        ),
+                    },
+                    {
+                        term: t('automation.trigger_assignee_added'),
+                        description: t(
+                            'automation.trigger_assignee_added_desc',
+                        ),
+                    },
+                    {
+                        term: t('automation.trigger_due_date_passed'),
+                        description: t(
+                            'automation.trigger_due_date_passed_desc',
+                        ),
+                    },
+                ],
+            },
+            {
+                heading: t('automation.condition_fields'),
+                data: [
+                    {
+                        term: t('automation.field_status'),
+                        description: t('automation.field_status_desc'),
+                    },
+                    {
+                        term: t('automation.field_priority'),
+                        description: t('automation.field_priority_desc'),
+                    },
+                    {
+                        term: t('automation.field_assignee'),
+                        description: t('automation.field_assignee_desc'),
+                    },
+                    {
+                        term: t('automation.field_label'),
+                        description: t('automation.field_label_desc'),
+                    },
+                    {
+                        term: t('automation.field_story_points'),
+                        description: t('automation.field_story_points_desc'),
+                    },
+                ],
+            },
+            {
+                heading: t('automation.condition_operators'),
+                data: [
+                    {
+                        term: t('automation.op_equals'),
+                        description: t('automation.op_equals_desc'),
+                    },
+                    {
+                        term: t('automation.op_contains'),
+                        description: t('automation.op_contains_desc'),
+                    },
+                    {
+                        term: t('automation.op_comparison'),
+                        description: t('automation.op_comparison_desc'),
+                    },
+                    {
+                        term: t('automation.op_in'),
+                        description: t('automation.op_in_desc'),
+                    },
+                ],
+            },
+            {
+                heading: t('automation.action_types'),
+                data: [
+                    {
+                        term: t('automation.action_assign_user'),
+                        description: t('automation.action_assign_user_desc'),
+                    },
+                    {
+                        term: t('automation.action_add_label'),
+                        description: t('automation.action_add_label_desc'),
+                    },
+                    {
+                        term: t('automation.action_remove_label'),
+                        description: t('automation.action_remove_label_desc'),
+                    },
+                    {
+                        term: t('automation.action_set_priority'),
+                        description: t('automation.action_set_priority_desc'),
+                    },
+                    {
+                        term: t('automation.action_move_column'),
+                        description: t('automation.action_move_column_desc'),
+                    },
+                    {
+                        term: t('automation.action_send_notification'),
+                        description: t(
+                            'automation.action_send_notification_desc',
+                        ),
+                    },
+                    {
+                        term: t('automation.action_add_comment'),
+                        description: t('automation.action_add_comment_desc'),
+                    },
+                ],
+            },
+        ],
+        tips: [
+            t('guide.automation.tip_1'),
+            t('guide.automation.tip_2'),
+            t('guide.automation.tip_3'),
+            t('guide.automation.tip_4'),
+        ],
+        tipsHeading: t('guide.automation.tips_title'),
+    };
+}
 
 interface AutomationRule {
     id: number;
@@ -237,6 +237,8 @@ export default function AutomationIndex({
     rules: initialRules,
     options,
 }: Props) {
+    const { t } = useTranslation();
+    const automationGuide = useAutomationGuide(t);
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [newRule, setNewRule] = useState({
         name: '',
@@ -283,7 +285,7 @@ export default function AutomationIndex({
     };
 
     const handleDeleteRule = (ruleId: number) => {
-        if (!confirm('Delete this automation rule?')) {
+        if (!confirm(t('automation.delete_confirm'))) {
             return;
         }
 
@@ -310,7 +312,10 @@ export default function AutomationIndex({
 
                     if (result) {
                         alert(
-                            `Found ${result.matching_count} matching tasks out of ${result.total_tasks} total.`,
+                            t('automation.test_result', {
+                                matching: result.matching_count,
+                                total: result.total_tasks,
+                            }),
                         );
                     }
                 },
@@ -341,16 +346,18 @@ export default function AutomationIndex({
                         <span>{project.name}</span>
                     </Link>
                     <span className="text-sm text-muted-foreground">/</span>
-                    <span className="text-sm font-medium">Automation</span>
+                    <span className="text-sm font-medium">
+                        {t('automation.title')}
+                    </span>
                 </div>
 
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-semibold tracking-tight">
-                            Automation Rules
+                            {t('automation.title')}
                         </h1>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            Create rules to automate task management
+                            {t('automation.description')}
                         </p>
                     </div>
 
@@ -363,13 +370,13 @@ export default function AutomationIndex({
                             <DialogTrigger asChild>
                                 <Button>
                                     <Plus className="mr-2 size-4" />
-                                    New Rule
+                                    {t('automation.new_rule')}
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="max-w-2xl">
                                 <DialogHeader>
                                     <DialogTitle>
-                                        Create Automation Rule
+                                        {t('automation.create_automation_rule')}
                                     </DialogTitle>
                                 </DialogHeader>
                                 <form
@@ -377,7 +384,9 @@ export default function AutomationIndex({
                                     className="space-y-4"
                                 >
                                     <div>
-                                        <Label>Rule Name</Label>
+                                        <Label>
+                                            {t('automation.rule_name')}
+                                        </Label>
                                         <Input
                                             value={newRule.name}
                                             onChange={(e) =>
@@ -386,15 +395,21 @@ export default function AutomationIndex({
                                                     name: e.target.value,
                                                 })
                                             }
-                                            placeholder="e.g., Auto-assign on status change"
+                                            placeholder={t(
+                                                'automation.rule_name_placeholder',
+                                            )}
                                             required
                                         />
                                     </div>
 
                                     <div>
                                         <Label className="flex items-center gap-1.5">
-                                            Trigger Event
-                                            <InlineTooltip content="The event that fires this rule. Choose when you want the automation to run." />
+                                            {t('automation.trigger_event')}
+                                            <InlineTooltip
+                                                content={t(
+                                                    'automation.trigger_event_tooltip',
+                                                )}
+                                            />
                                         </Label>
                                         <Select
                                             value={newRule.trigger_event}
@@ -406,7 +421,11 @@ export default function AutomationIndex({
                                             }
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select trigger..." />
+                                                <SelectValue
+                                                    placeholder={t(
+                                                        'automation.select_trigger',
+                                                    )}
+                                                />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {options.trigger_events.map(
@@ -425,8 +444,12 @@ export default function AutomationIndex({
 
                                     <div>
                                         <Label className="flex items-center gap-1.5">
-                                            Conditions
-                                            <InlineTooltip content="Optional filters. The rule only runs on tasks matching ALL conditions. Leave empty to match all tasks." />
+                                            {t('automation.conditions')}
+                                            <InlineTooltip
+                                                content={t(
+                                                    'automation.conditions_tooltip',
+                                                )}
+                                            />
                                         </Label>
                                         <div className="mt-2 space-y-2">
                                             {newRule.conditions.map(
@@ -592,15 +615,19 @@ export default function AutomationIndex({
                                                     })
                                                 }
                                             >
-                                                Add Condition
+                                                {t('automation.add_condition')}
                                             </Button>
                                         </div>
                                     </div>
 
                                     <div>
                                         <Label className="flex items-center gap-1.5">
-                                            Actions
-                                            <InlineTooltip content="What happens to matching tasks. You can add multiple actions — they all run in order." />
+                                            {t('automation.actions')}
+                                            <InlineTooltip
+                                                content={t(
+                                                    'automation.actions_tooltip',
+                                                )}
+                                            />
                                         </Label>
                                         <div className="mt-2 space-y-2">
                                             {newRule.actions.map(
@@ -629,7 +656,11 @@ export default function AutomationIndex({
                                                             }}
                                                         >
                                                             <SelectTrigger className="w-44">
-                                                                <SelectValue placeholder="Action type" />
+                                                                <SelectValue
+                                                                    placeholder={t(
+                                                                        'automation.action_type',
+                                                                    )}
+                                                                />
                                                             </SelectTrigger>
                                                             <SelectContent>
                                                                 {options.action_types.map(
@@ -668,10 +699,16 @@ export default function AutomationIndex({
                                                                         updated,
                                                                 });
                                                             }}
-                                                            placeholder="Value (e.g., user:5, label:3)"
+                                                            placeholder={t(
+                                                                'automation.value_placeholder',
+                                                            )}
                                                             className="flex-1"
                                                         />
-                                                        <InlineTooltip content="Format depends on action type: user:{ID}, label:{ID}, priority:{ID}, column:{ID}, or plain text for notifications/comments." />
+                                                        <InlineTooltip
+                                                            content={t(
+                                                                'automation.value_tooltip',
+                                                            )}
+                                                        />
 
                                                         <Button
                                                             type="button"
@@ -716,7 +753,7 @@ export default function AutomationIndex({
                                                     })
                                                 }
                                             >
-                                                Add Action
+                                                {t('automation.add_action')}
                                             </Button>
                                         </div>
                                     </div>
@@ -729,7 +766,7 @@ export default function AutomationIndex({
                                                 setShowCreateDialog(false)
                                             }
                                         >
-                                            Cancel
+                                            {t('common.cancel')}
                                         </Button>
                                         <Button
                                             type="submit"
@@ -738,7 +775,7 @@ export default function AutomationIndex({
                                                 !newRule.trigger_event
                                             }
                                         >
-                                            Create Rule
+                                            {t('automation.create_rule')}
                                         </Button>
                                     </div>
                                 </form>
@@ -828,7 +865,7 @@ export default function AutomationIndex({
                                             }
                                         >
                                             <Play className="mr-1 size-3" />
-                                            Test
+                                            {t('automation.test')}
                                         </Button>
                                         <Button
                                             variant="ghost"
@@ -865,15 +902,15 @@ export default function AutomationIndex({
                             <Zap className="size-12 text-muted-foreground/40" />
                             <div className="text-center">
                                 <p className="text-lg font-medium">
-                                    No automation rules
+                                    {t('automation.no_rules')}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    Create rules to automate task management.
+                                    {t('automation.no_rules_description')}
                                 </p>
                             </div>
                             <Button onClick={() => setShowCreateDialog(true)}>
                                 <Plus className="mr-2 size-4" />
-                                New Rule
+                                {t('automation.new_rule')}
                             </Button>
                         </div>
                     )}

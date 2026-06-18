@@ -346,7 +346,9 @@ export default function WorkloadPage({
                         >
                             {t('common.cancel')}
                         </Button>
-                        <Button onClick={saveCapacity}>{t('common.save')}</Button>
+                        <Button onClick={saveCapacity}>
+                            {t('common.save')}
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

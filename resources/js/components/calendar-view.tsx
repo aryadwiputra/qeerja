@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -72,6 +73,7 @@ function toDate(s: string | null): Date | null {
 }
 
 export function CalendarView({ tasks, onTaskClick }: CalendarViewProps) {
+    const { t } = useTranslation();
     const today = useMemo(() => {
         const d = new Date();
         d.setHours(0, 0, 0, 0);
@@ -129,7 +131,7 @@ export function CalendarView({ tasks, onTaskClick }: CalendarViewProps) {
                         size="sm"
                         onClick={goToday}
                     >
-                        Today
+                        {t('calendar.today')}
                     </Button>
                     <Button
                         type="button"
@@ -216,7 +218,9 @@ export function CalendarView({ tasks, onTaskClick }: CalendarViewProps) {
                                 ))}
                                 {dayTasks.length > 3 && (
                                     <span className="px-1 text-[10px] text-muted-foreground">
-                                        +{dayTasks.length - 3} more
+                                        {t('calendar.more', {
+                                            count: dayTasks.length - 3,
+                                        })}
                                     </span>
                                 )}
                             </div>

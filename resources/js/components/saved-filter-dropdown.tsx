@@ -2,6 +2,7 @@
 
 import { Bookmark, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -42,6 +43,7 @@ export function SavedFilterDropdown({
     currentSort,
     onLoad,
 }: Props) {
+    const { t } = useTranslation();
     const [filters, setFilters] = useState<SavedFilter[]>([]);
     const [saveName, setSaveName] = useState('');
     const [saving, setSaving] = useState(false);
@@ -139,7 +141,7 @@ export function SavedFilterDropdown({
     };
 
     const handleDelete = (filterId: number) => {
-        if (!confirm('Delete this saved filter?')) {
+        if (!confirm(t('filter.delete_filter'))) {
             return;
         }
 
@@ -176,7 +178,7 @@ export function SavedFilterDropdown({
             <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
                     <Bookmark className="mr-1.5 size-3.5" />
-                    <span>Saved filters</span>
+                    <span>{t('filter.saved_filters')}</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
@@ -215,7 +217,7 @@ export function SavedFilterDropdown({
                     ))
                 ) : (
                     <div className="px-2 py-1.5 text-xs text-muted-foreground">
-                        No saved filters
+                        {t('filter.no_saved_filters')}
                     </div>
                 )}
 
@@ -226,7 +228,7 @@ export function SavedFilterDropdown({
                             <Input
                                 value={saveName}
                                 onChange={(e) => setSaveName(e.target.value)}
-                                placeholder="Filter name..."
+                                placeholder={t('filter.filter_name')}
                                 className="h-7 text-xs"
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
@@ -241,7 +243,7 @@ export function SavedFilterDropdown({
                                 onClick={handleSave}
                                 disabled={!saveName.trim() || saving}
                             >
-                                Save
+                                {t('common.save')}
                             </Button>
                         </div>
                     </>

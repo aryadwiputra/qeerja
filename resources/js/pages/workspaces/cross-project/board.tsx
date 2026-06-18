@@ -117,7 +117,10 @@ export default function CrossProjectBoard({
                             {t('cross_project.board')}
                         </h1>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            {t('cross_project.board_summary', { projectCount: projects.length, taskCount: tasks.length })}
+                            {t('cross_project.board_summary', {
+                                projectCount: projects.length,
+                                taskCount: tasks.length,
+                            })}
                         </p>
                     </div>
 

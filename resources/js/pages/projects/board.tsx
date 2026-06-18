@@ -28,8 +28,10 @@ import {
     Users,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BoardColumnManager } from '@/components/board-column-manager';
 import { FeatureGuide } from '@/components/feature-guide';
+import type { GuideContent } from '@/components/feature-guide';
 import { TaskCard } from '@/components/task-card';
 import { TaskCreateDialog } from '@/components/task-create-dialog';
 import { TaskDetailDrawer } from '@/components/task-detail-drawer';
@@ -91,56 +93,52 @@ interface TaskItem {
     }>;
 }
 
-const boardGuide = {
-    title: 'Kanban Board',
-    description:
-        'Visualize your workflow by dragging tasks across columns to reflect their current status.',
-    sections: [
-        {
-            title: 'How the Board Works',
-            content:
-                'Each column represents a stage in your workflow (e.g., To Do, In Progress, Done). Tasks are displayed as cards that you can drag between columns to update their status.',
-        },
-        {
-            title: 'Real-Time Collaboration',
-            content:
-                'See who else is viewing the board via the avatars in the header. Changes made by others appear instantly without page reload.',
-        },
-    ],
-    items: [
-        {
-            heading: 'Board Features',
-            data: [
-                {
-                    term: 'Drag & Drop',
-                    description:
-                        'Drag a task card from one column to another to change its status. The move is saved automatically.',
-                },
-                {
-                    term: 'Column Management',
-                    description:
-                        'Click "Columns" to add, rename, reorder, or delete board columns. You can also set WIP (Work In Progress) limits.',
-                },
-                {
-                    term: 'Swimlanes',
-                    description:
-                        'Group tasks by assignee, priority, or epic using the swimlane dropdown. Helps visualize workload distribution.',
-                },
-                {
-                    term: 'Multiple Boards',
-                    description:
-                        'Switch between different board views using the board selector in the header. Each board can have its own columns.',
-                },
-            ],
-        },
-    ],
-    tips: [
-        'Use keyboard shortcut "c" to quickly create a new task from the board.',
-        'Click a task card to open the detail drawer without leaving the board.',
-        'Set WIP limits on columns to prevent overloading your team.',
-        'Use swimlanes to spot bottlenecks in specific areas of work.',
-    ],
-};
+function useBoardGuide(t: (key: string) => string): GuideContent {
+    return {
+        title: t('guide.board.title'),
+        description: t('guide.board.description'),
+        sections: [
+            {
+                title: t('guide.board.section_how'),
+                content: t('guide.board.content_how'),
+            },
+            {
+                title: t('guide.board.section_realtime'),
+                content: t('guide.board.content_realtime'),
+            },
+        ],
+        items: [
+            {
+                heading: t('guide.board.heading_features'),
+                data: [
+                    {
+                        term: t('guide.board.drag_drop'),
+                        description: t('guide.board.drag_drop_desc'),
+                    },
+                    {
+                        term: t('guide.board.column_management'),
+                        description: t('guide.board.column_management_desc'),
+                    },
+                    {
+                        term: t('guide.board.swimlanes'),
+                        description: t('guide.board.swimlanes_desc'),
+                    },
+                    {
+                        term: t('guide.board.multiple_boards'),
+                        description: t('guide.board.multiple_boards_desc'),
+                    },
+                ],
+            },
+        ],
+        tips: [
+            t('guide.board.tip_1'),
+            t('guide.board.tip_2'),
+            t('guide.board.tip_3'),
+            t('guide.board.tip_4'),
+        ],
+        tipsHeading: t('guide.board.tips_title'),
+    };
+}
 
 interface Column {
     id: number;
@@ -348,6 +346,7 @@ function DroppableColumn({
     activeTaskId: number | null;
     children: React.ReactNode;
 }) {
+    const { t } = useTranslation();
     const { setNodeRef, isOver } = useDroppable({ id: `col:${column.id}` });
     const isEmpty = column.tasks.length === 0;
     const hasActiveTask = activeTaskId !== null;
@@ -369,14 +368,16 @@ function DroppableColumn({
                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
                         <ArrowDown className="size-6 animate-bounce text-primary" />
                         <p className="text-xs font-medium text-primary">
-                            Drop here
+                            {t('board.drop_here')}
                         </p>
                     </div>
                 </div>
             )}
             {!isOver && isEmpty && !hasActiveTask && (
                 <div className="flex flex-1 items-center justify-center py-8">
-                    <p className="text-xs text-muted-foreground">No tasks</p>
+                    <p className="text-xs text-muted-foreground">
+                        {t('board.no_tasks')}
+                    </p>
                 </div>
             )}
         </div>
@@ -438,6 +439,8 @@ function BoardClient({
     epics,
     sprints,
 }: Props) {
+    const { t } = useTranslation();
+    const boardGuide = useBoardGuide(t);
     const [columns, setColumns] = useState(initialColumns);
     const columnsSnapshotRef = useRef(columns);
     const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
@@ -914,7 +917,7 @@ function BoardClient({
                         {allBoards.length > 1 && (
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-muted-foreground">
-                                    Board:
+                                    {t('board.board_label')}
                                 </span>
                                 <Select
                                     value={String(board.id)}
@@ -969,7 +972,7 @@ function BoardClient({
                             onClick={() => setColumnManagerOpen(true)}
                         >
                             <Settings2 className="size-3.5" />
-                            <span>Columns</span>
+                            <span>{t('board.columns')}</span>
                         </Button>
                         <TaskCreateDialog
                             workspaceSlug={workspace.slug}

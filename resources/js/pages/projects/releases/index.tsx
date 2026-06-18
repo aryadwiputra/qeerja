@@ -251,7 +251,9 @@ export default function ReleasesIndex({
                         <span>{project.name}</span>
                     </Link>
                     <span className="text-sm text-muted-foreground">/</span>
-                    <span className="text-sm font-medium">{t('release.title')}</span>
+                    <span className="text-sm font-medium">
+                        {t('release.title')}
+                    </span>
                 </div>
 
                 <div className="mx-auto w-full max-w-4xl">

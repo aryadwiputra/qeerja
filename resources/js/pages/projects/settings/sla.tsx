@@ -3,6 +3,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { FeatureGuide, InlineTooltip } from '@/components/feature-guide';
 import type { GuideContent } from '@/components/feature-guide';
@@ -31,46 +32,52 @@ import {
     update as updateSla,
 } from '@/routes/projects/sla-policies';
 
-const slaGuide: GuideContent = {
-    title: 'SLA Policies',
-    description:
-        'Define response and resolution time targets for different task types.',
-    sections: [
-        {
-            title: 'What is an SLA?',
-            content:
-                "A Service Level Agreement (SLA) sets time targets for how quickly tasks should be responded to and resolved. When a task is created, the SLA timer starts. If the target isn't met, the task is flagged as breached.",
-        },
-        {
-            title: 'How it works',
-            content:
-                '1. Create a policy for each task type (Bug, Feature, etc.).\n2. Set the response time — how long before the first response is expected.\n3. Set the resolution time — how long before the task should be completed.\n4. The system checks for breaches every hour and logs them as task activity.',
-        },
-    ],
-    items: [
-        {
-            heading: 'Time Fields',
-            data: [
-                {
-                    term: 'Response Time (hours)',
-                    description:
-                        'Maximum hours before the first response is expected. Measured from task creation. Set to 0 to disable.',
-                },
-                {
-                    term: 'Resolution Time (hours)',
-                    description:
-                        'Maximum hours before the task should be resolved (marked as done). Measured from task creation. Set to 0 to disable.',
-                },
-            ],
-        },
-    ],
-    tips: [
-        'Each task type can only have one SLA policy. Create separate policies for Bugs, Features, etc.',
-        "SLA breaches are detected hourly by a background job. They won't appear instantly.",
-        "Breach events are logged in the task's activity feed for auditing.",
-        'Disable a policy temporarily without deleting it using the enabled toggle.',
-    ],
-};
+function useSlaGuide(t: (key: string) => string): GuideContent {
+    return {
+        title: t('guide.sla.title'),
+        description: t('guide.sla.description'),
+        sections: [
+            {
+                title: t('guide.sla.section_what'),
+                content: t('guide.sla.content_what'),
+            },
+            {
+                title: t('guide.sla.section_breach'),
+                content: t('guide.sla.content_breach'),
+            },
+        ],
+        items: [
+            {
+                heading: t('guide.sla.heading_features'),
+                data: [
+                    {
+                        term: t('guide.sla.response_time'),
+                        description: t('guide.sla.response_time_desc'),
+                    },
+                    {
+                        term: t('guide.sla.resolution_time'),
+                        description: t('guide.sla.resolution_time_desc'),
+                    },
+                    {
+                        term: t('guide.sla.breach_detection'),
+                        description: t('guide.sla.breach_detection_desc'),
+                    },
+                    {
+                        term: t('guide.sla.policy_name'),
+                        description: t('guide.sla.policy_name_desc'),
+                    },
+                ],
+            },
+        ],
+        tips: [
+            t('guide.sla.tip_1'),
+            t('guide.sla.tip_2'),
+            t('guide.sla.tip_3'),
+            t('guide.sla.tip_4'),
+        ],
+        tipsHeading: t('guide.sla.tips_title'),
+    };
+}
 
 interface TaskType {
     id: number;
@@ -113,6 +120,8 @@ export default function SlaSettings({
     policies,
     taskTypes,
 }: Props) {
+    const { t } = useTranslation();
+    const slaGuide = useSlaGuide(t);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editing, setEditing] = useState<SlaPolicyData | null>(null);
     const [deleting, setDeleting] = useState<SlaPolicyData | null>(null);
@@ -188,7 +197,7 @@ export default function SlaSettings({
                     </Link>
                     <span className="text-sm text-muted-foreground">/</span>
                     <span className="text-sm text-muted-foreground">
-                        SLA Policies
+                        {t('sla_page.title')}
                     </span>
                 </div>
 
@@ -196,11 +205,10 @@ export default function SlaSettings({
                     <div className="mb-6 flex items-start justify-between gap-4">
                         <div>
                             <h1 className="text-2xl font-semibold tracking-tight">
-                                SLA Policies
+                                {t('sla_page.title')}
                             </h1>
                             <p className="mt-1 text-sm text-muted-foreground">
-                                Set response and resolution time targets per
-                                task type.
+                                {t('sla_page.description')}
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -211,7 +219,7 @@ export default function SlaSettings({
                                 disabled={availableTypes.length === 0}
                             >
                                 <Plus className="size-3" />
-                                Add policy
+                                {t('sla_page.add_policy')}
                             </Button>
                         </div>
                     </div>
@@ -241,13 +249,13 @@ export default function SlaSettings({
                                             {policy.task_type.name}
                                         </Badge>
                                         <span className="text-sm text-muted-foreground">
-                                            Response:{' '}
+                                            {t('sla_page.response')}{' '}
                                             <span className="font-medium text-foreground">
                                                 {policy.response_hours}h
                                             </span>
                                         </span>
                                         <span className="text-sm text-muted-foreground">
-                                            Resolution:{' '}
+                                            {t('sla_page.resolution')}{' '}
                                             <span className="font-medium text-foreground">
                                                 {policy.resolution_hours}h
                                             </span>
@@ -261,8 +269,8 @@ export default function SlaSettings({
                                             className="text-xs"
                                         >
                                             {policy.enabled
-                                                ? 'Enabled'
-                                                : 'Disabled'}
+                                                ? t('sla_page.enabled')
+                                                : t('sla_page.disabled')}
                                         </Badge>
                                     </div>
                                     <div className="hidden gap-1 group-hover:flex">
@@ -302,11 +310,10 @@ export default function SlaSettings({
                         <div className="flex flex-col items-center justify-center gap-3 rounded-md border border-dashed py-16 text-center">
                             <div>
                                 <p className="text-sm font-medium">
-                                    No SLA policies yet
+                                    {t('sla_page.no_policies')}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    Add policies to track response and
-                                    resolution time targets.
+                                    {t('sla_page.no_policies_description')}
                                 </p>
                             </div>
                             <Button
@@ -315,7 +322,7 @@ export default function SlaSettings({
                                 disabled={availableTypes.length === 0}
                             >
                                 <Plus className="size-3" />
-                                Add policy
+                                {t('sla_page.add_policy')}
                             </Button>
                         </div>
                     )}
@@ -326,19 +333,25 @@ export default function SlaSettings({
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>
-                            {editing ? 'Edit SLA policy' : 'Add SLA policy'}
+                            {editing
+                                ? t('sla_page.edit_policy')
+                                : t('sla_page.add_sla_policy')}
                         </DialogTitle>
                     </DialogHeader>
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-2">
-                            <Label>Task Type</Label>
+                            <Label>{t('sla_page.task_type')}</Label>
                             <Select
                                 value={taskTypeId}
                                 onValueChange={setTaskTypeId}
                                 disabled={!!editing}
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select task type..." />
+                                    <SelectValue
+                                        placeholder={t(
+                                            'sla_page.select_task_type',
+                                        )}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {availableTypes.map((t) => (
@@ -358,8 +371,12 @@ export default function SlaSettings({
                                     htmlFor="response-hours"
                                     className="flex items-center gap-1.5"
                                 >
-                                    Response (hours)
-                                    <InlineTooltip content="Maximum hours before the first response is expected. Measured from task creation." />
+                                    {t('sla_page.response_hours')}
+                                    <InlineTooltip
+                                        content={t(
+                                            'sla_page.response_hours_tooltip',
+                                        )}
+                                    />
                                 </Label>
                                 <Input
                                     id="response-hours"
@@ -376,8 +393,12 @@ export default function SlaSettings({
                                     htmlFor="resolution-hours"
                                     className="flex items-center gap-1.5"
                                 >
-                                    Resolution (hours)
-                                    <InlineTooltip content="Maximum hours before the task should be completed. Measured from task creation." />
+                                    {t('sla_page.resolution_hours')}
+                                    <InlineTooltip
+                                        content={t(
+                                            'sla_page.resolution_hours_tooltip',
+                                        )}
+                                    />
                                 </Label>
                                 <Input
                                     id="resolution-hours"
@@ -398,7 +419,7 @@ export default function SlaSettings({
                             variant="outline"
                             onClick={() => setDialogOpen(false)}
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             onClick={handleSubmit}
@@ -408,7 +429,7 @@ export default function SlaSettings({
                                 resolutionHours < 1
                             }
                         >
-                            {editing ? 'Save' : 'Add'}
+                            {editing ? t('common.save') : t('common.add')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -421,13 +442,15 @@ export default function SlaSettings({
                         setDeleting(null);
                     }
                 }}
-                title="Delete SLA policy"
+                title={t('sla_page.delete_sla_policy')}
                 description={
                     deleting
-                        ? `Remove the SLA policy for "${deleting.task_type.name}"?`
+                        ? t('sla_page.delete_sla_description', {
+                              name: deleting.task_type.name,
+                          })
                         : ''
                 }
-                confirmText="Delete"
+                confirmText={t('common.delete')}
                 onConfirm={() => {
                     if (!deleting) {
                         return;

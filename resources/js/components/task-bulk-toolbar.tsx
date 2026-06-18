@@ -61,8 +61,8 @@ export function TaskBulkToolbar({ selectedCount, onClear, onAction }: Props) {
         <div className="mb-4 flex flex-col gap-3 rounded-lg border bg-muted/40 p-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <p className="text-sm font-medium">
-                    {selectedCount}{' '}
-                    {selectedCount === 1 ? 'task' : 'tasks'} selected
+                    {selectedCount} {selectedCount === 1 ? 'task' : 'tasks'}{' '}
+                    selected
                 </p>
                 <p className="text-xs text-muted-foreground">
                     Apply a bulk action to the selected tasks.

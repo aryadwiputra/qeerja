@@ -111,7 +111,9 @@ export default function GoalsIndex({ workspace, goals: initialGoals }: Props) {
                         <span>{workspace.name}</span>
                     </Link>
                     <span className="text-sm text-muted-foreground">/</span>
-                    <span className="text-sm font-medium">{t('goal.title')}</span>
+                    <span className="text-sm font-medium">
+                        {t('goal.title')}
+                    </span>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -136,7 +138,9 @@ export default function GoalsIndex({ workspace, goals: initialGoals }: Props) {
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>{t('goal.create_goal')}</DialogTitle>
+                                <DialogTitle>
+                                    {t('goal.create_goal')}
+                                </DialogTitle>
                             </DialogHeader>
                             <form
                                 onSubmit={handleCreateGoal}
@@ -152,7 +156,9 @@ export default function GoalsIndex({ workspace, goals: initialGoals }: Props) {
                                                 title: e.target.value,
                                             })
                                         }
-                                        placeholder={t('goal.placeholder_title')}
+                                        placeholder={t(
+                                            'goal.placeholder_title',
+                                        )}
                                         required
                                     />
                                 </div>
@@ -166,7 +172,9 @@ export default function GoalsIndex({ workspace, goals: initialGoals }: Props) {
                                                 description: e.target.value,
                                             })
                                         }
-                                        placeholder={t('goal.placeholder_description')}
+                                        placeholder={t(
+                                            'goal.placeholder_description',
+                                        )}
                                         className="mt-1 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs"
                                         rows={3}
                                     />
@@ -291,9 +299,13 @@ export default function GoalsIndex({ workspace, goals: initialGoals }: Props) {
                                 <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
                                     <span className="flex items-center gap-1">
                                         <Target className="size-3" />
-                                        {goal.key_results_count} {t('goal.key_results_count')}
+                                        {goal.key_results_count}{' '}
+                                        {t('goal.key_results_count')}
                                     </span>
-                                    <span>{goal.epics_count} {t('goal.epics_count')}</span>
+                                    <span>
+                                        {goal.epics_count}{' '}
+                                        {t('goal.epics_count')}
+                                    </span>
                                 </div>
                             </CardContent>
                         </Card>

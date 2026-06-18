@@ -47,7 +47,8 @@ export function WorkspaceSwitcher() {
                     className="max-w-[14rem] min-w-0 justify-start border-sidebar-border/60 sm:max-w-[18rem]"
                 >
                     <span className="truncate">
-                        {currentWorkspace?.name ?? t('workspace.select_workspace')}
+                        {currentWorkspace?.name ??
+                            t('workspace.select_workspace')}
                     </span>
                     <ChevronDown className="shrink-0 text-muted-foreground" />
                 </Button>

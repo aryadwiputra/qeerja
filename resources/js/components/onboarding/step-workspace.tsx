@@ -50,11 +50,15 @@ export function StepWorkspace({ onCreated }: StepWorkspaceProps) {
                     {({ errors, processing }) => (
                         <>
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="name">{t('onboarding.workspace_name')}</Label>
+                                <Label htmlFor="name">
+                                    {t('onboarding.workspace_name')}
+                                </Label>
                                 <Input
                                     id="name"
                                     name="name"
-                                    placeholder={t('onboarding.workspace_name_placeholder')}
+                                    placeholder={t(
+                                        'onboarding.workspace_name_placeholder',
+                                    )}
                                     required
                                     onChange={(e) => {
                                         if (!slugManuallyEdited) {
@@ -82,11 +86,15 @@ export function StepWorkspace({ onCreated }: StepWorkspaceProps) {
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="slug">{t('onboarding.workspace_slug')}</Label>
+                                <Label htmlFor="slug">
+                                    {t('onboarding.workspace_slug')}
+                                </Label>
                                 <Input
                                     id="slug"
                                     name="slug"
-                                    placeholder={t('onboarding.workspace_slug_placeholder')}
+                                    placeholder={t(
+                                        'onboarding.workspace_slug_placeholder',
+                                    )}
                                     required
                                     onFocus={() => setSlugManuallyEdited(true)}
                                     data-invalid={!!errors.slug}
@@ -101,7 +109,9 @@ export function StepWorkspace({ onCreated }: StepWorkspaceProps) {
 
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="description">
-                                    {t('onboarding.workspace_description_label')}{' '}
+                                    {t(
+                                        'onboarding.workspace_description_label',
+                                    )}{' '}
                                     <span className="text-muted-foreground">
                                         ({t('common.optional')})
                                     </span>
@@ -109,7 +119,9 @@ export function StepWorkspace({ onCreated }: StepWorkspaceProps) {
                                 <Input
                                     id="description"
                                     name="description"
-                                    placeholder={t('onboarding.workspace_desc_placeholder')}
+                                    placeholder={t(
+                                        'onboarding.workspace_desc_placeholder',
+                                    )}
                                 />
                             </div>
 

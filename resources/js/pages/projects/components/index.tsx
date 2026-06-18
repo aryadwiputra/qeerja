@@ -238,12 +238,16 @@ export default function ComponentsIndex({
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>
-                            {editing ? t('component.edit_component') : t('component.create_component')}
+                            {editing
+                                ? t('component.edit_component')
+                                : t('component.create_component')}
                         </DialogTitle>
                     </DialogHeader>
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="component-name">{t('component.name')}</Label>
+                            <Label htmlFor="component-name">
+                                {t('component.name')}
+                            </Label>
                             <Input
                                 id="component-name"
                                 value={name}
@@ -252,7 +256,9 @@ export default function ComponentsIndex({
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="component-desc">{t('component.description')}</Label>
+                            <Label htmlFor="component-desc">
+                                {t('component.description')}
+                            </Label>
                             <Input
                                 id="component-desc"
                                 value={description}

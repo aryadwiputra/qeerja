@@ -102,7 +102,9 @@ export default function AdminWorkspacesIndex({ workspaces, filters }: Props) {
                             onClick={toggleArchived}
                         >
                             <Archive className="mr-1 size-4" />
-                            {filters.archived ? t('admin.active') : t('admin.archived')}
+                            {filters.archived
+                                ? t('admin.active')
+                                : t('admin.archived')}
                         </Button>
                     </div>
                 </CardHeader>

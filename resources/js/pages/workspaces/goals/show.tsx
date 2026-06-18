@@ -268,7 +268,9 @@ export default function GoalShow({ workspace, goal: initialGoal }: Props) {
                                         className="space-y-4"
                                     >
                                         <div>
-                                            <Label>{t('goal.title_label')}</Label>
+                                            <Label>
+                                                {t('goal.title_label')}
+                                            </Label>
                                             <Input
                                                 value={newKeyResult.title}
                                                 onChange={(e) =>
@@ -277,12 +279,16 @@ export default function GoalShow({ workspace, goal: initialGoal }: Props) {
                                                         title: e.target.value,
                                                     })
                                                 }
-                                                placeholder={t('goal.placeholder_key_result')}
+                                                placeholder={t(
+                                                    'goal.placeholder_key_result',
+                                                )}
                                                 required
                                             />
                                         </div>
                                         <div>
-                                            <Label>{t('goal.target_value')}</Label>
+                                            <Label>
+                                                {t('goal.target_value')}
+                                            </Label>
                                             <Input
                                                 type="number"
                                                 min="0"
@@ -458,7 +464,9 @@ export default function GoalShow({ workspace, goal: initialGoal }: Props) {
                     </div>
 
                     <div className="mt-8">
-                        <h2 className="text-lg font-semibold">{t('goal.linked_epics')}</h2>
+                        <h2 className="text-lg font-semibold">
+                            {t('goal.linked_epics')}
+                        </h2>
                         <div className="mt-4 space-y-2">
                             {goal.epics.map((epic) => (
                                 <div

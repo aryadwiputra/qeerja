@@ -31,7 +31,9 @@ export default function WorkspacesCreate() {
                 <div className="mx-auto w-full max-w-lg">
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('workspace.create_workspace')}</CardTitle>
+                            <CardTitle>
+                                {t('workspace.create_workspace')}
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <Form
@@ -49,7 +51,9 @@ export default function WorkspacesCreate() {
                                             <Input
                                                 id="name"
                                                 name="name"
-                                                placeholder={t('workspace.workspace_name_placeholder')}
+                                                placeholder={t(
+                                                    'workspace.workspace_name_placeholder',
+                                                )}
                                                 onChange={(e) => {
                                                     if (!slugManuallyEdited) {
                                                         const slugInput =
@@ -83,11 +87,15 @@ export default function WorkspacesCreate() {
                                         </div>
 
                                         <div className="flex flex-col gap-2">
-                                            <Label htmlFor="slug">{t('workspace.slug_label')}</Label>
+                                            <Label htmlFor="slug">
+                                                {t('workspace.slug_label')}
+                                            </Label>
                                             <Input
                                                 id="slug"
                                                 name="slug"
-                                                placeholder={t('workspace.workspace_slug_placeholder')}
+                                                placeholder={t(
+                                                    'workspace.workspace_slug_placeholder',
+                                                )}
                                                 onFocus={() =>
                                                     setSlugManuallyEdited(true)
                                                 }
@@ -103,7 +111,9 @@ export default function WorkspacesCreate() {
 
                                         <div className="flex flex-col gap-2">
                                             <Label htmlFor="description">
-                                                {t('workspace.description_label')}{' '}
+                                                {t(
+                                                    'workspace.description_label',
+                                                )}{' '}
                                                 <span className="text-muted-foreground">
                                                     ({t('common.optional')})
                                                 </span>
@@ -111,7 +121,9 @@ export default function WorkspacesCreate() {
                                             <Input
                                                 id="description"
                                                 name="description"
-                                                placeholder={t('workspace.workspace_desc_placeholder')}
+                                                placeholder={t(
+                                                    'workspace.workspace_desc_placeholder',
+                                                )}
                                             />
                                         </div>
 
@@ -122,7 +134,9 @@ export default function WorkspacesCreate() {
                                         >
                                             {processing
                                                 ? t('common.creating')
-                                                : t('workspace.create_workspace')}
+                                                : t(
+                                                      'workspace.create_workspace',
+                                                  )}
                                         </Button>
                                     </>
                                 )}

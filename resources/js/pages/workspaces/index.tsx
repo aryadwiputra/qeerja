@@ -182,7 +182,9 @@ export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
                                                 size="sm"
                                                 className="w-full"
                                             >
-                                                {t('workspace.restore_workspace')}
+                                                {t(
+                                                    'workspace.restore_workspace',
+                                                )}
                                             </Button>
                                         </form>
                                     </CardContent>

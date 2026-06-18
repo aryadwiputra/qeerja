@@ -122,9 +122,7 @@ export function SprintDialog({
 
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="sprint-name">
-                            {t('sprint.name')}
-                        </Label>
+                        <Label htmlFor="sprint-name">{t('sprint.name')}</Label>
                         <Input
                             id="sprint-name"
                             value={name}
@@ -134,9 +132,7 @@ export function SprintDialog({
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="sprint-goal">
-                            {t('sprint.goal')}
-                        </Label>
+                        <Label htmlFor="sprint-goal">{t('sprint.goal')}</Label>
                         <Input
                             id="sprint-goal"
                             value={goal}
@@ -177,9 +173,7 @@ export function SprintDialog({
                                 id="sprint-start"
                                 type="date"
                                 value={startDate}
-                                onChange={(e) =>
-                                    setStartDate(e.target.value)
-                                }
+                                onChange={(e) => setStartDate(e.target.value)}
                             />
                         </div>
 

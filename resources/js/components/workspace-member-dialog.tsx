@@ -107,7 +107,9 @@ export function WorkspaceMemberDialog({
 
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="member-search">{t('members.search_users')}</Label>
+                        <Label htmlFor="member-search">
+                            {t('members.search_users')}
+                        </Label>
                         <Input
                             id="member-search"
                             value={searchTerm}
@@ -154,7 +156,9 @@ export function WorkspaceMemberDialog({
 
                     {selectedUserId && (
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="member-role">{t('members.role')}</Label>
+                            <Label htmlFor="member-role">
+                                {t('members.role')}
+                            </Label>
                             <Select
                                 value={selectedRole}
                                 onValueChange={setSelectedRole}
@@ -163,7 +167,9 @@ export function WorkspaceMemberDialog({
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="admin">{t('members.admin')}</SelectItem>
+                                    <SelectItem value="admin">
+                                        {t('members.admin')}
+                                    </SelectItem>
                                     <SelectItem value="manager">
                                         {t('members.manager')}
                                     </SelectItem>

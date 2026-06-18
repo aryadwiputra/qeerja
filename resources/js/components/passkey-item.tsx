@@ -51,7 +51,8 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
                                 <span className="mx-1 text-muted-foreground/50">
                                     /
                                 </span>
-                                {t('security.last_used')} {passkey.last_used_at_diff}
+                                {t('security.last_used')}{' '}
+                                {passkey.last_used_at_diff}
                             </>
                         )}
                     </p>
@@ -76,14 +77,18 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
                     </DialogDescription>
                     <DialogFooter className="gap-2">
                         <DialogClose asChild>
-                            <Button variant="secondary">{t('common.cancel')}</Button>
+                            <Button variant="secondary">
+                                {t('common.cancel')}
+                            </Button>
                         </DialogClose>
                         <Button
                             variant="destructive"
                             onClick={handleDelete}
                             disabled={isDeleting}
                         >
-                            {isDeleting ? t('common.removing') : t('security.remove_passkey')}
+                            {isDeleting
+                                ? t('common.removing')
+                                : t('security.remove_passkey')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

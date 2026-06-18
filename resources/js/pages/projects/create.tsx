@@ -27,7 +27,9 @@ export default function ProjectsCreate({ workspace }: Props) {
 
     return (
         <>
-            <Head title={`${workspace.name} — ${t('project.create_project')}`} />
+            <Head
+                title={`${workspace.name} — ${t('project.create_project')}`}
+            />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Link
@@ -35,7 +37,9 @@ export default function ProjectsCreate({ workspace }: Props) {
                     className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <ArrowLeft className="size-4" />
-                    <span>{t('common.back')} to {t('sidebar.projects')}</span>
+                    <span>
+                        {t('common.back')} to {t('sidebar.projects')}
+                    </span>
                 </Link>
 
                 <div className="mx-auto w-full max-w-lg">
@@ -61,7 +65,9 @@ export default function ProjectsCreate({ workspace }: Props) {
                                             <Input
                                                 id="name"
                                                 name="name"
-                                                placeholder={t('onboarding.project_name_placeholder')}
+                                                placeholder={t(
+                                                    'onboarding.project_name_placeholder',
+                                                )}
                                                 onChange={(e) => {
                                                     if (!slugManuallyEdited) {
                                                         const slugInput =
@@ -118,11 +124,15 @@ export default function ProjectsCreate({ workspace }: Props) {
                                         </div>
 
                                         <div className="flex flex-col gap-2">
-                                            <Label htmlFor="key">{t('onboarding.project_key')}</Label>
+                                            <Label htmlFor="key">
+                                                {t('onboarding.project_key')}
+                                            </Label>
                                             <Input
                                                 id="key"
                                                 name="key"
-                                                placeholder={t('onboarding.project_key_placeholder')}
+                                                placeholder={t(
+                                                    'onboarding.project_key_placeholder',
+                                                )}
                                                 maxLength={6}
                                                 className="font-mono uppercase"
                                                 onFocus={(e) => {
@@ -144,11 +154,15 @@ export default function ProjectsCreate({ workspace }: Props) {
                                         </div>
 
                                         <div className="flex flex-col gap-2">
-                                            <Label htmlFor="slug">{t('onboarding.project_slug')}</Label>
+                                            <Label htmlFor="slug">
+                                                {t('onboarding.project_slug')}
+                                            </Label>
                                             <Input
                                                 id="slug"
                                                 name="slug"
-                                                placeholder={t('onboarding.project_slug_placeholder')}
+                                                placeholder={t(
+                                                    'onboarding.project_slug_placeholder',
+                                                )}
                                                 onFocus={() =>
                                                     setSlugManuallyEdited(true)
                                                 }

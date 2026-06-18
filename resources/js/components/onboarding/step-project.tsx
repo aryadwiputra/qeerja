@@ -78,11 +78,15 @@ export function StepProject({
                     encType="multipart/form-data"
                 >
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="project-name">{t('onboarding.project_name')}</Label>
+                        <Label htmlFor="project-name">
+                            {t('onboarding.project_name')}
+                        </Label>
                         <Input
                             id="project-name"
                             name="name"
-                            placeholder={t('onboarding.project_name_placeholder')}
+                            placeholder={t(
+                                'onboarding.project_name_placeholder',
+                            )}
                             required
                             onChange={(e) => {
                                 if (!slugManuallyEdited) {
@@ -121,11 +125,15 @@ export function StepProject({
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="project-key">{t('onboarding.project_key')}</Label>
+                            <Label htmlFor="project-key">
+                                {t('onboarding.project_key')}
+                            </Label>
                             <Input
                                 id="project-key"
                                 name="key"
-                                placeholder={t('onboarding.project_key_placeholder')}
+                                placeholder={t(
+                                    'onboarding.project_key_placeholder',
+                                )}
                                 required
                                 maxLength={20}
                                 onFocus={() => setSlugManuallyEdited(true)}
@@ -140,11 +148,15 @@ export function StepProject({
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="project-slug">{t('onboarding.project_slug')}</Label>
+                            <Label htmlFor="project-slug">
+                                {t('onboarding.project_slug')}
+                            </Label>
                             <Input
                                 id="project-slug"
                                 name="slug"
-                                placeholder={t('onboarding.project_slug_placeholder')}
+                                placeholder={t(
+                                    'onboarding.project_slug_placeholder',
+                                )}
                                 required
                                 onFocus={() => setSlugManuallyEdited(true)}
                                 data-invalid={!!errors.slug}
@@ -183,7 +195,9 @@ export function StepProject({
                         <Input
                             id="project-description"
                             name="description"
-                            placeholder={t('onboarding.project_desc_placeholder')}
+                            placeholder={t(
+                                'onboarding.project_desc_placeholder',
+                            )}
                         />
                     </div>
 
@@ -203,7 +217,9 @@ export function StepProject({
                             disabled={processing}
                             className="flex-1"
                         >
-                            {processing ? t('workspace.creating') : t('onboarding.create_project')}
+                            {processing
+                                ? t('workspace.creating')
+                                : t('onboarding.create_project')}
                         </Button>
                     </div>
                 </form>

@@ -207,7 +207,9 @@ export function TaskCreateDialog({
                             onValueChange={setPriorityId}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder={t('task.no_priority')} />
+                                <SelectValue
+                                    placeholder={t('task.no_priority')}
+                                />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value={NO_PRIORITY_VALUE}>
@@ -230,7 +232,9 @@ export function TaskCreateDialog({
                             <Label>{t('task.epic')}</Label>
                             <Select value={epicId} onValueChange={setEpicId}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder={t('task.no_epic')} />
+                                    <SelectValue
+                                        placeholder={t('task.no_epic')}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value={NO_EPIC_VALUE}>
@@ -255,7 +259,9 @@ export function TaskCreateDialog({
                                 onValueChange={setSprintId}
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder={t('task.no_sprint')} />
+                                    <SelectValue
+                                        placeholder={t('task.no_sprint')}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value={NO_SPRINT_VALUE}>

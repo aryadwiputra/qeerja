@@ -1,7 +1,9 @@
 import { Loader2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { VelocityChart } from '@/components/charts/velocity-chart';
 import { FeatureGuide } from '@/components/feature-guide';
+import type { GuideContent } from '@/components/feature-guide';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { index as reportsIndex } from '@/routes/projects/reports';
@@ -59,63 +61,60 @@ interface ReportsTabProps {
     projectSlug: string;
 }
 
-const reportsGuide = {
-    title: 'Project Reports',
-    description:
-        'Track project health with velocity charts, burndown tracking, and workload distribution.',
-    sections: [
-        {
-            title: 'Report Overview',
-            content:
-                "Reports provide a snapshot of your project's progress. View task completion rates, velocity trends, burndown charts, and team workload distribution.",
-        },
-        {
-            title: 'Using Reports for Planning',
-            content:
-                "Use velocity data to estimate how much work your team can handle in future sprints. Burndown charts show if you're on track to complete sprint goals.",
-        },
-    ],
-    items: [
-        {
-            heading: 'Report Sections',
-            data: [
-                {
-                    term: 'Summary Cards',
-                    description:
-                        'Quick overview of total tasks, completed count, overdue tasks, and overall completion rate.',
-                },
-                {
-                    term: 'Tasks by Status',
-                    description:
-                        'Bar chart showing task distribution across workflow stages. Helps identify bottlenecks.',
-                },
-                {
-                    term: 'Velocity Chart',
-                    description:
-                        "Bar chart comparing committed vs completed story points across sprints. Shows your team's average velocity.",
-                },
-                {
-                    term: 'Burndown Chart',
-                    description:
-                        "Line chart showing remaining work vs ideal burndown for the current sprint. Helps predict if you'll finish on time.",
-                },
-                {
-                    term: 'Team Workload',
-                    description:
-                        "Shows each team member's assigned tasks and completion count. Helps identify overloaded team members.",
-                },
-            ],
-        },
-    ],
-    tips: [
-        'Check velocity after each sprint to improve future sprint planning accuracy.',
-        'A healthy burndown shows a steady downward trend — flat spots indicate blocked work.',
-        'Use workload data to rebalance assignments if someone is overloaded.',
-        'Review reports weekly to catch issues early before they become blockers.',
-    ],
-};
+function useReportsGuide(t: (key: string) => string): GuideContent {
+    return {
+        title: t('guide.reports.title'),
+        description: t('guide.reports.description'),
+        sections: [
+            {
+                title: t('guide.reports.section_overview'),
+                content: t('guide.reports.content_overview'),
+            },
+            {
+                title: t('guide.reports.section_planning'),
+                content: t('guide.reports.content_planning'),
+            },
+        ],
+        items: [
+            {
+                heading: t('guide.reports.heading_features'),
+                data: [
+                    {
+                        term: t('guide.reports.summary_cards'),
+                        description: t('guide.reports.summary_cards_desc'),
+                    },
+                    {
+                        term: t('guide.reports.tasks_by_status'),
+                        description: t('guide.reports.tasks_by_status_desc'),
+                    },
+                    {
+                        term: t('guide.reports.velocity_chart'),
+                        description: t('guide.reports.velocity_chart_desc'),
+                    },
+                    {
+                        term: t('guide.reports.burndown_chart'),
+                        description: t('guide.reports.burndown_chart_desc'),
+                    },
+                    {
+                        term: t('guide.reports.team_workload'),
+                        description: t('guide.reports.team_workload_desc'),
+                    },
+                ],
+            },
+        ],
+        tips: [
+            t('guide.reports.tip_1'),
+            t('guide.reports.tip_2'),
+            t('guide.reports.tip_3'),
+            t('guide.reports.tip_4'),
+        ],
+        tipsHeading: t('guide.reports.tips_title'),
+    };
+}
 
 export function ReportsTab({ workspaceSlug, projectSlug }: ReportsTabProps) {
+    const { t } = useTranslation();
+    const reportsGuide = useReportsGuide(t);
     const [data, setData] = useState<ReportData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -148,7 +147,7 @@ export function ReportsTab({ workspaceSlug, projectSlug }: ReportsTabProps) {
             .then(setData)
             .catch((err: unknown) => {
                 if ((err as Error)?.name !== 'AbortError') {
-                    setError('Failed to load reports.');
+                    setError(t('reports.failed_to_load'));
                 }
             })
             .finally(() => setLoading(false));
@@ -168,7 +167,7 @@ export function ReportsTab({ workspaceSlug, projectSlug }: ReportsTabProps) {
         return (
             <div className="flex items-center justify-center py-20">
                 <p className="text-sm text-muted-foreground">
-                    {error ?? 'No data.'}
+                    {error ?? t('reports.no_data')}
                 </p>
             </div>
         );
@@ -182,21 +181,27 @@ export function ReportsTab({ workspaceSlug, projectSlug }: ReportsTabProps) {
     return (
         <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">Reports</h2>
+                <h2 className="text-lg font-semibold">{t('reports.title')}</h2>
                 <FeatureGuide content={reportsGuide} />
             </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <SummaryCard label="Total tasks" value={data.summary.total} />
-                <SummaryCard label="Completed" value={data.summary.completed} />
                 <SummaryCard
-                    label="Overdue"
+                    label={t('reports.total_tasks')}
+                    value={data.summary.total}
+                />
+                <SummaryCard
+                    label={t('reports.completed')}
+                    value={data.summary.completed}
+                />
+                <SummaryCard
+                    label={t('reports.overdue')}
                     value={data.summary.overdue}
                     className={
                         data.summary.overdue > 0 ? 'text-destructive' : ''
                     }
                 />
                 <SummaryCard
-                    label="Completion rate"
+                    label={t('reports.completion_rate')}
                     value={`${data.summary.completion_rate}%`}
                 />
             </div>
@@ -204,7 +209,7 @@ export function ReportsTab({ workspaceSlug, projectSlug }: ReportsTabProps) {
             <Card>
                 <CardHeader>
                     <CardTitle className="text-sm font-semibold">
-                        Tasks by status
+                        {t('reports.tasks_by_status')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-3">
@@ -230,7 +235,7 @@ export function ReportsTab({ workspaceSlug, projectSlug }: ReportsTabProps) {
                     ))}
                     {data.summary.by_status.length === 0 && (
                         <p className="text-sm text-muted-foreground">
-                            No tasks yet.
+                            {t('reports.no_tasks')}
                         </p>
                     )}
                 </CardContent>
@@ -240,7 +245,7 @@ export function ReportsTab({ workspaceSlug, projectSlug }: ReportsTabProps) {
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-sm font-semibold">
-                            Assignee workload
+                            {t('reports.assignee_workload')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-3">
@@ -267,7 +272,7 @@ export function ReportsTab({ workspaceSlug, projectSlug }: ReportsTabProps) {
                         ))}
                         {data.assignee_workload.length === 0 && (
                             <p className="text-sm text-muted-foreground">
-                                No assigned tasks.
+                                {t('reports.no_assigned_tasks')}
                             </p>
                         )}
                     </CardContent>
@@ -277,7 +282,9 @@ export function ReportsTab({ workspaceSlug, projectSlug }: ReportsTabProps) {
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-sm font-semibold">
-                                Burndown — {data.burndown.sprint.name}
+                                {t('reports.burndown_label', {
+                                    name: data.burndown.sprint.name,
+                                })}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -292,10 +299,12 @@ export function ReportsTab({ workspaceSlug, projectSlug }: ReportsTabProps) {
                     <CardHeader>
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-semibold">
-                                Velocity
+                                {t('reports.velocity')}
                             </CardTitle>
                             <span className="text-xs text-muted-foreground">
-                                Avg: {data.velocity.avg_velocity} pts/sprint
+                                {t('reports.avg_velocity', {
+                                    value: data.velocity.avg_velocity,
+                                })}
                             </span>
                         </div>
                     </CardHeader>
