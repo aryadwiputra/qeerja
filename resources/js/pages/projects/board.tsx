@@ -355,29 +355,27 @@ function DroppableColumn({
     const { setNodeRef, isOver } = useDroppable({ id: `col:${column.id}` });
     const isEmpty = column.tasks.length === 0;
     const hasActiveTask = activeTaskId !== null;
+    const isTaskDrag = hasActiveTask && !isOverForReorder;
+    const isColumnReorder = hasActiveTask && isOverForReorder;
 
     return (
         <div
             ref={setNodeRef}
             className={cn(
                 'group flex w-[calc(100vw-2rem)] shrink-0 snap-start flex-col rounded-xl border border-border bg-card/70 transition-[background-color,border-color,box-shadow] sm:w-72',
-                isOver && hasActiveTask && !isEmpty && !isOverForReorder
+                isOver && isTaskDrag && !isEmpty
                     ? 'border-dashed border-primary/50 bg-primary/[0.04]'
                     : isOver &&
-                          hasActiveTask &&
-                          !isEmpty &&
-                          'border-primary/40 bg-primary/[0.04] shadow-soft',
+                          isTaskDrag &&
+                          isEmpty &&
+                          'border-dashed border-primary/50 bg-primary/5 shadow-soft',
                 isOver &&
-                    isEmpty &&
-                    hasActiveTask &&
-                    'border-dashed border-primary/50 bg-primary/5 shadow-soft',
-                isOverForReorder &&
-                    hasActiveTask &&
+                    isColumnReorder &&
                     'border-dashed border-primary/50 bg-primary/[0.06] shadow-soft',
             )}
         >
             {children}
-            {isOver && hasActiveTask && (
+            {isOver && isTaskDrag && (
                 <div className="flex flex-1 items-center justify-center py-4">
                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
                         <ArrowDown className="size-6 animate-bounce text-primary" />
@@ -807,11 +805,16 @@ function BoardClient({
 
         if (origCol.id === toColumn.id) {
             if (typeof overId === 'string' && overId.startsWith('col:')) {
-                position = toColumn.tasks.length;
+                position = toColumn.tasks.length - 1;
             } else {
-                position = toColumn.tasks.findIndex(
+                const overIdx = toColumn.tasks.findIndex(
                     (t) => t.id === (overId as number),
                 );
+                const activeIdx = toColumn.tasks.findIndex(
+                    (t) => t.id === taskId,
+                );
+
+                position = activeIdx < overIdx ? overIdx - 1 : overIdx;
                 position = Math.max(0, position);
             }
 
@@ -828,7 +831,21 @@ function BoardClient({
                         return col;
                     }
 
-                    tasks.splice(position, 0, found);
+                    let insertPos: number;
+
+                    if (
+                        typeof overId === 'string' &&
+                        overId.startsWith('col:')
+                    ) {
+                        insertPos = tasks.length;
+                    } else {
+                        insertPos = tasks.findIndex(
+                            (t) => t.id === (overId as number),
+                        );
+                        insertPos = Math.max(0, insertPos);
+                    }
+
+                    tasks.splice(insertPos, 0, found);
 
                     return { ...col, tasks };
                 }),
@@ -841,6 +858,35 @@ function BoardClient({
                     (t) => t.id === (overId as number),
                 );
                 position = Math.max(0, position);
+            }
+
+            const task = origCol.tasks.find((t) => t.id === taskId);
+
+            if (task) {
+                const movedTask = {
+                    ...task,
+                    status: toColumn.status_key,
+                };
+
+                setColumns((prev) =>
+                    prev.map((col) => {
+                        if (col.id === origCol.id) {
+                            return {
+                                ...col,
+                                tasks: col.tasks.filter((t) => t.id !== taskId),
+                            };
+                        }
+
+                        if (col.id === toColumn!.id) {
+                            const updated = [...col.tasks];
+                            updated.splice(position, 0, movedTask);
+
+                            return { ...col, tasks: updated };
+                        }
+
+                        return col;
+                    }),
+                );
             }
         }
 
