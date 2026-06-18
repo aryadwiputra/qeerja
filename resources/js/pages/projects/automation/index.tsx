@@ -3,6 +3,8 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Plus, Zap, Trash2, Play, Pause } from 'lucide-react';
 import { useState } from 'react';
+import { FeatureGuide, InlineTooltip } from '@/components/feature-guide';
+import type { GuideContent } from '@/components/feature-guide';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,6 +25,147 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { show as projectShow } from '@/routes/projects';
+
+const automationGuide: GuideContent = {
+    title: 'Automation Rules',
+    description:
+        'Automate task management by creating rules that trigger actions when specific events occur.',
+    sections: [
+        {
+            title: 'How it works',
+            content:
+                'Each rule has three parts: a trigger event (when it fires), optional conditions (filter which tasks), and actions (what to do). Rules run in priority order (highest first).',
+        },
+        {
+            title: 'Creating a rule',
+            content:
+                '1. Give your rule a descriptive name.\n2. Choose a trigger event — this determines when the rule fires.\n3. Add conditions (optional) — the rule only runs on tasks matching all conditions.\n4. Add one or more actions — what happens to matching tasks.\n5. Click "Create Rule" to save.',
+        },
+    ],
+    items: [
+        {
+            heading: 'Trigger Events',
+            data: [
+                {
+                    term: 'Task Created',
+                    description:
+                        'Fires when a new task is created in this project.',
+                },
+                {
+                    term: 'Status Changed',
+                    description:
+                        'Fires when a task is moved to a different board column.',
+                },
+                {
+                    term: 'Priority Changed',
+                    description: "Fires when a task's priority is updated.",
+                },
+                {
+                    term: 'Assignee Added',
+                    description: 'Fires when someone is assigned to a task.',
+                },
+                {
+                    term: 'Due Date Passed',
+                    description:
+                        'Fires when a task passes its due date (checked hourly).',
+                },
+            ],
+        },
+        {
+            heading: 'Condition Fields',
+            data: [
+                {
+                    term: 'Status',
+                    description:
+                        'The task\'s current board column status key (e.g., "in_progress", "done").',
+                },
+                {
+                    term: 'Priority',
+                    description:
+                        'The task\'s current priority key (e.g., "high", "low").',
+                },
+                {
+                    term: 'Assignee',
+                    description:
+                        'User ID(s) assigned to the task. Use "contains" to check if a specific user is assigned.',
+                },
+                {
+                    term: 'Label',
+                    description:
+                        'Label ID(s) attached to the task. Use "contains" to check if a specific label is attached.',
+                },
+                {
+                    term: 'Story Points',
+                    description:
+                        'The task\'s story point value. Use "greater_than" or "less_than" for numeric comparisons.',
+                },
+            ],
+        },
+        {
+            heading: 'Condition Operators',
+            data: [
+                {
+                    term: 'Equals / Not Equals',
+                    description: 'Exact match or non-match.',
+                },
+                {
+                    term: 'Contains / Not Contains',
+                    description: 'Partial string match or non-match.',
+                },
+                {
+                    term: 'Greater Than / Less Than',
+                    description: 'Numeric comparison.',
+                },
+                {
+                    term: 'In / Not In',
+                    description:
+                        'Value is in (or not in) a comma-separated list.',
+                },
+            ],
+        },
+        {
+            heading: 'Action Types & Value Formats',
+            data: [
+                {
+                    term: 'Assign User',
+                    description: 'Format: user:{ID} — Example: user:5',
+                },
+                {
+                    term: 'Add Label',
+                    description: 'Format: label:{ID} — Example: label:3',
+                },
+                {
+                    term: 'Remove Label',
+                    description: 'Format: label:{ID} — Example: label:3',
+                },
+                {
+                    term: 'Set Priority',
+                    description: 'Format: priority:{ID} — Example: priority:2',
+                },
+                {
+                    term: 'Move to Column',
+                    description: 'Format: column:{ID} — Example: column:4',
+                },
+                {
+                    term: 'Send Notification',
+                    description:
+                        'The message text sent to task assignees (or reporter if unassigned).',
+                },
+                {
+                    term: 'Add Comment',
+                    description:
+                        'A comment posted by Automation Bot on the task.',
+                },
+            ],
+        },
+    ],
+    tips: [
+        'Use the "Test" button on any rule to preview how many tasks currently match its conditions.',
+        'Higher priority rules run first. Adjust priority to control execution order.',
+        "Disabled rules won't fire. Toggle them on/off with the play/pause button.",
+        'Conditions are optional — a rule with no conditions matches all tasks for the chosen trigger.',
+    ],
+};
 
 interface AutomationRule {
     id: number;
@@ -211,367 +354,397 @@ export default function AutomationIndex({
                         </p>
                     </div>
 
-                    <Dialog
-                        open={showCreateDialog}
-                        onOpenChange={setShowCreateDialog}
-                    >
-                        <DialogTrigger asChild>
-                            <Button>
-                                <Plus className="mr-2 size-4" />
-                                New Rule
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
-                            <DialogHeader>
-                                <DialogTitle>
-                                    Create Automation Rule
-                                </DialogTitle>
-                            </DialogHeader>
-                            <form
-                                onSubmit={handleCreateRule}
-                                className="space-y-4"
-                            >
-                                <div>
-                                    <Label>Rule Name</Label>
-                                    <Input
-                                        value={newRule.name}
-                                        onChange={(e) =>
-                                            setNewRule({
-                                                ...newRule,
-                                                name: e.target.value,
-                                            })
-                                        }
-                                        placeholder="e.g., Auto-assign on status change"
-                                        required
-                                    />
-                                </div>
+                    <div className="flex items-center gap-2">
+                        <FeatureGuide content={automationGuide} />
+                        <Dialog
+                            open={showCreateDialog}
+                            onOpenChange={setShowCreateDialog}
+                        >
+                            <DialogTrigger asChild>
+                                <Button>
+                                    <Plus className="mr-2 size-4" />
+                                    New Rule
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                                <DialogHeader>
+                                    <DialogTitle>
+                                        Create Automation Rule
+                                    </DialogTitle>
+                                </DialogHeader>
+                                <form
+                                    onSubmit={handleCreateRule}
+                                    className="space-y-4"
+                                >
+                                    <div>
+                                        <Label>Rule Name</Label>
+                                        <Input
+                                            value={newRule.name}
+                                            onChange={(e) =>
+                                                setNewRule({
+                                                    ...newRule,
+                                                    name: e.target.value,
+                                                })
+                                            }
+                                            placeholder="e.g., Auto-assign on status change"
+                                            required
+                                        />
+                                    </div>
 
-                                <div>
-                                    <Label>Trigger Event</Label>
-                                    <Select
-                                        value={newRule.trigger_event}
-                                        onValueChange={(value) =>
-                                            setNewRule({
-                                                ...newRule,
-                                                trigger_event: value,
-                                            })
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select trigger..." />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {options.trigger_events.map(
-                                                (event) => (
-                                                    <SelectItem
-                                                        key={event.value}
-                                                        value={event.value}
+                                    <div>
+                                        <Label className="flex items-center gap-1.5">
+                                            Trigger Event
+                                            <InlineTooltip content="The event that fires this rule. Choose when you want the automation to run." />
+                                        </Label>
+                                        <Select
+                                            value={newRule.trigger_event}
+                                            onValueChange={(value) =>
+                                                setNewRule({
+                                                    ...newRule,
+                                                    trigger_event: value,
+                                                })
+                                            }
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select trigger..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {options.trigger_events.map(
+                                                    (event) => (
+                                                        <SelectItem
+                                                            key={event.value}
+                                                            value={event.value}
+                                                        >
+                                                            {event.label}
+                                                        </SelectItem>
+                                                    ),
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div>
+                                        <Label className="flex items-center gap-1.5">
+                                            Conditions
+                                            <InlineTooltip content="Optional filters. The rule only runs on tasks matching ALL conditions. Leave empty to match all tasks." />
+                                        </Label>
+                                        <div className="mt-2 space-y-2">
+                                            {newRule.conditions.map(
+                                                (condition, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-center gap-2"
                                                     >
-                                                        {event.label}
-                                                    </SelectItem>
+                                                        <Select
+                                                            value={
+                                                                condition.field
+                                                            }
+                                                            onValueChange={(
+                                                                value,
+                                                            ) => {
+                                                                const updated =
+                                                                    [
+                                                                        ...newRule.conditions,
+                                                                    ];
+                                                                updated[
+                                                                    index
+                                                                ].field = value;
+                                                                setNewRule({
+                                                                    ...newRule,
+                                                                    conditions:
+                                                                        updated,
+                                                                });
+                                                            }}
+                                                        >
+                                                            <SelectTrigger className="w-40">
+                                                                <SelectValue placeholder="Field" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {options.condition_fields.map(
+                                                                    (field) => (
+                                                                        <SelectItem
+                                                                            key={
+                                                                                field.value
+                                                                            }
+                                                                            value={
+                                                                                field.value
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                field.label
+                                                                            }
+                                                                        </SelectItem>
+                                                                    ),
+                                                                )}
+                                                            </SelectContent>
+                                                        </Select>
+
+                                                        <Select
+                                                            value={
+                                                                condition.operator
+                                                            }
+                                                            onValueChange={(
+                                                                value,
+                                                            ) => {
+                                                                const updated =
+                                                                    [
+                                                                        ...newRule.conditions,
+                                                                    ];
+                                                                updated[
+                                                                    index
+                                                                ].operator =
+                                                                    value;
+                                                                setNewRule({
+                                                                    ...newRule,
+                                                                    conditions:
+                                                                        updated,
+                                                                });
+                                                            }}
+                                                        >
+                                                            <SelectTrigger className="w-36">
+                                                                <SelectValue placeholder="Operator" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {options.condition_operators.map(
+                                                                    (op) => (
+                                                                        <SelectItem
+                                                                            key={
+                                                                                op.value
+                                                                            }
+                                                                            value={
+                                                                                op.value
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                op.label
+                                                                            }
+                                                                        </SelectItem>
+                                                                    ),
+                                                                )}
+                                                            </SelectContent>
+                                                        </Select>
+
+                                                        <Input
+                                                            value={
+                                                                condition.value
+                                                            }
+                                                            onChange={(e) => {
+                                                                const updated =
+                                                                    [
+                                                                        ...newRule.conditions,
+                                                                    ];
+                                                                updated[
+                                                                    index
+                                                                ].value =
+                                                                    e.target.value;
+                                                                setNewRule({
+                                                                    ...newRule,
+                                                                    conditions:
+                                                                        updated,
+                                                                });
+                                                            }}
+                                                            placeholder="Value"
+                                                            className="flex-1"
+                                                        />
+
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => {
+                                                                const updated =
+                                                                    newRule.conditions.filter(
+                                                                        (
+                                                                            _,
+                                                                            i,
+                                                                        ) =>
+                                                                            i !==
+                                                                            index,
+                                                                    );
+                                                                setNewRule({
+                                                                    ...newRule,
+                                                                    conditions:
+                                                                        updated,
+                                                                });
+                                                            }}
+                                                        >
+                                                            <Trash2 className="size-4" />
+                                                        </Button>
+                                                    </div>
                                                 ),
                                             )}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() =>
+                                                    setNewRule({
+                                                        ...newRule,
+                                                        conditions: [
+                                                            ...newRule.conditions,
+                                                            {
+                                                                field: 'status',
+                                                                operator:
+                                                                    'equals',
+                                                                value: '',
+                                                            },
+                                                        ],
+                                                    })
+                                                }
+                                            >
+                                                Add Condition
+                                            </Button>
+                                        </div>
+                                    </div>
 
-                                <div>
-                                    <Label>Conditions</Label>
-                                    <div className="mt-2 space-y-2">
-                                        {newRule.conditions.map(
-                                            (condition, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="flex items-center gap-2"
-                                                >
-                                                    <Select
-                                                        value={condition.field}
-                                                        onValueChange={(
-                                                            value,
-                                                        ) => {
-                                                            const updated = [
-                                                                ...newRule.conditions,
-                                                            ];
-                                                            updated[
-                                                                index
-                                                            ].field = value;
-                                                            setNewRule({
-                                                                ...newRule,
-                                                                conditions:
-                                                                    updated,
-                                                            });
-                                                        }}
+                                    <div>
+                                        <Label className="flex items-center gap-1.5">
+                                            Actions
+                                            <InlineTooltip content="What happens to matching tasks. You can add multiple actions — they all run in order." />
+                                        </Label>
+                                        <div className="mt-2 space-y-2">
+                                            {newRule.actions.map(
+                                                (action, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-center gap-2"
                                                     >
-                                                        <SelectTrigger className="w-40">
-                                                            <SelectValue placeholder="Field" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {options.condition_fields.map(
-                                                                (field) => (
-                                                                    <SelectItem
-                                                                        key={
-                                                                            field.value
-                                                                        }
-                                                                        value={
-                                                                            field.value
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            field.label
-                                                                        }
-                                                                    </SelectItem>
-                                                                ),
-                                                            )}
-                                                        </SelectContent>
-                                                    </Select>
+                                                        <Select
+                                                            value={action.type}
+                                                            onValueChange={(
+                                                                value,
+                                                            ) => {
+                                                                const updated =
+                                                                    [
+                                                                        ...newRule.actions,
+                                                                    ];
+                                                                updated[
+                                                                    index
+                                                                ].type = value;
+                                                                setNewRule({
+                                                                    ...newRule,
+                                                                    actions:
+                                                                        updated,
+                                                                });
+                                                            }}
+                                                        >
+                                                            <SelectTrigger className="w-44">
+                                                                <SelectValue placeholder="Action type" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {options.action_types.map(
+                                                                    (type) => (
+                                                                        <SelectItem
+                                                                            key={
+                                                                                type.value
+                                                                            }
+                                                                            value={
+                                                                                type.value
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                type.label
+                                                                            }
+                                                                        </SelectItem>
+                                                                    ),
+                                                                )}
+                                                            </SelectContent>
+                                                        </Select>
 
-                                                    <Select
-                                                        value={
-                                                            condition.operator
-                                                        }
-                                                        onValueChange={(
-                                                            value,
-                                                        ) => {
-                                                            const updated = [
-                                                                ...newRule.conditions,
-                                                            ];
-                                                            updated[
-                                                                index
-                                                            ].operator = value;
-                                                            setNewRule({
-                                                                ...newRule,
-                                                                conditions:
-                                                                    updated,
-                                                            });
-                                                        }}
-                                                    >
-                                                        <SelectTrigger className="w-36">
-                                                            <SelectValue placeholder="Operator" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {options.condition_operators.map(
-                                                                (op) => (
-                                                                    <SelectItem
-                                                                        key={
-                                                                            op.value
-                                                                        }
-                                                                        value={
-                                                                            op.value
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            op.label
-                                                                        }
-                                                                    </SelectItem>
-                                                                ),
-                                                            )}
-                                                        </SelectContent>
-                                                    </Select>
+                                                        <Input
+                                                            value={action.value}
+                                                            onChange={(e) => {
+                                                                const updated =
+                                                                    [
+                                                                        ...newRule.actions,
+                                                                    ];
+                                                                updated[
+                                                                    index
+                                                                ].value =
+                                                                    e.target.value;
+                                                                setNewRule({
+                                                                    ...newRule,
+                                                                    actions:
+                                                                        updated,
+                                                                });
+                                                            }}
+                                                            placeholder="Value (e.g., user:5, label:3)"
+                                                            className="flex-1"
+                                                        />
+                                                        <InlineTooltip content="Format depends on action type: user:{ID}, label:{ID}, priority:{ID}, column:{ID}, or plain text for notifications/comments." />
 
-                                                    <Input
-                                                        value={condition.value}
-                                                        onChange={(e) => {
-                                                            const updated = [
-                                                                ...newRule.conditions,
-                                                            ];
-                                                            updated[
-                                                                index
-                                                            ].value =
-                                                                e.target.value;
-                                                            setNewRule({
-                                                                ...newRule,
-                                                                conditions:
-                                                                    updated,
-                                                            });
-                                                        }}
-                                                        placeholder="Value"
-                                                        className="flex-1"
-                                                    />
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => {
+                                                                const updated =
+                                                                    newRule.actions.filter(
+                                                                        (
+                                                                            _,
+                                                                            i,
+                                                                        ) =>
+                                                                            i !==
+                                                                            index,
+                                                                    );
+                                                                setNewRule({
+                                                                    ...newRule,
+                                                                    actions:
+                                                                        updated,
+                                                                });
+                                                            }}
+                                                        >
+                                                            <Trash2 className="size-4" />
+                                                        </Button>
+                                                    </div>
+                                                ),
+                                            )}
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() =>
+                                                    setNewRule({
+                                                        ...newRule,
+                                                        actions: [
+                                                            ...newRule.actions,
+                                                            {
+                                                                type: 'assign',
+                                                                value: '',
+                                                            },
+                                                        ],
+                                                    })
+                                                }
+                                            >
+                                                Add Action
+                                            </Button>
+                                        </div>
+                                    </div>
 
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => {
-                                                            const updated =
-                                                                newRule.conditions.filter(
-                                                                    (_, i) =>
-                                                                        i !==
-                                                                        index,
-                                                                );
-                                                            setNewRule({
-                                                                ...newRule,
-                                                                conditions:
-                                                                    updated,
-                                                            });
-                                                        }}
-                                                    >
-                                                        <Trash2 className="size-4" />
-                                                    </Button>
-                                                </div>
-                                            ),
-                                        )}
+                                    <div className="flex justify-end gap-2">
                                         <Button
                                             type="button"
                                             variant="outline"
-                                            size="sm"
                                             onClick={() =>
-                                                setNewRule({
-                                                    ...newRule,
-                                                    conditions: [
-                                                        ...newRule.conditions,
-                                                        {
-                                                            field: 'status',
-                                                            operator: 'equals',
-                                                            value: '',
-                                                        },
-                                                    ],
-                                                })
+                                                setShowCreateDialog(false)
                                             }
                                         >
-                                            Add Condition
+                                            Cancel
                                         </Button>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <Label>Actions</Label>
-                                    <div className="mt-2 space-y-2">
-                                        {newRule.actions.map(
-                                            (action, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="flex items-center gap-2"
-                                                >
-                                                    <Select
-                                                        value={action.type}
-                                                        onValueChange={(
-                                                            value,
-                                                        ) => {
-                                                            const updated = [
-                                                                ...newRule.actions,
-                                                            ];
-                                                            updated[
-                                                                index
-                                                            ].type = value;
-                                                            setNewRule({
-                                                                ...newRule,
-                                                                actions:
-                                                                    updated,
-                                                            });
-                                                        }}
-                                                    >
-                                                        <SelectTrigger className="w-44">
-                                                            <SelectValue placeholder="Action type" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {options.action_types.map(
-                                                                (type) => (
-                                                                    <SelectItem
-                                                                        key={
-                                                                            type.value
-                                                                        }
-                                                                        value={
-                                                                            type.value
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            type.label
-                                                                        }
-                                                                    </SelectItem>
-                                                                ),
-                                                            )}
-                                                        </SelectContent>
-                                                    </Select>
-
-                                                    <Input
-                                                        value={action.value}
-                                                        onChange={(e) => {
-                                                            const updated = [
-                                                                ...newRule.actions,
-                                                            ];
-                                                            updated[
-                                                                index
-                                                            ].value =
-                                                                e.target.value;
-                                                            setNewRule({
-                                                                ...newRule,
-                                                                actions:
-                                                                    updated,
-                                                            });
-                                                        }}
-                                                        placeholder="Value (e.g., user:5, label:3)"
-                                                        className="flex-1"
-                                                    />
-
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => {
-                                                            const updated =
-                                                                newRule.actions.filter(
-                                                                    (_, i) =>
-                                                                        i !==
-                                                                        index,
-                                                                );
-                                                            setNewRule({
-                                                                ...newRule,
-                                                                actions:
-                                                                    updated,
-                                                            });
-                                                        }}
-                                                    >
-                                                        <Trash2 className="size-4" />
-                                                    </Button>
-                                                </div>
-                                            ),
-                                        )}
                                         <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() =>
-                                                setNewRule({
-                                                    ...newRule,
-                                                    actions: [
-                                                        ...newRule.actions,
-                                                        {
-                                                            type: 'assign',
-                                                            value: '',
-                                                        },
-                                                    ],
-                                                })
+                                            type="submit"
+                                            disabled={
+                                                !newRule.name.trim() ||
+                                                !newRule.trigger_event
                                             }
                                         >
-                                            Add Action
+                                            Create Rule
                                         </Button>
                                     </div>
-                                </div>
-
-                                <div className="flex justify-end gap-2">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() =>
-                                            setShowCreateDialog(false)
-                                        }
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        type="submit"
-                                        disabled={
-                                            !newRule.name.trim() ||
-                                            !newRule.trigger_event
-                                        }
-                                    >
-                                        Create Rule
-                                    </Button>
-                                </div>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
                 </div>
 
                 <div className="space-y-3">
