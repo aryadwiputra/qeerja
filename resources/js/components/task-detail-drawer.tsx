@@ -17,6 +17,7 @@ import {
     X,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AttachmentPreviewDialog } from '@/components/attachment-preview-dialog';
 import { MentionInput } from '@/components/mention-autocomplete';
 import { TaskComment } from '@/components/task-comment';
@@ -263,6 +264,7 @@ export function TaskDetailDrawer({
     onOpenChange,
     onDelete,
 }: Props) {
+    const { t } = useTranslation();
     const user = usePage().props.auth?.user as { id: number } | null;
     const [loading, setLoading] = useState(false);
     const [task, setTask] = useState<TaskDetail | null>(null);
@@ -672,7 +674,7 @@ export function TaskDetailDrawer({
             !workspaceSlug ||
             !projectSlug ||
             !taskId ||
-            !confirm('Delete this comment?')
+            !confirm(t('task.delete_comment'))
         ) {
             return;
         }
@@ -721,7 +723,7 @@ export function TaskDetailDrawer({
             !workspaceSlug ||
             !projectSlug ||
             !taskId ||
-            !confirm('Delete this attachment?')
+            !confirm(t('task.delete_attachment'))
         ) {
             return;
         }
@@ -885,7 +887,7 @@ export function TaskDetailDrawer({
             !projectSlug ||
             !taskId ||
             !task ||
-            !confirm('Remove this relation?')
+            !confirm(t('task.remove_relation'))
         ) {
             return;
         }
@@ -909,7 +911,7 @@ export function TaskDetailDrawer({
             !workspaceSlug ||
             !projectSlug ||
             !taskId ||
-            !confirm('Delete this task?')
+            !confirm(t('task.delete_task'))
         ) {
             return;
         }
@@ -935,11 +937,10 @@ export function TaskDetailDrawer({
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent className="w-[720px] max-w-[90vw] overflow-y-auto p-0 sm:max-w-[720px]">
                 <SheetTitle className="sr-only">
-                    {task ? task.title : 'Task details'}
+                    {task ? task.title : t('task.task_details')}
                 </SheetTitle>
                 <SheetDescription className="sr-only">
-                    View and edit task details, comments, attachments, and
-                    activity.
+                    {t('task.task_details_description')}
                 </SheetDescription>
                 {loading ? (
                     <div className="flex items-center justify-center py-20">
@@ -1085,8 +1086,8 @@ export function TaskDetailDrawer({
                                         )}
                                         <span>
                                             {isWatchedByCurrentUser()
-                                                ? 'Watching'
-                                                : 'Watch'}
+                                                ? t('task.watching')
+                                                : t('task.watch')}
                                         </span>
                                         {task.watcher_count > 0 && (
                                             <span className="ml-0.5 text-muted-foreground">
@@ -1101,7 +1102,7 @@ export function TaskDetailDrawer({
                         <div className="flex flex-col gap-6 px-6 py-4">
                             <div>
                                 <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                    Description
+                                    {t('task.description')}
                                 </Label>
                                 <textarea
                                     value={task.description ?? ''}
@@ -1115,7 +1116,7 @@ export function TaskDetailDrawer({
                                             description: task.description ?? '',
                                         })
                                     }
-                                    placeholder="Add a description..."
+                                    placeholder={t('task.add_description')}
                                     className="mt-2 min-h-28 w-full resize-y rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                                 />
                             </div>
@@ -1123,7 +1124,7 @@ export function TaskDetailDrawer({
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div className="flex flex-col gap-2">
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                        Status
+                                        {t('task.status')}
                                     </Label>
                                     <Select
                                         value={String(task.board_column.id)}
@@ -1171,7 +1172,7 @@ export function TaskDetailDrawer({
 
                                 <div className="flex flex-col gap-2">
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                        Task type
+                                        {t('task.type')}
                                     </Label>
                                     <Select
                                         value={String(task.task_type.id)}
@@ -1218,7 +1219,7 @@ export function TaskDetailDrawer({
 
                                 <div className="flex flex-col gap-2">
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                        Priority
+                                        {t('task.priority')}
                                     </Label>
                                     <Select
                                         value={
@@ -1250,7 +1251,7 @@ export function TaskDetailDrawer({
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="none">
-                                                No priority
+                                                {t('task.no_priority')}
                                             </SelectItem>
                                             {options.priorities.map(
                                                 (priority) => (
@@ -1270,7 +1271,7 @@ export function TaskDetailDrawer({
 
                                 <div className="flex flex-col gap-2">
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                        Story points
+                                        {t('task.story_points')}
                                     </Label>
                                     <Input
                                         type="number"
@@ -1296,7 +1297,7 @@ export function TaskDetailDrawer({
 
                                 <div className="flex flex-col gap-2">
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                        Epic
+                                        {t('task.epic')}
                                     </Label>
                                     <Select
                                         value={
@@ -1311,7 +1312,7 @@ export function TaskDetailDrawer({
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="none">
-                                                No epic
+                                                {t('task.no_epic')}
                                             </SelectItem>
                                             {options.epics.map((epic) => (
                                                 <SelectItem
@@ -1327,7 +1328,7 @@ export function TaskDetailDrawer({
 
                                 <div className="flex flex-col gap-2">
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                        Sprint
+                                        {t('task.sprint')}
                                     </Label>
                                     <Select
                                         value={
@@ -1342,7 +1343,7 @@ export function TaskDetailDrawer({
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="none">
-                                                No sprint
+                                                {t('task.no_sprint')}
                                             </SelectItem>
                                             {options.sprints.map((sprint) => (
                                                 <SelectItem
@@ -1358,7 +1359,7 @@ export function TaskDetailDrawer({
 
                                 <div className="flex flex-col gap-2">
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                        Parent task
+                                        {t('task.parent_task')}
                                     </Label>
                                     <Select
                                         value={
@@ -1373,7 +1374,7 @@ export function TaskDetailDrawer({
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="none">
-                                                No parent
+                                                {t('task.no_parent')}
                                             </SelectItem>
                                             {options.available_parent_tasks.map(
                                                 (parentTask) => (
@@ -1394,7 +1395,7 @@ export function TaskDetailDrawer({
 
                                 <div className="flex flex-col gap-2">
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                        Start date
+                                        {t('task.start_date')}
                                     </Label>
                                     <Input
                                         type="date"
@@ -1412,7 +1413,7 @@ export function TaskDetailDrawer({
 
                                 <div className="flex flex-col gap-2">
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                        Due date
+                                        {t('task.due_date')}
                                     </Label>
                                     <Input
                                         type="date"
@@ -1430,7 +1431,7 @@ export function TaskDetailDrawer({
 
                                 <div>
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                        Reporter
+                                        {t('task.reporter')}
                                     </Label>
                                     <p className="mt-1 text-sm">
                                         {task.reporter?.name ?? 'Unknown'}
@@ -1444,7 +1445,7 @@ export function TaskDetailDrawer({
                                 <div className="mb-3 flex items-center gap-2">
                                     <ListTree className="size-4" />
                                     <h3 className="text-sm font-semibold">
-                                        Sub-tasks
+                                        {t('task.sub_tasks')}
                                     </h3>
                                     <span className="text-xs text-muted-foreground">
                                         {
@@ -1530,7 +1531,7 @@ export function TaskDetailDrawer({
                                     </div>
                                 ) : (
                                     <p className="mb-3 text-sm text-muted-foreground">
-                                        No sub-tasks yet.
+                                        {t('task.no_sub_tasks')}
                                     </p>
                                 )}
 
@@ -1543,7 +1544,7 @@ export function TaskDetailDrawer({
                                         onChange={(e) =>
                                             setSubTaskTitle(e.target.value)
                                         }
-                                        placeholder="Add sub-task..."
+                                        placeholder={t('task.add_sub_task')}
                                         className="h-8 text-sm"
                                     />
                                     <Button
@@ -1553,7 +1554,7 @@ export function TaskDetailDrawer({
                                         disabled={!subTaskTitle.trim()}
                                     >
                                         <Plus className="size-3" />
-                                        <span>Add</span>
+                                        <span>{t('common.add')}</span>
                                     </Button>
                                 </form>
                             </div>
@@ -1563,7 +1564,7 @@ export function TaskDetailDrawer({
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                        Assignees
+                                        {t('task.assignees')}
                                     </Label>
                                     <div className="mt-2 flex flex-wrap gap-2">
                                         {options.assignees.map((assignee) => {
@@ -1596,7 +1597,7 @@ export function TaskDetailDrawer({
                                         })}
                                         {options.assignees.length === 0 && (
                                             <span className="text-sm text-muted-foreground">
-                                                No project members.
+                                                {t('task.no_members')}
                                             </span>
                                         )}
                                     </div>
@@ -1604,7 +1605,7 @@ export function TaskDetailDrawer({
 
                                 <div>
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                        Labels
+                                        {t('task.labels')}
                                     </Label>
                                     <div className="mt-2 flex flex-wrap gap-2">
                                         {options.labels.map((label) => {
@@ -1643,7 +1644,7 @@ export function TaskDetailDrawer({
                                         })}
                                         {options.labels.length === 0 && (
                                             <span className="text-sm text-muted-foreground">
-                                                No labels yet.
+                                                {t('task.no_labels')}
                                             </span>
                                         )}
                                     </div>
@@ -1651,9 +1652,9 @@ export function TaskDetailDrawer({
                             </div>
 
                             <div>
-                                <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                                    Created
-                                </Label>
+                                    <Label className="text-xs tracking-wider text-muted-foreground uppercase">
+                                        {t('task.created')}
+                                    </Label>
                                 <p className="mt-1 text-sm">
                                     {new Date(
                                         task.created_at,
@@ -1671,7 +1672,7 @@ export function TaskDetailDrawer({
                                 <div className="mb-3 flex items-center gap-2">
                                     <Paperclip className="size-4" />
                                     <h3 className="text-sm font-semibold">
-                                        Attachments
+                                        {t('task.attachments')}
                                     </h3>
                                 </div>
 
@@ -1694,7 +1695,7 @@ export function TaskDetailDrawer({
                                         disabled={!attachmentFile}
                                     >
                                         <Upload className="size-4" />
-                                        <span>Upload</span>
+                                        <span>{t('common.upload')}</span>
                                     </Button>
                                 </form>
 
@@ -1718,7 +1719,7 @@ export function TaskDetailDrawer({
                                                         {formatBytes(
                                                             attachment.file_size,
                                                         )}{' '}
-                                                        by{' '}
+                                                        {t('common.by')}{' '}
                                                         {
                                                             attachment.uploader
                                                                 .name
@@ -1758,7 +1759,7 @@ export function TaskDetailDrawer({
                                     </div>
                                 ) : (
                                     <p className="py-4 text-center text-sm text-muted-foreground">
-                                        No attachments yet.
+                                        {t('task.no_attachments')}
                                     </p>
                                 )}
                             </div>
@@ -1769,7 +1770,7 @@ export function TaskDetailDrawer({
                                 <div className="mb-3 flex items-center gap-2">
                                     <ListTree className="size-4" />
                                     <h3 className="text-sm font-semibold">
-                                        Relations
+                                        {t('task.relations')}
                                     </h3>
                                 </div>
 
@@ -1808,7 +1809,7 @@ export function TaskDetailDrawer({
                                     </div>
                                 ) : (
                                     <p className="mb-3 text-sm text-muted-foreground">
-                                        No relations yet.
+                                        {t('task.no_relations')}
                                     </p>
                                 )}
 
@@ -1818,7 +1819,7 @@ export function TaskDetailDrawer({
                                 >
                                     <div className="flex flex-col gap-1">
                                         <Label className="text-[10px] tracking-wider text-muted-foreground uppercase">
-                                            Task
+                                            {t('task.title')}
                                         </Label>
                                         <Select
                                             value={newRelationTaskId}
@@ -1829,7 +1830,7 @@ export function TaskDetailDrawer({
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="none">
-                                                    Select task...
+                                                    {t('task.select_task')}
                                                 </SelectItem>
                                                 {options.project_tasks
                                                     .filter(
@@ -1856,7 +1857,7 @@ export function TaskDetailDrawer({
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <Label className="text-[10px] tracking-wider text-muted-foreground uppercase">
-                                            Type
+                                            {t('task.type')}
                                         </Label>
                                         <Select
                                             value={newRelationType}
@@ -1867,13 +1868,13 @@ export function TaskDetailDrawer({
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="relates_to">
-                                                    Relates to
+                                                    {t('relation.relates_to')}
                                                 </SelectItem>
                                                 <SelectItem value="blocks">
-                                                    Blocks
+                                                    {t('relation.blocks')}
                                                 </SelectItem>
                                                 <SelectItem value="duplicates">
-                                                    Duplicates
+                                                    {t('relation.duplicates')}
                                                 </SelectItem>
                                             </SelectContent>
                                         </Select>
@@ -1885,7 +1886,7 @@ export function TaskDetailDrawer({
                                         disabled={newRelationTaskId === 'none'}
                                     >
                                         <Plus className="size-3" />
-                                        <span>Add</span>
+                                        <span>{t('common.add')}</span>
                                     </Button>
                                 </form>
                             </div>
@@ -1896,7 +1897,7 @@ export function TaskDetailDrawer({
                                 <div className="mb-3 flex items-center gap-2">
                                     <MessageSquare className="size-4" />
                                     <h3 className="text-sm font-semibold">
-                                        Comments
+                                        {t('task.comments')}
                                     </h3>
                                 </div>
 
@@ -1908,7 +1909,7 @@ export function TaskDetailDrawer({
                                         value={commentBody}
                                         onChange={handleCommentInputChange}
                                         members={options.assignees}
-                                        placeholder="Write a comment... Use @ to mention someone"
+                                        placeholder={t('task.write_comment')}
                                     />
                                     {typingUsers.length > 0 && (
                                         <p className="mt-1 text-xs text-muted-foreground italic">
@@ -1934,7 +1935,7 @@ export function TaskDetailDrawer({
                                     </div>
                                 ) : (
                                     <p className="py-4 text-center text-sm text-muted-foreground">
-                                        No comments yet.
+                                        {t('task.no_comments')}
                                     </p>
                                 )}
                             </div>
@@ -1945,7 +1946,7 @@ export function TaskDetailDrawer({
                                 <div className="mb-3 flex items-center gap-2">
                                     <Activity className="size-4" />
                                     <h3 className="text-sm font-semibold">
-                                        Activity
+                                        {t('task.activity')}
                                     </h3>
                                 </div>
 
@@ -1976,6 +1977,7 @@ export function TaskDetailDrawer({
                                                             item.field_name,
                                                             item.old_value,
                                                             item.new_value,
+                                                            t,
                                                         )}
                                                     </p>
                                                     <span className="text-xs text-muted-foreground">
@@ -1989,7 +1991,7 @@ export function TaskDetailDrawer({
                                     </div>
                                 ) : (
                                     <p className="py-4 text-center text-sm text-muted-foreground">
-                                        No activity yet.
+                                        {t('task.no_activity')}
                                     </p>
                                 )}
                             </div>
@@ -1998,7 +2000,7 @@ export function TaskDetailDrawer({
                 ) : (
                     <div className="flex items-center justify-center py-20">
                         <p className="text-sm text-muted-foreground">
-                            Task not found.
+                            {t('task.task_not_found')}
                         </p>
                     </div>
                 )}
@@ -2025,36 +2027,37 @@ function formatAction(
     field: string | null,
     oldVal: string | null,
     newVal: string | null,
+    t: (key: string, options?: Record<string, unknown>) => string,
 ): string {
     switch (action) {
         case 'created':
-            return 'created this task';
+            return t('task_activity.created');
         case 'status_changed':
-            return `changed status from "${oldVal}" to "${newVal}"`;
+            return t('task_activity.changed_status', { from: oldVal, to: newVal });
         case 'priority_changed':
-            return `changed priority from "${oldVal}" to "${newVal}"`;
+            return t('task_activity.changed_priority', { from: oldVal, to: newVal });
         case 'due_date_changed':
-            return `changed due date from "${oldVal}" to "${newVal}"`;
+            return t('task_activity.changed_due_date', { from: oldVal, to: newVal });
         case 'parent_changed':
-            return `changed parent from "${oldVal ?? 'none'}" to "${newVal ?? 'none'}"`;
+            return t('task_activity.changed_parent', { from: oldVal ?? 'none', to: newVal ?? 'none' });
         case 'assigned':
-            return `assigned ${newVal}`;
+            return `${t('task_activity.assigned')} ${newVal}`;
         case 'unassigned':
-            return `unassigned ${oldVal}`;
+            return `${t('task_activity.unassigned')} ${oldVal}`;
         case 'watcher_added':
-            return `added watcher ${newVal}`;
+            return `${t('task_activity.added_watcher')} ${newVal}`;
         case 'watcher_removed':
-            return `removed watcher ${oldVal}`;
+            return `${t('task_activity.removed_watcher')} ${oldVal}`;
         case 'relation_added':
-            return `added ${newVal ?? 'relation'}`;
+            return `${t('task_activity.added')} ${newVal ?? 'relation'}`;
         case 'relation_removed':
-            return `removed relation`;
+            return t('task_activity.removed_relation');
         case 'epic_changed':
-            return `changed epic from "${oldVal ?? 'none'}" to "${newVal ?? 'none'}"`;
+            return t('task_activity.changed_epic', { from: oldVal ?? 'none', to: newVal ?? 'none' });
         case 'sprint_changed':
-            return `changed sprint from "${oldVal ?? 'none'}" to "${newVal ?? 'none'}"`;
+            return t('task_activity.changed_sprint', { from: oldVal ?? 'none', to: newVal ?? 'none' });
         case 'updated':
-            return field ? `updated ${field}` : 'updated this task';
+            return field ? `${t('task_activity.updated')} ${field}` : t('task_activity.updated');
         default:
             return action.replace(/_/g, ' ');
     }

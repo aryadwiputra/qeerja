@@ -1,4 +1,5 @@
 import { Calendar, Clock3, UserRound } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -50,6 +51,8 @@ interface Props {
 }
 
 export function TaskSearchResult({ task, onOpen }: Props) {
+    const { t } = useTranslation();
+
     return (
         <button
             type="button"
@@ -73,7 +76,7 @@ export function TaskSearchResult({ task, onOpen }: Props) {
                         </Badge>
                         {task.archived_at && (
                             <Badge variant="destructive" className="text-xs">
-                                Archived
+                                {t('task_search.archived')}
                             </Badge>
                         )}
                     </div>
@@ -98,7 +101,7 @@ export function TaskSearchResult({ task, onOpen }: Props) {
                                 ? task.assignees
                                       .map((assignee) => assignee.name)
                                       .join(', ')
-                                : 'Unassigned'}
+                                : t('common.none')}
                         </span>
                         <span className="inline-flex items-center gap-1">
                             <Clock3 className="size-3" />

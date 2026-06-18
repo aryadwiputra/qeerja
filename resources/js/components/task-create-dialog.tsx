@@ -1,5 +1,6 @@
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -63,6 +64,7 @@ export function TaskCreateDialog({
     open: controlledOpen,
     onOpenChange: controlledOnOpenChange,
 }: Props) {
+    const { t } = useTranslation();
     const [internalOpen, setInternalOpen] = useState(false);
 
     const open = controlledOpen ?? internalOpen;
@@ -149,12 +151,12 @@ export function TaskCreateDialog({
             <DialogTrigger asChild>
                 <Button variant="outline" size="sm">
                     <Plus className="size-3.5" />
-                    <span>New task</span>
+                    <span>{t('task.new_task')}</span>
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Create task</DialogTitle>
+                    <DialogTitle>{t('task.create_task')}</DialogTitle>
                     <DialogDescription>
                         Add a new task to the project board.
                     </DialogDescription>
@@ -162,12 +164,12 @@ export function TaskCreateDialog({
 
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="task-title">Title</Label>
+                        <Label htmlFor="task-title">{t('task.title')}</Label>
                         <Input
                             id="task-title"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder="Task title"
+                            placeholder={t('task.task_title')}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     create();
@@ -177,7 +179,7 @@ export function TaskCreateDialog({
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label>Type</Label>
+                        <Label>{t('task.type')}</Label>
                         <Select
                             value={taskTypeId}
                             onValueChange={setTaskTypeId}
@@ -186,12 +188,12 @@ export function TaskCreateDialog({
                                 <SelectValue placeholder="Select type" />
                             </SelectTrigger>
                             <SelectContent>
-                                {taskTypes.map((t) => (
+                                {taskTypes.map((taskType) => (
                                     <SelectItem
-                                        key={t.id}
-                                        value={t.id.toString()}
+                                        key={taskType.id}
+                                        value={taskType.id.toString()}
                                     >
-                                        {t.name}
+                                        {taskType.name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -199,17 +201,17 @@ export function TaskCreateDialog({
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label>Priority</Label>
+                        <Label>{t('task.priority')}</Label>
                         <Select
                             value={priorityId}
                             onValueChange={setPriorityId}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="No priority" />
+                                <SelectValue placeholder={t('task.no_priority')} />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value={NO_PRIORITY_VALUE}>
-                                    None
+                                    {t('common.none')}
                                 </SelectItem>
                                 {priorities.map((p) => (
                                     <SelectItem
@@ -225,14 +227,14 @@ export function TaskCreateDialog({
 
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div className="flex flex-col gap-2">
-                            <Label>Epic</Label>
+                            <Label>{t('task.epic')}</Label>
                             <Select value={epicId} onValueChange={setEpicId}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="No epic" />
+                                    <SelectValue placeholder={t('task.no_epic')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value={NO_EPIC_VALUE}>
-                                        None
+                                        {t('common.none')}
                                     </SelectItem>
                                     {epics.map((epic) => (
                                         <SelectItem
@@ -247,17 +249,17 @@ export function TaskCreateDialog({
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <Label>Sprint</Label>
+                            <Label>{t('task.sprint')}</Label>
                             <Select
                                 value={sprintId}
                                 onValueChange={setSprintId}
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="No sprint" />
+                                    <SelectValue placeholder={t('task.no_sprint')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value={NO_SPRINT_VALUE}>
-                                        None
+                                        {t('common.none')}
                                     </SelectItem>
                                     {sprints.map((sprint) => (
                                         <SelectItem
@@ -277,13 +279,13 @@ export function TaskCreateDialog({
                             variant="outline"
                             onClick={() => setOpen(false)}
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             onClick={create}
                             disabled={!title.trim() || !taskTypeId}
                         >
-                            Create task
+                            {t('task.create_task')}
                         </Button>
                     </div>
                 </div>

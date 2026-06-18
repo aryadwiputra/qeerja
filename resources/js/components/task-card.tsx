@@ -1,4 +1,5 @@
 import { Calendar } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 interface Assignee {
@@ -60,6 +61,7 @@ export function TaskCard({
     isDragging?: boolean;
     onClick?: () => void;
 }) {
+    const { t } = useTranslation();
     const priorityColor = task.priority
         ? (priorityColors[task.priority.key] ?? 'bg-muted-foreground')
         : 'bg-muted-foreground';
@@ -148,7 +150,7 @@ export function TaskCard({
                 {task.due_date && (
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Calendar className="size-3" />
-                        <span>{formatDueDate(task.due_date)}</span>
+                        <span>{formatDueDate(task.due_date, t)}</span>
                     </div>
                 )}
             </div>
@@ -156,22 +158,22 @@ export function TaskCard({
     );
 }
 
-function formatDueDate(date: string): string {
+function formatDueDate(date: string, t: (key: string, options?: Record<string, unknown>) => string): string {
     const d = new Date(date);
     const now = new Date();
     const diff = d.getTime() - now.getTime();
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
 
     if (days < 0) {
-        return `${Math.abs(days)}d overdue`;
+        return t('common.days_overdue', { count: Math.abs(days) });
     }
 
     if (days === 0) {
-        return 'Today';
+        return t('common.today');
     }
 
     if (days === 1) {
-        return 'Tomorrow';
+        return t('common.tomorrow');
     }
 
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });

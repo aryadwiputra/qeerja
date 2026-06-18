@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -41,6 +42,7 @@ export function TaskComment({
     onUpdate?: (id: number, body: string) => void;
     onDelete?: (id: number) => void;
 }) {
+    const { t } = useTranslation();
     const [editing, setEditing] = useState(false);
     const [body, setBody] = useState(comment.body);
     const canManage = currentUserId === comment.user.id;
@@ -70,7 +72,7 @@ export function TaskComment({
                         </span>
                         {comment.edited_at && (
                             <span className="text-xs text-muted-foreground italic">
-                                (edited)
+                                {t('common.edited')}
                             </span>
                         )}
                     </div>
@@ -89,7 +91,7 @@ export function TaskComment({
                                     size="sm"
                                     onClick={handleSave}
                                 >
-                                    Save
+                                    {t('common.save')}
                                 </Button>
                                 <Button
                                     type="button"
@@ -100,7 +102,7 @@ export function TaskComment({
                                         setEditing(false);
                                     }}
                                 >
-                                    Cancel
+                                    {t('common.cancel')}
                                 </Button>
                             </div>
                         </div>
@@ -120,7 +122,7 @@ export function TaskComment({
                                     className="text-xs text-muted-foreground transition-colors hover:text-foreground"
                                     onClick={() => setEditing(true)}
                                 >
-                                    Edit
+                                    {t('common.edit')}
                                 </button>
                             )}
                             {onDelete && (
@@ -129,7 +131,7 @@ export function TaskComment({
                                     className="text-xs text-muted-foreground transition-colors hover:text-destructive"
                                     onClick={() => onDelete(comment.id)}
                                 >
-                                    Delete
+                                    {t('common.delete')}
                                 </button>
                             )}
                         </div>
