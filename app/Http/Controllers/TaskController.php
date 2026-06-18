@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\TaskCreated;
 use App\Events\TaskFieldUpdated;
 use App\Events\TaskMoved;
 use App\Http\Requests\MoveTaskColumnRequest;
@@ -13,6 +14,7 @@ use App\Models\Task;
 use App\Models\TaskActivity;
 use App\Models\TaskApproval;
 use App\Models\Workspace;
+use App\Services\AutomationEngine;
 use App\Services\NotificationService;
 use App\Services\TaskActivityService;
 use Illuminate\Http\JsonResponse;
@@ -261,6 +263,8 @@ class TaskController extends Controller
             $task->sprints()->attach($validated['sprint_ids']);
         }
 
+        TaskCreated::dispatch($project->id, $task->id);
+
         $activity->created($task, $request->user());
         $activity->updated(
             $task->refresh(),
@@ -368,6 +372,16 @@ class TaskController extends Controller
 
         if ($fieldChanges !== []) {
             TaskFieldUpdated::dispatch($project->id, $task->id, $fieldChanges);
+        }
+
+        if (array_key_exists('assignee_ids', $validated)) {
+            $addedAssignees = array_diff($newAssigneeIds, $oldAssigneeIds);
+
+            if (! empty($addedAssignees)) {
+                app(AutomationEngine::class)->handleTaskEvent($task, 'task.assignee_added', [
+                    'assignee_ids' => $addedAssignees,
+                ]);
+            }
         }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Task updated.']);
@@ -495,6 +509,13 @@ class TaskController extends Controller
 
         $task->refresh();
         $activity->moved($task, $request->user(), $fromColumn, $targetColumn);
+
+        if (! $isSameColumn) {
+            app(AutomationEngine::class)->handleTaskEvent($task, 'task.status_changed', [
+                'from' => $fromColumn?->status_key,
+                'to' => $targetColumn->status_key,
+            ]);
+        }
 
         broadcast(new TaskMoved(
             task: $task,

@@ -101,6 +101,11 @@ class Project extends Model
         return $this->hasMany(ApprovalFlow::class);
     }
 
+    public function savedFilters(): HasMany
+    {
+        return $this->hasMany(SavedFilter::class);
+    }
+
     public function integration(): HasOne
     {
         return $this->hasOne(Integration::class);
