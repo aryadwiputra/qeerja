@@ -1,6 +1,7 @@
 import { Loader2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { VelocityChart } from '@/components/charts/velocity-chart';
+import { FeatureGuide } from '@/components/feature-guide';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { index as reportsIndex } from '@/routes/projects/reports';
@@ -57,6 +58,62 @@ interface ReportsTabProps {
     workspaceSlug: string;
     projectSlug: string;
 }
+
+const reportsGuide = {
+    title: 'Project Reports',
+    description:
+        'Track project health with velocity charts, burndown tracking, and workload distribution.',
+    sections: [
+        {
+            title: 'Report Overview',
+            content:
+                "Reports provide a snapshot of your project's progress. View task completion rates, velocity trends, burndown charts, and team workload distribution.",
+        },
+        {
+            title: 'Using Reports for Planning',
+            content:
+                "Use velocity data to estimate how much work your team can handle in future sprints. Burndown charts show if you're on track to complete sprint goals.",
+        },
+    ],
+    items: [
+        {
+            heading: 'Report Sections',
+            data: [
+                {
+                    term: 'Summary Cards',
+                    description:
+                        'Quick overview of total tasks, completed count, overdue tasks, and overall completion rate.',
+                },
+                {
+                    term: 'Tasks by Status',
+                    description:
+                        'Bar chart showing task distribution across workflow stages. Helps identify bottlenecks.',
+                },
+                {
+                    term: 'Velocity Chart',
+                    description:
+                        "Bar chart comparing committed vs completed story points across sprints. Shows your team's average velocity.",
+                },
+                {
+                    term: 'Burndown Chart',
+                    description:
+                        "Line chart showing remaining work vs ideal burndown for the current sprint. Helps predict if you'll finish on time.",
+                },
+                {
+                    term: 'Team Workload',
+                    description:
+                        "Shows each team member's assigned tasks and completion count. Helps identify overloaded team members.",
+                },
+            ],
+        },
+    ],
+    tips: [
+        'Check velocity after each sprint to improve future sprint planning accuracy.',
+        'A healthy burndown shows a steady downward trend — flat spots indicate blocked work.',
+        'Use workload data to rebalance assignments if someone is overloaded.',
+        'Review reports weekly to catch issues early before they become blockers.',
+    ],
+};
 
 export function ReportsTab({ workspaceSlug, projectSlug }: ReportsTabProps) {
     const [data, setData] = useState<ReportData | null>(null);
@@ -124,6 +181,10 @@ export function ReportsTab({ workspaceSlug, projectSlug }: ReportsTabProps) {
 
     return (
         <div className="flex flex-col gap-6">
+            <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Reports</h2>
+                <FeatureGuide content={reportsGuide} />
+            </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 <SummaryCard label="Total tasks" value={data.summary.total} />
                 <SummaryCard label="Completed" value={data.summary.completed} />

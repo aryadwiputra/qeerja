@@ -263,195 +263,208 @@ export default function ApprovalsSettings({
                                     New Flow
                                 </Button>
                             </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
-                            <DialogHeader>
-                                <DialogTitle>Create Approval Flow</DialogTitle>
-                            </DialogHeader>
-                            <form
-                                onSubmit={handleCreateFlow}
-                                className="space-y-4"
-                            >
-                                <div>
-                                    <Label>Flow Name</Label>
-                                    <Input
-                                        value={newFlow.name}
-                                        onChange={(e) =>
-                                            setNewFlow({
-                                                ...newFlow,
-                                                name: e.target.value,
-                                            })
-                                        }
-                                        placeholder="e.g., QA Approval"
-                                        required
-                                    />
-                                </div>
+                            <DialogContent className="max-w-2xl">
+                                <DialogHeader>
+                                    <DialogTitle>
+                                        Create Approval Flow
+                                    </DialogTitle>
+                                </DialogHeader>
+                                <form
+                                    onSubmit={handleCreateFlow}
+                                    className="space-y-4"
+                                >
+                                    <div>
+                                        <Label>Flow Name</Label>
+                                        <Input
+                                            value={newFlow.name}
+                                            onChange={(e) =>
+                                                setNewFlow({
+                                                    ...newFlow,
+                                                    name: e.target.value,
+                                                })
+                                            }
+                                            placeholder="e.g., QA Approval"
+                                            required
+                                        />
+                                    </div>
 
-                                <div>
-                                    <Label>Target Column</Label>
-                                    <Select
-                                        value={newFlow.column_id}
-                                        onValueChange={(value) =>
-                                            setNewFlow({
-                                                ...newFlow,
-                                                column_id: value,
-                                            })
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select column..." />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {options.columns.map((col) => (
-                                                <SelectItem
-                                                    key={col.id}
-                                                    value={String(col.id)}
-                                                >
-                                                    <div className="flex items-center gap-2">
-                                                        <div
-                                                            className="size-2 rounded-full"
-                                                            style={{
-                                                                backgroundColor:
-                                                                    col.color ??
-                                                                    '#64748b',
-                                                            }}
-                                                        />
-                                                        {col.name}
-                                                    </div>
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                <div>
-                                    <Label>Required Approvers</Label>
-                                    <div className="mt-2 space-y-2">
-                                        {newFlow.required_approvers.map(
-                                            (approver, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="flex items-center gap-2"
-                                                >
-                                                    <Badge variant="outline">
-                                                        {getApproverLabel(
-                                                            approver,
-                                                        )}
-                                                    </Badge>
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="size-6"
-                                                        onClick={() =>
-                                                            removeApprover(
-                                                                index,
-                                                            )
-                                                        }
+                                    <div>
+                                        <Label>Target Column</Label>
+                                        <Select
+                                            value={newFlow.column_id}
+                                            onValueChange={(value) =>
+                                                setNewFlow({
+                                                    ...newFlow,
+                                                    column_id: value,
+                                                })
+                                            }
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select column..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {options.columns.map((col) => (
+                                                    <SelectItem
+                                                        key={col.id}
+                                                        value={String(col.id)}
                                                     >
-                                                        <Trash2 className="size-3" />
-                                                    </Button>
-                                                </div>
-                                            ),
-                                        )}
-                                        <div className="flex gap-2">
-                                            <Select
-                                                value=""
-                                                onValueChange={(value) =>
-                                                    addApprover(
-                                                        'user',
-                                                        `user:${value}`,
-                                                    )
-                                                }
-                                            >
-                                                <SelectTrigger className="w-48">
-                                                    <SelectValue placeholder="Add user..." />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {options.members.map(
-                                                        (member) => (
-                                                            <SelectItem
-                                                                key={member.id}
-                                                                value={String(
-                                                                    member.id,
-                                                                )}
-                                                            >
-                                                                {member.name}
-                                                            </SelectItem>
-                                                        ),
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                            <Select
-                                                value=""
-                                                onValueChange={(value) =>
-                                                    addApprover('role', value)
-                                                }
-                                            >
-                                                <SelectTrigger className="w-48">
-                                                    <SelectValue placeholder="Add role..." />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {options.roles.map(
-                                                        (role) => (
-                                                            <SelectItem
-                                                                key={role.value}
-                                                                value={
-                                                                    role.value
-                                                                }
-                                                            >
-                                                                {role.label}
-                                                            </SelectItem>
-                                                        ),
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
+                                                        <div className="flex items-center gap-2">
+                                                            <div
+                                                                className="size-2 rounded-full"
+                                                                style={{
+                                                                    backgroundColor:
+                                                                        col.color ??
+                                                                        '#64748b',
+                                                                }}
+                                                            />
+                                                            {col.name}
+                                                        </div>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div>
+                                        <Label>Required Approvers</Label>
+                                        <div className="mt-2 space-y-2">
+                                            {newFlow.required_approvers.map(
+                                                (approver, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-center gap-2"
+                                                    >
+                                                        <Badge variant="outline">
+                                                            {getApproverLabel(
+                                                                approver,
+                                                            )}
+                                                        </Badge>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="size-6"
+                                                            onClick={() =>
+                                                                removeApprover(
+                                                                    index,
+                                                                )
+                                                            }
+                                                        >
+                                                            <Trash2 className="size-3" />
+                                                        </Button>
+                                                    </div>
+                                                ),
+                                            )}
+                                            <div className="flex gap-2">
+                                                <Select
+                                                    value=""
+                                                    onValueChange={(value) =>
+                                                        addApprover(
+                                                            'user',
+                                                            `user:${value}`,
+                                                        )
+                                                    }
+                                                >
+                                                    <SelectTrigger className="w-48">
+                                                        <SelectValue placeholder="Add user..." />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {options.members.map(
+                                                            (member) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        member.id
+                                                                    }
+                                                                    value={String(
+                                                                        member.id,
+                                                                    )}
+                                                                >
+                                                                    {
+                                                                        member.name
+                                                                    }
+                                                                </SelectItem>
+                                                            ),
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <Select
+                                                    value=""
+                                                    onValueChange={(value) =>
+                                                        addApprover(
+                                                            'role',
+                                                            value,
+                                                        )
+                                                    }
+                                                >
+                                                    <SelectTrigger className="w-48">
+                                                        <SelectValue placeholder="Add role..." />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {options.roles.map(
+                                                            (role) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        role.value
+                                                                    }
+                                                                    value={
+                                                                        role.value
+                                                                    }
+                                                                >
+                                                                    {role.label}
+                                                                </SelectItem>
+                                                            ),
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div>
-                                    <Label>Minimum Approvals Required</Label>
-                                    <Input
-                                        type="number"
-                                        min="1"
-                                        value={newFlow.min_approvals}
-                                        onChange={(e) =>
-                                            setNewFlow({
-                                                ...newFlow,
-                                                min_approvals: Number(
-                                                    e.target.value,
-                                                ),
-                                            })
-                                        }
-                                        className="mt-1 w-32"
-                                    />
-                                </div>
+                                    <div>
+                                        <Label>
+                                            Minimum Approvals Required
+                                        </Label>
+                                        <Input
+                                            type="number"
+                                            min="1"
+                                            value={newFlow.min_approvals}
+                                            onChange={(e) =>
+                                                setNewFlow({
+                                                    ...newFlow,
+                                                    min_approvals: Number(
+                                                        e.target.value,
+                                                    ),
+                                                })
+                                            }
+                                            className="mt-1 w-32"
+                                        />
+                                    </div>
 
-                                <div className="flex justify-end gap-2">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() =>
-                                            setShowCreateDialog(false)
-                                        }
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        type="submit"
-                                        disabled={
-                                            !newFlow.name.trim() ||
-                                            !newFlow.column_id ||
-                                            newFlow.required_approvers
-                                                .length === 0
-                                        }
-                                    >
-                                        Create Flow
-                                    </Button>
-                                </div>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
+                                    <div className="flex justify-end gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() =>
+                                                setShowCreateDialog(false)
+                                            }
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            type="submit"
+                                            disabled={
+                                                !newFlow.name.trim() ||
+                                                !newFlow.column_id ||
+                                                newFlow.required_approvers
+                                                    .length === 0
+                                            }
+                                        >
+                                            Create Flow
+                                        </Button>
+                                    </div>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </div>
 

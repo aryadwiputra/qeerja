@@ -105,7 +105,7 @@ const backlogGuide = {
         {
             title: 'What is the Backlog?',
             content:
-                'The backlog is a holding area for all tasks that haven\'t been assigned to a sprint. It\'s your project\'s task inbox where you can triage, prioritize, and organize work before committing it to a sprint.',
+                "The backlog is a holding area for all tasks that haven't been assigned to a sprint. It's your project's task inbox where you can triage, prioritize, and organize work before committing it to a sprint.",
         },
         {
             title: 'Sprint Planning from Backlog',
@@ -144,7 +144,7 @@ const backlogGuide = {
         'Keep the backlog groomed — regularly review and reprioritize tasks.',
         'Use story points to estimate effort before adding tasks to sprints.',
         'Tasks at the top of the backlog are highest priority.',
-        'Create tasks directly from the backlog if you\'re not ready to assign them to a sprint.',
+        "Create tasks directly from the backlog if you're not ready to assign them to a sprint.",
     ],
 };
 
