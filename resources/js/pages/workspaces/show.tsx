@@ -9,6 +9,7 @@ import {
     Target,
     Users,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -50,6 +51,7 @@ interface Props {
 }
 
 export default function WorkspaceShow({ workspace, projects }: Props) {
+    const { t } = useTranslation();
     const activeProjects = projects.filter((p) => p.status !== 'archived');
     const hasProjects = projects.length > 0;
 
@@ -64,7 +66,7 @@ export default function WorkspaceShow({ workspace, projects }: Props) {
                         className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                         <ArrowLeft className="size-4" />
-                        <span>Workspaces</span>
+                        <span>{t('workspace.back_to_workspaces')}</span>
                     </Link>
                 </div>
 
@@ -76,7 +78,7 @@ export default function WorkspaceShow({ workspace, projects }: Props) {
                         <p className="text-sm text-muted-foreground">
                             {hasProjects
                                 ? `${projects.length} project${projects.length !== 1 ? 's' : ''}`
-                                : 'No projects yet'}
+                                : t('workspace.no_projects_yet')}
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -88,7 +90,7 @@ export default function WorkspaceShow({ workspace, projects }: Props) {
                             )}
                         >
                             <Target className="size-4" />
-                            <span className="hidden sm:inline">Goals</span>
+                            <span className="hidden sm:inline">{t('workspace.goals')}</span>
                         </Link>
                         <Link
                             href={crossProjectTimeline({
@@ -100,7 +102,7 @@ export default function WorkspaceShow({ workspace, projects }: Props) {
                             )}
                         >
                             <GanttChart className="size-4" />
-                            <span className="hidden sm:inline">Timeline</span>
+                            <span className="hidden sm:inline">{t('workspace.timeline')}</span>
                         </Link>
                         <Link
                             href={crossProjectBoard({
@@ -112,7 +114,7 @@ export default function WorkspaceShow({ workspace, projects }: Props) {
                             )}
                         >
                             <LayoutGrid className="size-4" />
-                            <span className="hidden sm:inline">Board</span>
+                            <span className="hidden sm:inline">{t('workspace.board')}</span>
                         </Link>
                         <Link
                             href={workspaceSettings({
@@ -124,7 +126,7 @@ export default function WorkspaceShow({ workspace, projects }: Props) {
                             )}
                         >
                             <Settings className="size-4" />
-                            <span className="hidden sm:inline">Settings</span>
+                            <span className="hidden sm:inline">{t('workspace.settings')}</span>
                         </Link>
                         <Link
                             href={projectCreate({ workspace: workspace.slug })}
@@ -134,7 +136,7 @@ export default function WorkspaceShow({ workspace, projects }: Props) {
                             )}
                         >
                             <Plus className="size-4" />
-                            <span>New project</span>
+                            <span>{t('workspace.new_project')}</span>
                         </Link>
                     </div>
                 </div>
@@ -144,11 +146,10 @@ export default function WorkspaceShow({ workspace, projects }: Props) {
                         <FolderKanban className="size-12 text-muted-foreground/40" />
                         <div className="text-center">
                             <p className="text-lg font-medium">
-                                No projects yet
+                                {t('workspace.no_projects_yet')}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                                Create your first project to start tracking
-                                tasks.
+                                {t('workspace.create_first_project')}
                             </p>
                         </div>
                         <Link
@@ -159,7 +160,7 @@ export default function WorkspaceShow({ workspace, projects }: Props) {
                             )}
                         >
                             <Plus className="size-4" />
-                            <span>Create project</span>
+                            <span>{t('workspace.create_project')}</span>
                         </Link>
                     </div>
                 )}

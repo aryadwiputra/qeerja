@@ -3,6 +3,7 @@ import { useForm } from '@inertiajs/react';
 import { Plus, Search, Trash2, ShieldCheck, Shield } from 'lucide-react';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
@@ -60,6 +61,7 @@ function UserFormDialog({
     open: boolean;
     onOpenChange: (v: boolean) => void;
 }) {
+    const { t } = useTranslation();
     const { data, setData, post, patch, processing, errors, reset } = useForm({
         name: user?.name ?? '',
         email: user?.email ?? '',
@@ -101,12 +103,12 @@ function UserFormDialog({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        {user ? 'Edit User' : 'Create User'}
+                        {user ? t('admin.edit_user') : t('admin.create_user')}
                     </DialogTitle>
                 </DialogHeader>
                 <form onSubmit={submit} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">{t('admin.name')}</Label>
                         <Input
                             id="name"
                             value={data.name}
@@ -119,7 +121,7 @@ function UserFormDialog({
                         )}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">{t('admin.email')}</Label>
                         <Input
                             id="email"
                             type="email"
@@ -135,8 +137,8 @@ function UserFormDialog({
                     <div className="space-y-2">
                         <Label htmlFor="password">
                             {user
-                                ? 'New password (leave blank to keep)'
-                                : 'Password'}
+                                ? t('admin.new_password_leave_blank')
+                                : t('admin.password')}
                         </Label>
                         <Input
                             id="password"
@@ -160,14 +162,14 @@ function UserFormDialog({
                                 setData('is_super_admin', v)
                             }
                         />
-                        <Label htmlFor="is_super_admin">Super Admin</Label>
+                        <Label htmlFor="is_super_admin">{t('admin.super_admin')}</Label>
                     </div>
                     <Button
                         type="submit"
                         disabled={processing}
                         className="w-full"
                     >
-                        {user ? 'Update' : 'Create'}
+                        {user ? t('common.update') : t('common.create')}
                     </Button>
                 </form>
             </DialogContent>
@@ -176,6 +178,7 @@ function UserFormDialog({
 }
 
 export default function AdminUsersIndex({ users, filters }: Props) {
+    const { t } = useTranslation();
     const [search, setSearch] = useState(filters.search ?? '');
     const [formOpen, setFormOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<UserData | null>(null);
@@ -211,15 +214,15 @@ export default function AdminUsersIndex({ users, filters }: Props) {
 
     return (
         <>
-            <Head title="Admin Users" />
+            <Head title={t('admin.users')} />
 
             <div className="mb-6 flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight">
-                        Users
+                        {t('admin.users')}
                     </h1>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        Manage all registered users.
+                        {t('admin.manage_all_users')}
                     </p>
                 </div>
                 <Button
@@ -227,7 +230,7 @@ export default function AdminUsersIndex({ users, filters }: Props) {
                     className="flex items-center gap-2"
                 >
                     <Plus className="size-4" />
-                    Create User
+                    {t('admin.create_user')}
                 </Button>
             </div>
 
@@ -242,12 +245,12 @@ export default function AdminUsersIndex({ users, filters }: Props) {
                             <Input
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Search by name or email..."
+                                placeholder={t('admin.search_by_name_or_email')}
                                 className="pl-9"
                             />
                         </div>
                         <Button type="submit" variant="secondary">
-                            Search
+                            {t('common.search')}
                         </Button>
                     </form>
                 </CardHeader>
@@ -255,19 +258,19 @@ export default function AdminUsersIndex({ users, filters }: Props) {
                     {noResults ? (
                         <div className="flex flex-col items-center justify-center py-16 text-sm text-muted-foreground">
                             {filters.search
-                                ? 'No users matching your search.'
-                                : 'No users found.'}
+                                ? t('admin.no_users_matching')
+                                : t('admin.no_users_found')}
                         </div>
                     ) : (
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Role</TableHead>
-                                    <TableHead>Workspaces</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Joined</TableHead>
+                                    <TableHead>{t('admin.name')}</TableHead>
+                                    <TableHead>{t('admin.email')}</TableHead>
+                                    <TableHead>{t('admin.role')}</TableHead>
+                                    <TableHead>{t('admin.workspaces')}</TableHead>
+                                    <TableHead>{t('admin.status')}</TableHead>
+                                    <TableHead>{t('admin.joined')}</TableHead>
                                     <TableHead className="w-24" />
                                 </TableRow>
                             </TableHeader>
@@ -285,12 +288,12 @@ export default function AdminUsersIndex({ users, filters }: Props) {
                                                 {user.is_super_admin ? (
                                                     <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400">
                                                         <ShieldCheck className="size-3" />
-                                                        Super Admin
+                                                        {t('admin.super_admin')}
                                                     </span>
                                                 ) : (
                                                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                                                         <Shield className="size-3" />
-                                                        User
+                                                        {t('admin.user')}
                                                     </span>
                                                 )}
                                             </TableCell>
@@ -300,11 +303,11 @@ export default function AdminUsersIndex({ users, filters }: Props) {
                                             <TableCell>
                                                 {user.deleted_at ? (
                                                     <span className="text-xs text-red-500">
-                                                        Deleted
+                                                        {t('admin.deleted')}
                                                     </span>
                                                 ) : (
                                                     <span className="text-xs text-green-600 dark:text-green-400">
-                                                        Active
+                                                        {t('admin.active')}
                                                     </span>
                                                 )}
                                             </TableCell>
@@ -322,7 +325,7 @@ export default function AdminUsersIndex({ users, filters }: Props) {
                                                         }
                                                     >
                                                         <span className="sr-only">
-                                                            Edit
+                                                            {t('common.edit')}
                                                         </span>
                                                         <svg
                                                             className="size-4"

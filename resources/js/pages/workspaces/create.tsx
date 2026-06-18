@@ -1,6 +1,7 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,11 +12,12 @@ import {
 } from '@/routes/workspaces';
 
 export default function WorkspacesCreate() {
+    const { t } = useTranslation();
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
     return (
         <>
-            <Head title="Create workspace" />
+            <Head title={t('workspace.create_workspace')} />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Link
@@ -23,13 +25,13 @@ export default function WorkspacesCreate() {
                     className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <ArrowLeft className="size-4" />
-                    <span>Back to workspaces</span>
+                    <span>{t('workspace.back_to_workspaces')}</span>
                 </Link>
 
                 <div className="mx-auto w-full max-w-lg">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Create workspace</CardTitle>
+                            <CardTitle>{t('workspace.create_workspace')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <Form
@@ -42,12 +44,12 @@ export default function WorkspacesCreate() {
                                     <>
                                         <div className="flex flex-col gap-2">
                                             <Label htmlFor="name">
-                                                Workspace name
+                                                {t('workspace.workspace_name')}
                                             </Label>
                                             <Input
                                                 id="name"
                                                 name="name"
-                                                placeholder="My Team"
+                                                placeholder={t('workspace.workspace_name_placeholder')}
                                                 onChange={(e) => {
                                                     if (!slugManuallyEdited) {
                                                         const slugInput =
@@ -81,11 +83,11 @@ export default function WorkspacesCreate() {
                                         </div>
 
                                         <div className="flex flex-col gap-2">
-                                            <Label htmlFor="slug">Slug</Label>
+                                            <Label htmlFor="slug">{t('workspace.slug_label')}</Label>
                                             <Input
                                                 id="slug"
                                                 name="slug"
-                                                placeholder="my-team"
+                                                placeholder={t('workspace.workspace_slug_placeholder')}
                                                 onFocus={() =>
                                                     setSlugManuallyEdited(true)
                                                 }
@@ -101,15 +103,15 @@ export default function WorkspacesCreate() {
 
                                         <div className="flex flex-col gap-2">
                                             <Label htmlFor="description">
-                                                Description{' '}
+                                                {t('workspace.description_label')}{' '}
                                                 <span className="text-muted-foreground">
-                                                    (optional)
+                                                    ({t('common.optional')})
                                                 </span>
                                             </Label>
                                             <Input
                                                 id="description"
                                                 name="description"
-                                                placeholder="A short description of your workspace"
+                                                placeholder={t('workspace.workspace_desc_placeholder')}
                                             />
                                         </div>
 
@@ -119,8 +121,8 @@ export default function WorkspacesCreate() {
                                             className="w-full"
                                         >
                                             {processing
-                                                ? 'Creating...'
-                                                : 'Create workspace'}
+                                                ? t('common.creating')
+                                                : t('workspace.create_workspace')}
                                         </Button>
                                     </>
                                 )}

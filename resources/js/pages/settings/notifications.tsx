@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import NotificationPreferenceController from '@/actions/App/Http/Controllers/Settings/NotificationPreferenceController';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
@@ -15,17 +16,19 @@ type Props = {
 };
 
 export default function NotificationSettings({ preferences }: Props) {
+    const { t } = useTranslation();
+
     return (
         <>
-            <Head title="Notification settings" />
+            <Head title={t('settings.notifications')} />
 
-            <h1 className="sr-only">Notification settings</h1>
+            <h1 className="sr-only">{t('settings.notifications')}</h1>
 
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Notifications"
-                    description="Manage how you receive notifications"
+                    title={t('settings.notifications')}
+                    description={t('settings.manage_notifications_description')}
                 />
 
                 <Form
@@ -42,13 +45,13 @@ export default function NotificationSettings({ preferences }: Props) {
                                     <thead>
                                         <tr className="border-b bg-muted/50">
                                             <th className="px-4 py-3 text-left font-medium">
-                                                Event
+                                                {t('settings.event')}
                                             </th>
                                             <th className="px-4 py-3 text-center font-medium">
-                                                In-app
+                                                {t('settings.in_app')}
                                             </th>
                                             <th className="px-4 py-3 text-center font-medium">
-                                                Email
+                                                {t('profile.email')}
                                             </th>
                                         </tr>
                                     </thead>
@@ -96,7 +99,7 @@ export default function NotificationSettings({ preferences }: Props) {
                                     disabled={processing}
                                     data-test="update-notifications-button"
                                 >
-                                    Save preferences
+                                    {t('common.save')}
                                 </Button>
                             </div>
                         </>

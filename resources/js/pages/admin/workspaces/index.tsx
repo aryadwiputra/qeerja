@@ -2,6 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Archive, Search, Users } from 'lucide-react';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -43,6 +44,7 @@ interface Props {
 }
 
 export default function AdminWorkspacesIndex({ workspaces, filters }: Props) {
+    const { t } = useTranslation();
     const [search, setSearch] = useState(filters.search ?? '');
 
     function handleSearch(e: FormEvent) {
@@ -66,15 +68,15 @@ export default function AdminWorkspacesIndex({ workspaces, filters }: Props) {
 
     return (
         <>
-            <Head title="Admin Workspaces" />
+            <Head title={t('admin.workspaces')} />
 
             <div className="mb-6 flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight">
-                        Workspaces
+                        {t('admin.workspaces')}
                     </h1>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        All workspaces across the system.
+                        {t('admin.all_workspaces')}
                     </p>
                 </div>
             </div>
@@ -90,7 +92,7 @@ export default function AdminWorkspacesIndex({ workspaces, filters }: Props) {
                             <Input
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Search workspaces..."
+                                placeholder={t('admin.search_workspaces')}
                                 className="pl-9"
                             />
                         </form>
@@ -100,7 +102,7 @@ export default function AdminWorkspacesIndex({ workspaces, filters }: Props) {
                             onClick={toggleArchived}
                         >
                             <Archive className="mr-1 size-4" />
-                            {filters.archived ? 'Active' : 'Archived'}
+                            {filters.archived ? t('admin.active') : t('admin.archived')}
                         </Button>
                     </div>
                 </CardHeader>
@@ -108,19 +110,19 @@ export default function AdminWorkspacesIndex({ workspaces, filters }: Props) {
                     {noResults ? (
                         <div className="flex flex-col items-center justify-center py-16 text-sm text-muted-foreground">
                             {filters.search
-                                ? 'No workspaces matching your search.'
-                                : 'No workspaces found.'}
+                                ? t('admin.no_workspaces_matching')
+                                : t('admin.no_workspaces_found')}
                         </div>
                     ) : (
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Slug</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Members</TableHead>
-                                    <TableHead>Projects</TableHead>
-                                    <TableHead>Created</TableHead>
+                                    <TableHead>{t('admin.name')}</TableHead>
+                                    <TableHead>{t('admin.slug')}</TableHead>
+                                    <TableHead>{t('admin.status')}</TableHead>
+                                    <TableHead>{t('admin.members')}</TableHead>
+                                    <TableHead>{t('admin.projects')}</TableHead>
+                                    <TableHead>{t('admin.created')}</TableHead>
                                     <TableHead />
                                 </TableRow>
                             </TableHeader>
@@ -136,11 +138,11 @@ export default function AdminWorkspacesIndex({ workspaces, filters }: Props) {
                                         <TableCell>
                                             {ws.deleted_at ? (
                                                 <span className="text-xs text-red-500">
-                                                    Archived
+                                                    {t('admin.archived')}
                                                 </span>
                                             ) : (
                                                 <span className="text-xs text-green-600 dark:text-green-400">
-                                                    Active
+                                                    {t('admin.active')}
                                                 </span>
                                             )}
                                         </TableCell>
@@ -161,7 +163,7 @@ export default function AdminWorkspacesIndex({ workspaces, filters }: Props) {
                                                 href={`/admin/workspaces/${ws.id}`}
                                                 className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                                             >
-                                                View
+                                                {t('common.view')}
                                             </Link>
                                         </TableCell>
                                     </TableRow>

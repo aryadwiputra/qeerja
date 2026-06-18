@@ -15,6 +15,7 @@ import {
     X,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -119,14 +120,6 @@ interface Props {
     priorities: PriorityData[];
 }
 
-const roleLabels: Record<string, string> = {
-    owner: 'Owner',
-    admin: 'Admin',
-    manager: 'Manager',
-    member: 'Member',
-    viewer: 'Viewer',
-};
-
 export default function WorkspaceSettings({
     workspace,
     members,
@@ -135,6 +128,14 @@ export default function WorkspaceSettings({
     taskTypes,
     priorities,
 }: Props) {
+    const { t } = useTranslation();
+    const roleLabels: Record<string, string> = {
+        owner: t('members.owner'),
+        admin: t('members.admin'),
+        manager: t('members.manager'),
+        member: t('members.member'),
+        viewer: t('members.viewer'),
+    };
     const [addMemberOpen, setAddMemberOpen] = useState(false);
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteRole, setInviteRole] = useState('member');
@@ -156,7 +157,7 @@ export default function WorkspaceSettings({
     };
 
     const handleRemoveMember = (memberId: number) => {
-        if (!confirm('Remove this member from the workspace?')) {
+        if (!confirm(t('workspace.remove_member_confirm'))) {
             return;
         }
 
@@ -184,7 +185,7 @@ export default function WorkspaceSettings({
     };
 
     const handleCancelInvitation = (invitationId: number) => {
-        if (!confirm('Cancel this invitation?')) {
+        if (!confirm(t('workspace.cancel_invitation_confirm'))) {
             return;
         }
 
@@ -220,7 +221,7 @@ export default function WorkspaceSettings({
     };
 
     const handleDeleteTaskType = (typeId: number) => {
-        if (!confirm('Delete this task type?')) {
+        if (!confirm(t('workspace.delete_task_type_confirm'))) {
             return;
         }
 
@@ -258,7 +259,7 @@ export default function WorkspaceSettings({
     };
 
     const handleDeletePriority = (priorityId: number) => {
-        if (!confirm('Delete this priority?')) {
+        if (!confirm(t('workspace.delete_priority_confirm'))) {
             return;
         }
 
@@ -293,24 +294,24 @@ export default function WorkspaceSettings({
                 <div className="mx-auto w-full max-w-2xl">
                     <Tabs defaultValue="general">
                         <TabsList className="mb-6">
-                            <TabsTrigger value="general">General</TabsTrigger>
-                            <TabsTrigger value="settings">Settings</TabsTrigger>
+                            <TabsTrigger value="general">{t('workspace.general')}</TabsTrigger>
+                            <TabsTrigger value="settings">{t('workspace.settings')}</TabsTrigger>
                             <TabsTrigger value="task-types">
-                                Task types
+                                {t('workspace.task_types')}
                             </TabsTrigger>
                             <TabsTrigger value="priorities">
-                                Priorities
+                                {t('workspace.priorities')}
                             </TabsTrigger>
-                            <TabsTrigger value="members">Members</TabsTrigger>
+                            <TabsTrigger value="members">{t('workspace.members_tab')}</TabsTrigger>
                             <TabsTrigger value="danger">
-                                Danger zone
+                                {t('workspace.danger_zone')}
                             </TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="general">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>General settings</CardTitle>
+                                    <CardTitle>{t('workspace.general_settings')}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <Form
@@ -326,7 +327,7 @@ export default function WorkspaceSettings({
                                             <>
                                                 <div className="flex flex-col gap-2">
                                                     <Label htmlFor="name">
-                                                        Workspace name
+                                                        {t('workspace.workspace_name')}
                                                     </Label>
                                                     <Input
                                                         id="name"
@@ -350,7 +351,7 @@ export default function WorkspaceSettings({
 
                                                 <div className="flex flex-col gap-2">
                                                     <Label htmlFor="slug">
-                                                        Slug
+                                                        {t('workspace.slug_label')}
                                                     </Label>
                                                     <Input
                                                         id="slug"
@@ -374,7 +375,7 @@ export default function WorkspaceSettings({
 
                                                 <div className="flex flex-col gap-2">
                                                     <Label htmlFor="description">
-                                                        Description
+                                                        {t('workspace.description_label')}
                                                     </Label>
                                                     <Input
                                                         id="description"
@@ -388,7 +389,7 @@ export default function WorkspaceSettings({
 
                                                 {wasSuccessful && (
                                                     <p className="text-sm text-emerald-600 dark:text-emerald-400">
-                                                        Settings saved.
+                                                        {t('settings.settings_saved')}
                                                     </p>
                                                 )}
 
@@ -397,8 +398,8 @@ export default function WorkspaceSettings({
                                                     disabled={processing}
                                                 >
                                                     {processing
-                                                        ? 'Saving...'
-                                                        : 'Save changes'}
+                                                        ? t('common.saving')
+                                                        : t('settings.save_changes')}
                                                 </Button>
                                             </>
                                         )}
@@ -410,7 +411,7 @@ export default function WorkspaceSettings({
                         <TabsContent value="settings">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Workspace settings</CardTitle>
+                                    <CardTitle>{t('workspace.workspace_settings')}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <Form
@@ -432,7 +433,7 @@ export default function WorkspaceSettings({
                                                         className="flex items-center gap-2"
                                                     >
                                                         <Globe className="size-4" />
-                                                        Default locale
+                                                        {t('workspace.default_locale')}
                                                     </Label>
                                                     <Select
                                                         name="default_locale"
@@ -468,7 +469,7 @@ export default function WorkspaceSettings({
                                                         className="flex items-center gap-2"
                                                     >
                                                         <Clock className="size-4" />
-                                                        Default timezone
+                                                        {t('workspace.default_timezone')}
                                                     </Label>
                                                     <Select
                                                         name="default_timezone"
@@ -520,8 +521,7 @@ export default function WorkspaceSettings({
                                                     >
                                                         <Bell className="size-4" />
                                                         <span>
-                                                            Auto-watch tasks I
-                                                            create
+                                                            {t('workspace.auto_watch_tasks')}
                                                         </span>
                                                     </Label>
                                                     <input
@@ -542,7 +542,7 @@ export default function WorkspaceSettings({
 
                                                 {wasSuccessful && (
                                                     <p className="text-sm text-emerald-600 dark:text-emerald-400">
-                                                        Settings saved.
+                                                        {t('settings.settings_saved')}
                                                     </p>
                                                 )}
 
@@ -552,8 +552,8 @@ export default function WorkspaceSettings({
                                                     className="w-fit"
                                                 >
                                                     {processing
-                                                        ? 'Saving...'
-                                                        : 'Save changes'}
+                                                        ? t('common.saving')
+                                                        : t('settings.save_changes')}
                                                 </Button>
                                             </>
                                         )}
@@ -567,7 +567,7 @@ export default function WorkspaceSettings({
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <Tag className="size-5" />
-                                        Task types
+                                        {t('workspace.task_types')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-6">
@@ -581,7 +581,7 @@ export default function WorkspaceSettings({
                                             <>
                                                 <div className="flex flex-col gap-2">
                                                     <Label htmlFor="task-type-name">
-                                                        Name
+                                                        {t('admin.name')}
                                                     </Label>
                                                     <Input
                                                         id="task-type-name"
@@ -602,7 +602,7 @@ export default function WorkspaceSettings({
                                                 </div>
                                                 <div className="flex flex-col gap-2">
                                                     <Label htmlFor="task-type-color">
-                                                        Color
+                                                        {t('epic.color')}
                                                     </Label>
                                                     <Input
                                                         id="task-type-color"
@@ -618,7 +618,7 @@ export default function WorkspaceSettings({
                                                         disabled={processing}
                                                     >
                                                         <Plus className="size-4" />
-                                                        <span>Add type</span>
+                                                        <span>{t('workspace.add_type')}</span>
                                                     </Button>
                                                 </div>
                                             </>
@@ -727,7 +727,7 @@ export default function WorkspaceSettings({
                                                                     )
                                                                 }
                                                             >
-                                                                Edit
+                                                                {t('workspace.edit')}
                                                             </Button>
                                                             <Button
                                                                 type="button"
@@ -749,7 +749,7 @@ export default function WorkspaceSettings({
                                         })}
                                         {taskTypes.length === 0 && (
                                             <p className="py-8 text-center text-sm text-muted-foreground">
-                                                No task types yet.
+                                                {t('workspace.no_task_types_yet')}
                                             </p>
                                         )}
                                     </div>
@@ -762,7 +762,7 @@ export default function WorkspaceSettings({
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <ArrowUpDown className="size-5" />
-                                        Priorities
+                                        {t('workspace.priorities')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-6">
@@ -776,7 +776,7 @@ export default function WorkspaceSettings({
                                             <>
                                                 <div className="flex flex-col gap-2">
                                                     <Label htmlFor="priority-name">
-                                                        Name
+                                                        {t('admin.name')}
                                                     </Label>
                                                     <Input
                                                         id="priority-name"
@@ -797,7 +797,7 @@ export default function WorkspaceSettings({
                                                 </div>
                                                 <div className="flex flex-col gap-2">
                                                     <Label htmlFor="priority-level">
-                                                        Level
+                                                        {t('workspace.level')}
                                                     </Label>
                                                     <Input
                                                         id="priority-level"
@@ -809,7 +809,7 @@ export default function WorkspaceSettings({
                                                 </div>
                                                 <div className="flex flex-col gap-2">
                                                     <Label htmlFor="priority-color">
-                                                        Color
+                                                        {t('epic.color')}
                                                     </Label>
                                                     <Input
                                                         id="priority-color"
@@ -825,7 +825,7 @@ export default function WorkspaceSettings({
                                                         disabled={processing}
                                                     >
                                                         <Plus className="size-4" />
-                                                        <span>Add</span>
+                                                        <span>{t('common.add')}</span>
                                                     </Button>
                                                 </div>
                                             </>
@@ -957,7 +957,7 @@ export default function WorkspaceSettings({
                                                                     )
                                                                 }
                                                             >
-                                                                Edit
+                                                                {t('workspace.edit')}
                                                             </Button>
                                                             <Button
                                                                 type="button"
@@ -979,7 +979,7 @@ export default function WorkspaceSettings({
                                         })}
                                         {priorities.length === 0 && (
                                             <p className="py-8 text-center text-sm text-muted-foreground">
-                                                No priorities yet.
+                                                {t('workspace.no_priorities_yet')}
                                             </p>
                                         )}
                                     </div>
@@ -990,13 +990,13 @@ export default function WorkspaceSettings({
                         <TabsContent value="members">
                             <Card>
                                 <CardHeader className="flex flex-row items-center justify-between">
-                                    <CardTitle>Members</CardTitle>
+                                    <CardTitle>{t('workspace.members_tab')}</CardTitle>
                                     <Button
                                         variant="outline"
                                         size="sm"
                                         onClick={() => setAddMemberOpen(true)}
                                     >
-                                        Add member
+                                        {t('workspace.add_member')}
                                     </Button>
                                 </CardHeader>
                                 <CardContent>
@@ -1073,7 +1073,7 @@ export default function WorkspaceSettings({
                                         ))}
                                         {members.length === 0 && (
                                             <p className="py-8 text-center text-sm text-muted-foreground">
-                                                No members yet.
+                                                {t('workspace.no_members_yet')}
                                             </p>
                                         )}
                                     </div>
@@ -1090,14 +1090,14 @@ export default function WorkspaceSettings({
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <Mail className="size-5" />
-                                        Invitations
+                                        {t('workspace.invitations')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-6">
                                     <div className="grid gap-3 sm:grid-cols-[1fr_160px_auto]">
                                         <div className="flex flex-col gap-2">
                                             <Label htmlFor="invite-email">
-                                                Email address
+                                                {t('workspace.email_address')}
                                             </Label>
                                             <Input
                                                 id="invite-email"
@@ -1113,7 +1113,7 @@ export default function WorkspaceSettings({
                                         </div>
                                         <div className="flex flex-col gap-2">
                                             <Label htmlFor="invite-role">
-                                                Role
+                                                {t('workspace.role_label')}
                                             </Label>
                                             <Select
                                                 value={inviteRole}
@@ -1124,16 +1124,16 @@ export default function WorkspaceSettings({
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="admin">
-                                                        Admin
+                                                        {t('members.admin')}
                                                     </SelectItem>
                                                     <SelectItem value="manager">
-                                                        Manager
+                                                        {t('members.manager')}
                                                     </SelectItem>
                                                     <SelectItem value="member">
-                                                        Member
+                                                        {t('members.member')}
                                                     </SelectItem>
                                                     <SelectItem value="viewer">
-                                                        Viewer
+                                                        {t('members.viewer')}
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
@@ -1146,7 +1146,7 @@ export default function WorkspaceSettings({
                                                 disabled={!inviteEmail.trim()}
                                             >
                                                 <Send className="size-4" />
-                                                Send invite
+                                                {t('workspace.send_invite')}
                                             </Button>
                                         </div>
                                     </div>
@@ -1165,7 +1165,7 @@ export default function WorkspaceSettings({
                                                         {invitation.email}
                                                     </span>
                                                     <span className="truncate text-xs text-muted-foreground">
-                                                        Invited by{' '}
+                                                        {t('workspace.invited_by')}{' '}
                                                         {
                                                             invitation
                                                                 .invited_by.name
@@ -1195,7 +1195,7 @@ export default function WorkspaceSettings({
                                         ))}
                                         {invitations.length === 0 && (
                                             <p className="py-8 text-center text-sm text-muted-foreground">
-                                                No pending invitations.
+                                                {t('workspace.no_pending_invitations')}
                                             </p>
                                         )}
                                     </div>
@@ -1208,18 +1208,14 @@ export default function WorkspaceSettings({
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-destructive">
                                         <AlertTriangle className="size-5" />
-                                        Danger zone
+                                        {t('workspace.danger_zone')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-4">
                                     {!isArchived ? (
                                         <>
                                             <p className="text-sm text-muted-foreground">
-                                                Archiving this workspace will
-                                                hide it from your workspace list
-                                                and prevent team members from
-                                                accessing its projects. You can
-                                                restore it at any time.
+                                                {t('workspace.archive_description')}
                                             </p>
                                             <Button
                                                 variant="destructive"
@@ -1227,7 +1223,7 @@ export default function WorkspaceSettings({
                                                     setDeleteConfirmOpen(true)
                                                 }
                                             >
-                                                Archive workspace
+                                                {t('workspace.archive_workspace')}
                                             </Button>
 
                                             {deleteConfirmOpen && (
@@ -1259,7 +1255,7 @@ export default function WorkspaceSettings({
                                                             variant="destructive"
                                                             size="sm"
                                                         >
-                                                            Confirm archive
+                                                            {t('workspace.confirm_archive')}
                                                         </Button>
                                                     </form>
                                                     <Button
@@ -1271,7 +1267,7 @@ export default function WorkspaceSettings({
                                                             )
                                                         }
                                                     >
-                                                        Cancel
+                                                        {t('common.cancel')}
                                                     </Button>
                                                 </div>
                                             )}
@@ -1279,9 +1275,7 @@ export default function WorkspaceSettings({
                                     ) : (
                                         <>
                                             <p className="text-sm text-muted-foreground">
-                                                This workspace is currently
-                                                archived. Restore it to make it
-                                                active again.
+                                                {t('workspace.restore_description')}
                                             </p>
                                             <form
                                                 action={workspaceRestore.url(
@@ -1304,7 +1298,7 @@ export default function WorkspaceSettings({
                                                     type="submit"
                                                     variant="default"
                                                 >
-                                                    Restore workspace
+                                                    {t('workspace.restore_workspace')}
                                                 </Button>
                                             </form>
                                         </>

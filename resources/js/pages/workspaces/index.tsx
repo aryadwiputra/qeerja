@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { Archive, FolderKanban, Plus, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,21 +28,22 @@ interface Props {
 }
 
 export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
+    const { t } = useTranslation();
     const activeWorkspaces = workspaces.filter((w) => !w.deleted_at);
     const archivedWorkspaces = workspaces.filter((w) => w.deleted_at);
 
     return (
         <>
-            <Head title="Workspaces" />
+            <Head title={t('admin.workspaces')} />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-semibold tracking-tight">
-                            Workspaces
+                            {t('admin.workspaces')}
                         </h1>
                         <p className="text-sm text-muted-foreground">
-                            Manage your workspaces and teams.
+                            {t('workspace.manage_your_workspaces')}
                         </p>
                     </div>
                     <Link
@@ -52,7 +54,7 @@ export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
                         )}
                     >
                         <Plus className="size-4" />
-                        <span>New workspace</span>
+                        <span>{t('workspace.new_workspace')}</span>
                     </Link>
                 </div>
 
@@ -61,11 +63,10 @@ export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
                         <FolderKanban className="size-12 text-muted-foreground/40" />
                         <div className="text-center">
                             <p className="text-lg font-medium">
-                                No workspaces yet
+                                {t('workspace.no_workspaces_yet')}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                                Create your first workspace to start managing
-                                projects and tasks.
+                                {t('workspace.create_first_workspace')}
                             </p>
                         </div>
                         <Link
@@ -76,7 +77,7 @@ export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
                             )}
                         >
                             <Plus className="size-4" />
-                            <span>Create workspace</span>
+                            <span>{t('workspace.create_workspace')}</span>
                         </Link>
                     </div>
                 )}
@@ -131,7 +132,7 @@ export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
                         <div className="flex items-center gap-2">
                             <Archive className="size-4 text-muted-foreground" />
                             <h2 className="text-sm font-medium text-muted-foreground">
-                                Archived
+                                {t('admin.archived')}
                             </h2>
                         </div>
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -153,7 +154,7 @@ export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
                                                         variant="secondary"
                                                         className="w-fit text-[10px]"
                                                     >
-                                                        Archived
+                                                        {t('admin.archived')}
                                                     </Badge>
                                                 </div>
                                             </div>
@@ -181,7 +182,7 @@ export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
                                                 size="sm"
                                                 className="w-full"
                                             >
-                                                Restore
+                                                {t('workspace.restore_workspace')}
                                             </Button>
                                         </form>
                                     </CardContent>
@@ -201,8 +202,8 @@ export default function WorkspacesIndex({ workspaces, showArchived }: Props) {
                                 className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                             >
                                 {showArchived
-                                    ? 'Hide archived'
-                                    : 'Show archived'}
+                                    ? t('workspace.hide_archived')
+                                    : t('workspace.show_archived')}
                             </Link>
                         </div>
                     )}

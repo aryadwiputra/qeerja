@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { LayoutDashboard, Users, Building2, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface RecentUser {
@@ -19,17 +20,19 @@ interface Props {
 }
 
 export default function AdminDashboard({ stats }: Props) {
+    const { t } = useTranslation();
+
     return (
         <>
-            <Head title="Admin Dashboard" />
+            <Head title={t('admin.dashboard')} />
 
             <div className="mb-8 flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight">
-                        Admin Dashboard
+                        {t('admin.dashboard')}
                     </h1>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        System overview and management.
+                        {t('admin.system_overview')}
                     </p>
                 </div>
             </div>
@@ -38,7 +41,7 @@ export default function AdminDashboard({ stats }: Props) {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Total Users
+                            {t('admin.total_users')}
                         </CardTitle>
                         <Users className="size-4 text-muted-foreground" />
                     </CardHeader>
@@ -48,7 +51,7 @@ export default function AdminDashboard({ stats }: Props) {
                             href="/admin/users"
                             className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
                         >
-                            View all <ArrowRight className="size-3" />
+                            {t('admin.view_all')} <ArrowRight className="size-3" />
                         </Link>
                     </CardContent>
                 </Card>
@@ -56,7 +59,7 @@ export default function AdminDashboard({ stats }: Props) {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Total Workspaces
+                            {t('admin.total_workspaces')}
                         </CardTitle>
                         <Building2 className="size-4 text-muted-foreground" />
                     </CardHeader>
@@ -68,7 +71,7 @@ export default function AdminDashboard({ stats }: Props) {
                             href="/admin/workspaces"
                             className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
                         >
-                            View all <ArrowRight className="size-3" />
+                            {t('admin.view_all')} <ArrowRight className="size-3" />
                         </Link>
                     </CardContent>
                 </Card>
@@ -76,7 +79,7 @@ export default function AdminDashboard({ stats }: Props) {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Total Projects
+                            {t('admin.total_projects')}
                         </CardTitle>
                         <LayoutDashboard className="size-4 text-muted-foreground" />
                     </CardHeader>
@@ -92,13 +95,13 @@ export default function AdminDashboard({ stats }: Props) {
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-base">
-                            Recent Registrations
+                            {t('admin.recent_registrations')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         {stats.recentUsers.length === 0 ? (
                             <p className="text-sm text-muted-foreground">
-                                No recent users.
+                                {t('admin.no_recent_users')}
                             </p>
                         ) : (
                             <div className="space-y-4">
