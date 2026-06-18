@@ -6,6 +6,7 @@ use App\Http\Controllers\AutomationRuleController;
 use App\Http\Controllers\BacklogController;
 use App\Http\Controllers\BoardColumnController;
 use App\Http\Controllers\BoardController;
+use App\Http\Controllers\BoardTaskReorderController;
 use App\Http\Controllers\CommentTypingController;
 use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\CrossProjectController;
@@ -196,6 +197,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/workspaces/{workspace:slug}/projects/{project:slug}/boards/{board}/columns/{boardColumn}', [BoardColumnController::class, 'update'])->name('projects.boards.columns.update');
         Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/boards/{board}/columns/{boardColumn}', [BoardColumnController::class, 'destroy'])->name('projects.boards.columns.destroy');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/boards/{board}/columns/reorder', [BoardColumnController::class, 'reorder'])->name('projects.boards.columns.reorder');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/boards/{board}/tasks/reorder', [BoardTaskReorderController::class, 'reorder'])->name('projects.boards.tasks.reorder');
         Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/github/auth', [GitHubAuthController::class, 'redirect'])->name('projects.github.auth');
         Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/github/callback', [GitHubAuthController::class, 'callback'])->name('projects.github.callback');
         Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/github', [GitHubAuthController::class, 'destroy'])->name('projects.github.destroy');
