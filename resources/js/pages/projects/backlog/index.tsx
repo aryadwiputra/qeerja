@@ -19,6 +19,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, CalendarDays, GripVertical, Layers } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { FeatureGuide } from '@/components/feature-guide';
 import { TaskDetailDrawer } from '@/components/task-detail-drawer';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -95,6 +96,57 @@ interface ProjectData {
     slug: string;
     color: string | null;
 }
+
+const backlogGuide = {
+    title: 'Backlog Management',
+    description:
+        'Organize and prioritize tasks that are not yet assigned to a sprint.',
+    sections: [
+        {
+            title: 'What is the Backlog?',
+            content:
+                'The backlog is a holding area for all tasks that haven\'t been assigned to a sprint. It\'s your project\'s task inbox where you can triage, prioritize, and organize work before committing it to a sprint.',
+        },
+        {
+            title: 'Sprint Planning from Backlog',
+            content:
+                'When planning a sprint, drag tasks from the backlog into a sprint to commit them to that iteration. Tasks in the backlog are visible but not actively worked on.',
+        },
+    ],
+    items: [
+        {
+            heading: 'Backlog Features',
+            data: [
+                {
+                    term: 'Drag & Drop Reorder',
+                    description:
+                        'Drag tasks within the backlog to reorder them by priority. Tasks at the top are typically worked on first.',
+                },
+                {
+                    term: 'Add to Sprint',
+                    description:
+                        'Click the sprint dropdown on a task to assign it to a specific sprint. The task moves from backlog to that sprint.',
+                },
+                {
+                    term: 'Sprint Overview',
+                    description:
+                        'See all sprints and their task counts in the Sprints section. Click a sprint name to view its details.',
+                },
+                {
+                    term: 'Task Details',
+                    description:
+                        'Click a task to open the detail drawer. From there you can edit properties, add comments, or move it to a sprint.',
+                },
+            ],
+        },
+    ],
+    tips: [
+        'Keep the backlog groomed — regularly review and reprioritize tasks.',
+        'Use story points to estimate effort before adding tasks to sprints.',
+        'Tasks at the top of the backlog are highest priority.',
+        'Create tasks directly from the backlog if you\'re not ready to assign them to a sprint.',
+    ],
+};
 
 interface Props {
     workspace: Workspace;
@@ -394,6 +446,7 @@ export default function BacklogIndex({
                                 any sprint
                             </p>
                         </div>
+                        <FeatureGuide content={backlogGuide} />
                     </div>
 
                     {sprints.length > 0 && (
