@@ -78,3 +78,21 @@ export interface BoardOption {
     name: string;
     type: string;
 }
+
+export type BoardDragType = 'task' | 'column';
+
+export type DropEdge = 'top' | 'bottom' | null;
+
+export interface BoardDropPosition {
+    columnId: number;
+    taskId: number | null;
+    index: number;
+    edge: DropEdge | 'append';
+}
+
+export interface ReorderBoardTasksPayload {
+    columns: Array<{
+        column_id: number;
+        task_ids: number[];
+    }>;
+}

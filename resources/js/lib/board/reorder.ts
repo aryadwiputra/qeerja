@@ -1,4 +1,11 @@
-import type { BoardColumn, BoardTaskItem } from '@/types/board';
+import type {
+    BoardColumn,
+    BoardDropPosition,
+    BoardTaskItem,
+    ReorderBoardTasksPayload,
+} from '@/types/board';
+
+const POSITION_STEP = 1000;
 
 /**
  * Clamp a value between min and max (inclusive).
@@ -15,6 +22,27 @@ export function findColumnByTaskId(
     taskId: number,
 ): BoardColumn | undefined {
     return columns.find((col) => col.tasks.some((t) => t.id === taskId));
+}
+
+export function findColumnById(
+    columns: BoardColumn[],
+    columnId: number,
+): BoardColumn | undefined {
+    return columns.find((col) => col.id === columnId);
+}
+
+export function normalizeTaskOrders(columns: BoardColumn[]): BoardColumn[] {
+    return columns.map((column) => ({
+        ...column,
+        tasks: column.tasks.map((task, index) => ({
+            ...task,
+            position: (index + 1) * POSITION_STEP,
+        })),
+    }));
+}
+
+export function normalizeColumnOrders(columns: BoardColumn[]): BoardColumn[] {
+    return columns.map((column, index) => ({ ...column, position: index }));
 }
 
 /**
@@ -128,23 +156,57 @@ export function reorderAcrossColumns(
 
     const clampedPos = clamp(position, 0, toCol.tasks.length);
 
-    return columns.map((col) => {
-        if (col.id === fromCol.id) {
-            return {
-                ...col,
-                tasks: col.tasks.filter((t) => t.id !== taskId),
-            };
-        }
+    return normalizeTaskOrders(
+        columns.map((col) => {
+            if (col.id === fromCol.id) {
+                return {
+                    ...col,
+                    tasks: col.tasks.filter((t) => t.id !== taskId),
+                };
+            }
 
-        if (col.id === toCol.id) {
-            const updated = [...col.tasks];
-            updated.splice(clampedPos, 0, movedTask);
+            if (col.id === toCol.id) {
+                const updated = [...col.tasks];
+                updated.splice(clampedPos, 0, movedTask);
 
-            return { ...col, tasks: updated };
-        }
+                return { ...col, tasks: updated };
+            }
 
-        return col;
-    });
+            return col;
+        }),
+    );
+}
+
+export function moveTaskWithinColumn(
+    columns: BoardColumn[],
+    taskId: number,
+    columnId: number,
+    overId: number | string,
+    edge: 'top' | 'bottom' | null,
+): BoardColumn[] {
+    return normalizeTaskOrders(
+        columns.map((column) =>
+            column.id === columnId
+                ? reorderSameColumnTasks(column, taskId, overId, edge)
+                : column,
+        ),
+    );
+}
+
+export function moveTaskAcrossColumns(
+    columns: BoardColumn[],
+    taskId: number,
+    fromColumnId: number,
+    toColumnId: number,
+    index: number,
+): BoardColumn[] {
+    return reorderAcrossColumns(
+        columns,
+        taskId,
+        fromColumnId,
+        toColumnId,
+        index,
+    );
 }
 
 /**
@@ -170,7 +232,7 @@ export function reorderColumns(
     const [moved] = updated.splice(activeIdx, 1);
     updated.splice(overIdx, 0, moved);
 
-    return updated.map((col, idx) => ({ ...col, position: idx }));
+    return normalizeColumnOrders(updated);
 }
 
 /**
@@ -180,6 +242,56 @@ export function buildColumnReorderPayload(
     columns: BoardColumn[],
 ): Array<{ id: number; position: number }> {
     return columns.map((col, idx) => ({ id: col.id, position: idx }));
+}
+
+export function buildTaskReorderPayload(
+    columns: BoardColumn[],
+): ReorderBoardTasksPayload {
+    return {
+        columns: columns.map((column) => ({
+            column_id: column.id,
+            task_ids: column.tasks.map((task) => task.id),
+        })),
+    };
+}
+
+export function calculateTaskDropPosition(
+    columns: BoardColumn[],
+    overId: number | string,
+    edge: 'top' | 'bottom' | null,
+): BoardDropPosition | null {
+    if (typeof overId === 'string' && overId.startsWith('col:')) {
+        const columnId = Number(overId.slice(4));
+        const column = findColumnById(columns, columnId);
+
+        if (!column) {
+            return null;
+        }
+
+        return {
+            columnId,
+            taskId: null,
+            index: column.tasks.length,
+            edge: 'append',
+        };
+    }
+
+    const taskId = Number(overId);
+    const column = findColumnByTaskId(columns, taskId);
+
+    if (!column) {
+        return null;
+    }
+
+    const taskIndex = column.tasks.findIndex((task) => task.id === taskId);
+    const index = edge === 'bottom' ? taskIndex + 1 : taskIndex;
+
+    return {
+        columnId: column.id,
+        taskId,
+        index: clamp(index, 0, column.tasks.length),
+        edge,
+    };
 }
 
 /**

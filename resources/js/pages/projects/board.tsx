@@ -21,13 +21,14 @@ import { GripVertical, Settings2, Users } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BoardColumn as BoardColumnComponent } from '@/components/board/board-column';
+import { BoardDragOverlay } from '@/components/board/board-drag-overlay';
 import { BoardSortableTask } from '@/components/board/board-task-card';
 import { BoardColumnHeader } from '@/components/board/column-header';
+import { reorderBoardTasks } from '@/components/board/lib/api';
 import { BoardColumnManager } from '@/components/board-column-manager';
 import { FeatureGuide } from '@/components/feature-guide';
 import type { GuideContent } from '@/components/feature-guide';
 import { PageHeader } from '@/components/page-header';
-import { TaskCard } from '@/components/task-card';
 import { TaskCreateDialog } from '@/components/task-create-dialog';
 import { TaskDetailDrawer } from '@/components/task-detail-drawer';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +43,7 @@ import {
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import {
     buildColumnReorderPayload,
+    buildTaskReorderPayload,
     calcSameColumnPosition,
     findColumnByTaskId as findColByTaskId,
     reorderAcrossColumns,
@@ -51,7 +53,7 @@ import {
 import { cn } from '@/lib/utils';
 import { board as projectBoard, show as projectShow } from '@/routes/projects';
 import { reorder as reorderColumns } from '@/routes/projects/boards/columns';
-import { move as moveTask } from '@/routes/projects/tasks';
+import { reorder as reorderTasks } from '@/routes/projects/boards/tasks';
 import type {
     BoardColumn,
     BoardData,
@@ -141,6 +143,18 @@ function getCsrfToken(): string {
     return decodeURIComponent(
         document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? '',
     );
+}
+
+function parseTaskId(id: string | number): number | null {
+    if (typeof id === 'number') {
+        return id;
+    }
+
+    if (id.startsWith('task:')) {
+        return Number(id.slice(5));
+    }
+
+    return null;
 }
 
 function getInitials(name: string): string {
@@ -344,9 +358,6 @@ function BoardClient({
         }),
     );
 
-    const findColumnByTaskId = (taskId: number) =>
-        findColByTaskId(columns, taskId);
-
     const handleDragStart = (event: DragStartEvent) => {
         columnsSnapshotRef.current = columns;
 
@@ -361,9 +372,10 @@ function BoardClient({
             return;
         }
 
+        const taskId = parseTaskId(event.active.id);
         const task = columns
             .flatMap((c) => c.tasks)
-            .find((t) => t.id === event.active.id);
+            .find((t) => t.id === taskId);
         setActiveTask(task ?? null);
     };
 
@@ -410,7 +422,9 @@ function BoardClient({
             setOverTaskId(null);
             setClosestEdge(null);
         } else {
-            setOverTaskId(overId as number);
+            const taskId = parseTaskId(overId);
+
+            setOverTaskId(taskId);
             setOverColumnId(null);
 
             const overRect = over.rect;
@@ -486,6 +500,28 @@ function BoardClient({
     useEcho(`private-project.${project.id}`, '.task.moved', handleTaskMoved, [
         activeTask,
     ]);
+
+    interface TasksReorderedEvent {
+        columns: BoardColumn[];
+    }
+
+    const handleTasksReordered = useCallback(
+        (e: TasksReorderedEvent) => {
+            if (activeTask) {
+                return;
+            }
+
+            setColumns(e.columns);
+        },
+        [activeTask],
+    );
+
+    useEcho(
+        `private-project.${project.id}`,
+        '.tasks.reordered',
+        handleTasksReordered,
+        [activeTask],
+    );
 
     interface ColumnsReorderedEvent {
         columns: Array<{ id: number; position: number }>;
@@ -586,8 +622,15 @@ function BoardClient({
             return;
         }
 
-        const taskId = active.id as number;
+        const taskId = parseTaskId(active.id);
         const overId = over.id;
+
+        if (!taskId) {
+            setColumns(columnsSnapshotRef.current);
+
+            return;
+        }
+
         const origCol = columnsSnapshotRef.current.find((c) =>
             c.tasks.some((t) => t.id === taskId),
         );
@@ -599,11 +642,14 @@ function BoardClient({
         }
 
         let toColumn: BoardColumn | undefined;
+        const overTaskId = parseTaskId(overId);
 
         if (typeof overId === 'string' && overId.startsWith('col:')) {
-            toColumn = columns.find((c) => c.id === Number(overId.slice(4)));
-        } else {
-            toColumn = findColumnByTaskId(overId as number);
+            toColumn = columnsSnapshotRef.current.find(
+                (c) => c.id === Number(overId.slice(4)),
+            );
+        } else if (overTaskId) {
+            toColumn = findColByTaskId(columnsSnapshotRef.current, overTaskId);
         }
 
         if (!toColumn) {
@@ -613,71 +659,92 @@ function BoardClient({
         }
 
         let position: number;
+        let nextColumns: BoardColumn[];
 
         if (origCol.id === toColumn.id) {
+            const targetId = overTaskId ?? overId;
+
             position = calcSameColumnPosition(
                 toColumn,
                 taskId,
-                overId,
+                targetId,
                 closestEdge,
             );
 
-            setColumns((prev) =>
-                prev.map((col) =>
-                    col.id === toColumn.id
-                        ? reorderSameColumnTasks(
-                              col,
-                              taskId,
-                              overId,
-                              closestEdge,
-                          )
-                        : col,
-                ),
+            nextColumns = columnsSnapshotRef.current.map((col) =>
+                col.id === toColumn.id
+                    ? reorderSameColumnTasks(col, taskId, targetId, closestEdge)
+                    : col,
             );
         } else {
             if (typeof overId === 'string' && overId.startsWith('col:')) {
                 position = toColumn.tasks.length;
-            } else {
+            } else if (overTaskId) {
                 const overIdx = toColumn.tasks.findIndex(
-                    (t) => t.id === (overId as number),
+                    (t) => t.id === overTaskId,
                 );
                 position = closestEdge === 'bottom' ? overIdx + 1 : overIdx;
                 position = Math.max(0, position);
+            } else {
+                setColumns(columnsSnapshotRef.current);
+
+                return;
             }
 
-            setColumns((prev) =>
-                reorderAcrossColumns(
-                    prev,
-                    taskId,
-                    origCol.id,
-                    toColumn.id,
-                    position,
-                ),
+            nextColumns = reorderAcrossColumns(
+                columnsSnapshotRef.current,
+                taskId,
+                origCol.id,
+                toColumn.id,
+                position,
             );
         }
 
-        fetch(
-            moveTask({
+        const previousSignature = columnsSnapshotRef.current
+            .map(
+                (column) =>
+                    `${column.id}:${column.tasks.map((task) => task.id).join(',')}`,
+            )
+            .join('|');
+        const nextSignature = nextColumns
+            .map(
+                (column) =>
+                    `${column.id}:${column.tasks.map((task) => task.id).join(',')}`,
+            )
+            .join('|');
+
+        if (previousSignature === nextSignature) {
+            return;
+        }
+
+        setColumns(nextColumns);
+
+        reorderBoardTasks(
+            reorderTasks({
                 workspace: workspace.slug,
                 project: project.slug,
-                task: taskId,
+                board: board.id,
             }).url,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-XSRF-TOKEN': getCsrfToken(),
-                },
-                body: JSON.stringify({
-                    board_column_id: toColumn.id,
-                    position,
-                }),
-            },
-        ).catch(() => {
-            setColumns(columnsSnapshotRef.current);
-            showError('Failed to move task. Please try again.');
-        });
+            buildTaskReorderPayload(nextColumns),
+        )
+            .then((serverColumns) => {
+                setColumns(serverColumns);
+            })
+            .catch((error: Error) => {
+                setColumns(columnsSnapshotRef.current);
+                showError(
+                    error.message || 'Failed to move task. Please try again.',
+                );
+            });
+    };
+
+    const handleDragCancel = () => {
+        setColumns(columnsSnapshotRef.current);
+        setActiveTask(null);
+        setActiveColumn(null);
+        setOverTaskId(null);
+        setOverColumnId(null);
+        setClosestEdge(null);
     };
 
     return (
@@ -869,6 +936,7 @@ function BoardClient({
                     onDragStart={handleDragStart}
                     onDragOver={handleDragOver}
                     onDragEnd={handleDragEnd}
+                    onDragCancel={handleDragCancel}
                 >
                     <SortableContext
                         items={columns.map((c) => `column:${c.id}`)}
@@ -922,7 +990,9 @@ function BoardClient({
                                     </BoardColumnHeader>
 
                                     <SortableContext
-                                        items={column.tasks.map((t) => t.id)}
+                                        items={column.tasks.map(
+                                            (t) => `task:${t.id}`,
+                                        )}
                                         strategy={verticalListSortingStrategy}
                                     >
                                         <div
@@ -1040,36 +1110,10 @@ function BoardClient({
                     </SortableContext>
 
                     <DragOverlay dropAnimation={null}>
-                        {activeTask && (
-                            <div className="w-72 rotate-2 shadow-elevated">
-                                <TaskCard task={activeTask} isDragging />
-                            </div>
-                        )}
-                        {activeColumn && (
-                            <div className="w-72 rotate-2 rounded-xl border border-border bg-card shadow-elevated">
-                                <div className="flex items-center justify-between px-3 py-2.5">
-                                    <div className="flex items-center gap-2">
-                                        <div
-                                            className="size-2.5 rounded-full"
-                                            style={{
-                                                backgroundColor:
-                                                    activeColumn.color ??
-                                                    '#64748B',
-                                            }}
-                                        />
-                                        <h3 className="text-sm font-semibold">
-                                            {activeColumn.name}
-                                        </h3>
-                                        <Badge
-                                            variant="secondary"
-                                            className="px-1.5 py-0 text-[10px]"
-                                        >
-                                            {activeColumn.tasks.length}
-                                        </Badge>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                        <BoardDragOverlay
+                            task={activeTask}
+                            column={activeColumn}
+                        />
                     </DragOverlay>
                 </DndContext>
 

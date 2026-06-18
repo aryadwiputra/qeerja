@@ -1,6 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
+import { DropIndicator } from '@/components/board/drop-indicator';
 import { TaskCard } from '@/components/task-card';
 import type { BoardTaskItem } from '@/types/board';
 
@@ -26,7 +27,7 @@ export function BoardSortableTask({
         transform,
         transition,
         isDragging: isSortableDragging,
-    } = useSortable({ id: task.id });
+    } = useSortable({ id: `task:${task.id}`, data: { type: 'task', task } });
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -37,12 +38,7 @@ export function BoardSortableTask({
     return (
         <div ref={setNodeRef} style={style} {...attributes}>
             <div className="group/task relative">
-                {isOver && edge === 'top' && (
-                    <div className="absolute -top-1 right-2 left-2 z-10 h-0.5 rounded-full bg-primary" />
-                )}
-                {isOver && edge === 'bottom' && (
-                    <div className="absolute right-2 -bottom-1 left-2 z-10 h-0.5 rounded-full bg-primary" />
-                )}
+                {isOver && <DropIndicator edge={edge ?? null} />}
                 <div
                     {...listeners}
                     className="absolute top-1/2 left-0 -translate-y-1/2 cursor-grab opacity-0 transition-opacity group-hover/task:opacity-100"
