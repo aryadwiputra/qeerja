@@ -1,11 +1,14 @@
 import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { Globe, LogOut, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
@@ -18,12 +21,21 @@ type Props = {
 };
 
 export function UserMenuContent({ user }: Props) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const cleanup = useMobileNavigation();
 
     const handleLogout = () => {
         cleanup();
         router.flushAll();
+    };
+
+    const handleLanguageChange = (locale: string) => {
+        i18n.changeLanguage(locale);
+        router.patch(
+            edit(),
+            { locale },
+            { preserveState: true, preserveScroll: true },
+        );
     };
 
     return (
@@ -46,6 +58,30 @@ export function UserMenuContent({ user }: Props) {
                         {t('user_menu.settings')}
                     </Link>
                 </DropdownMenuItem>
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                        <Globe className="mr-2" />
+                        {t('profile.language')}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                        <DropdownMenuItem
+                            onClick={() => handleLanguageChange('en')}
+                            className={
+                                i18n.language === 'en' ? 'font-bold' : ''
+                            }
+                        >
+                            English
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => handleLanguageChange('id')}
+                            className={
+                                i18n.language === 'id' ? 'font-bold' : ''
+                            }
+                        >
+                            Bahasa Indonesia
+                        </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                </DropdownMenuSub>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
