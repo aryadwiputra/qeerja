@@ -295,11 +295,13 @@ function SortableTask({
     isDragging,
     onClick,
     isOver,
+    edge,
 }: {
     task: TaskItem;
     isDragging?: boolean;
     onClick?: () => void;
     isOver?: boolean;
+    edge?: 'top' | 'bottom' | null;
 }) {
     const {
         attributes,
@@ -319,8 +321,11 @@ function SortableTask({
     return (
         <div ref={setNodeRef} style={style} {...attributes}>
             <div className="group/task relative">
-                {isOver && (
+                {isOver && edge === 'top' && (
                     <div className="absolute -top-1 right-2 left-2 z-10 h-0.5 rounded-full bg-primary" />
+                )}
+                {isOver && edge === 'bottom' && (
+                    <div className="absolute right-2 -bottom-1 left-2 z-10 h-0.5 rounded-full bg-primary" />
                 )}
                 <div
                     {...listeners}
@@ -362,7 +367,7 @@ function DroppableColumn({
         <div
             ref={setNodeRef}
             className={cn(
-                'group flex w-[calc(100vw-2rem)] shrink-0 snap-start flex-col rounded-xl border border-border bg-card/70 transition-[background-color,border-color,box-shadow] sm:w-72',
+                'group flex min-h-0 w-[calc(100vw-2rem)] shrink-0 snap-start flex-col rounded-xl border border-border bg-card/70 transition-[background-color,border-color,box-shadow] sm:w-72',
                 isOver && isTaskDrag && !isEmpty
                     ? 'border-dashed border-primary/50 bg-primary/[0.04]'
                     : isOver &&
@@ -468,6 +473,10 @@ function BoardClient({
     const [newTaskOpen, setNewTaskOpen] = useState(false);
     const [overTaskId, setOverTaskId] = useState<number | null>(null);
     const [overColumnId, setOverColumnId] = useState<number | null>(null);
+    const [closestEdge, setClosestEdge] = useState<'top' | 'bottom' | null>(
+        null,
+    );
+    const pointerYRef = useRef(0);
 
     const [presenceUsers, setPresenceUsers] = useState<
         Array<{ id: number; name: string }>
@@ -601,9 +610,21 @@ function BoardClient({
         if (typeof overId === 'string' && overId.startsWith('col:')) {
             setOverColumnId(Number(overId.slice(4)));
             setOverTaskId(null);
+            setClosestEdge(null);
         } else {
             setOverTaskId(overId as number);
             setOverColumnId(null);
+
+            const overRect = over.rect;
+            const pointerY = pointerYRef.current;
+
+            if (overRect && pointerY > 0) {
+                setClosestEdge(
+                    pointerY < overRect.top + overRect.height / 2
+                        ? 'top'
+                        : 'bottom',
+                );
+            }
         }
     };
 
@@ -709,6 +730,7 @@ function BoardClient({
         setActiveColumn(null);
         setOverTaskId(null);
         setOverColumnId(null);
+        setClosestEdge(null);
 
         if (!over || !active) {
             setColumns(columnsSnapshotRef.current);
@@ -813,8 +835,14 @@ function BoardClient({
                 const activeIdx = toColumn.tasks.findIndex(
                     (t) => t.id === taskId,
                 );
+                const insertBelow = closestEdge === 'bottom';
 
-                position = activeIdx < overIdx ? overIdx - 1 : overIdx;
+                if (insertBelow) {
+                    position = activeIdx < overIdx ? overIdx : overIdx + 1;
+                } else {
+                    position = activeIdx < overIdx ? overIdx - 1 : overIdx;
+                }
+
                 position = Math.max(0, position);
             }
 
@@ -843,6 +871,10 @@ function BoardClient({
                             (t) => t.id === (overId as number),
                         );
                         insertPos = Math.max(0, insertPos);
+
+                        if (closestEdge === 'bottom') {
+                            insertPos++;
+                        }
                     }
 
                     tasks.splice(insertPos, 0, found);
@@ -854,9 +886,10 @@ function BoardClient({
             if (typeof overId === 'string' && overId.startsWith('col:')) {
                 position = toColumn.tasks.length;
             } else {
-                position = toColumn.tasks.findIndex(
+                const overIdx = toColumn.tasks.findIndex(
                     (t) => t.id === (overId as number),
                 );
+                position = closestEdge === 'bottom' ? overIdx + 1 : overIdx;
                 position = Math.max(0, position);
             }
 
@@ -920,6 +953,9 @@ function BoardClient({
             <div
                 className="mx-auto flex h-full w-full max-w-[1600px] flex-1 flex-col overflow-hidden"
                 suppressHydrationWarning
+                onPointerMove={(e) => {
+                    pointerYRef.current = e.clientY;
+                }}
             >
                 <PageHeader
                     className="mb-4 shrink-0"
@@ -1145,7 +1181,7 @@ function BoardClient({
                                     >
                                         <div
                                             className={cn(
-                                                'flex min-h-[100px] flex-col gap-2 px-2 pb-2',
+                                                'flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-2 pb-2',
                                                 column.tasks.length === 0 &&
                                                     'hidden',
                                             )}
@@ -1201,6 +1237,12 @@ function BoardClient({
                                                                                   overTaskId ===
                                                                                   task.id
                                                                               }
+                                                                              edge={
+                                                                                  overTaskId ===
+                                                                                  task.id
+                                                                                      ? closestEdge
+                                                                                      : null
+                                                                              }
                                                                               onClick={() => {
                                                                                   setDrawerTaskId(
                                                                                       task.id,
@@ -1227,6 +1269,12 @@ function BoardClient({
                                                           isOver={
                                                               overTaskId ===
                                                               task.id
+                                                          }
+                                                          edge={
+                                                              overTaskId ===
+                                                              task.id
+                                                                  ? closestEdge
+                                                                  : null
                                                           }
                                                           onClick={() => {
                                                               setDrawerTaskId(
