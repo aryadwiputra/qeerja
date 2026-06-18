@@ -17,6 +17,7 @@ use App\Http\Controllers\GoalController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\MyTasksController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotificationRuleController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PriorityController;
 use App\Http\Controllers\ProjectController;
@@ -219,6 +220,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/approvals/{flow}', [ApprovalFlowController::class, 'destroy'])->name('projects.approvals.destroy');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/approve', [ApprovalFlowController::class, 'approve'])->name('projects.tasks.approve');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/reject', [ApprovalFlowController::class, 'reject'])->name('projects.tasks.reject');
+
+        Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/notification-rules', [NotificationRuleController::class, 'index'])->name('projects.notification-rules.index');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/notification-rules', [NotificationRuleController::class, 'store'])->name('projects.notification-rules.store');
+        Route::put('/workspaces/{workspace:slug}/projects/{project:slug}/notification-rules/{rule}', [NotificationRuleController::class, 'update'])->name('projects.notification-rules.update');
+        Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/notification-rules/{rule}', [NotificationRuleController::class, 'destroy'])->name('projects.notification-rules.destroy');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/notification-rules/{rule}/toggle', [NotificationRuleController::class, 'toggle'])->name('projects.notification-rules.toggle');
 
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/comments', [TaskCommentController::class, 'store'])->name('projects.tasks.comments.store');
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/tasks/{task}/comments/typing', [CommentTypingController::class, 'ping'])->name('projects.tasks.comments.typing');
