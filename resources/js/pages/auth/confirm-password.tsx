@@ -1,4 +1,4 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, setLayoutProps } from '@inertiajs/react';
 import {
     index as confirmOptions,
     store as confirmStore,
@@ -9,12 +9,20 @@ import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { useTranslation } from 'react-i18next';
 import { store } from '@/routes/password/confirm';
 
 export default function ConfirmPassword() {
+    const { t } = useTranslation();
+
+    setLayoutProps({
+        title: t('auth.confirm_title'),
+        description: t('auth.confirm_description'),
+    });
+
     return (
         <>
-            <Head title="Confirm password" />
+            <Head title={t('auth.confirm_title')} />
 
             <PasskeyVerify
                 routes={{
@@ -34,11 +42,11 @@ export default function ConfirmPassword() {
                 {({ processing, errors }) => (
                     <div className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">{t('auth.password')}</Label>
                             <PasswordInput
                                 id="password"
                                 name="password"
-                                placeholder="Password"
+                                placeholder={t('auth.password')}
                                 autoComplete="current-password"
                                 autoFocus
                             />
@@ -53,7 +61,7 @@ export default function ConfirmPassword() {
                                 data-test="confirm-password-button"
                             >
                                 {processing && <Spinner />}
-                                Confirm password
+                                {t('auth.confirm_password')}
                             </Button>
                         </div>
                     </div>
@@ -62,9 +70,3 @@ export default function ConfirmPassword() {
         </>
     );
 }
-
-ConfirmPassword.layout = {
-    title: 'Confirm password',
-    description:
-        'This is a secure area of the application. Please confirm your password before continuing.',
-};
