@@ -51,6 +51,7 @@ export function NotificationSidebarItem() {
                 duration: 5000,
             });
         },
+        [userId, workspaceSlug],
     );
 
     return (

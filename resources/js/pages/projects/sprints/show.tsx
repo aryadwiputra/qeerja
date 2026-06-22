@@ -237,7 +237,12 @@ export default function SprintShow({
 
     return (
         <>
-            <Head title={t('sprint.show_title', { sprint: sprint.name, project: project.name })} />
+            <Head
+                title={t('sprint.show_title', {
+                    sprint: sprint.name,
+                    project: project.name,
+                })}
+            />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <PageHeader

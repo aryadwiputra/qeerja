@@ -40,7 +40,11 @@ export default function AdminWorkspaceShow({ workspace, members }: Props) {
 
     return (
         <>
-            <Head title={t('admin.workspace_show_title', { name: workspace.name })} />
+            <Head
+                title={t('admin.workspace_show_title', {
+                    name: workspace.name,
+                })}
+            />
 
             <PageHeader
                 title={workspace.name}

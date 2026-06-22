@@ -386,14 +386,14 @@ class TaskController extends Controller
             $task->updateQuietly(['position' => $maxPosition + 1000]);
             $task->refresh();
 
-            broadcast(new TaskMoved(
+            TaskMoved::dispatch(
                 task: $task,
                 fromColumnId: $oldColumnId,
                 toColumnId: $toColumn->id,
                 position: $task->position,
                 status: $toColumn->status_key,
                 projectId: $project->id,
-            ));
+            );
         }
 
         if (array_key_exists('assignee_ids', $validated)) {
@@ -541,14 +541,14 @@ class TaskController extends Controller
             ]);
         }
 
-        broadcast(new TaskMoved(
+        TaskMoved::dispatch(
             task: $task,
             fromColumnId: $oldColumnId,
             toColumnId: $targetColumn->id,
             position: $task->position,
             status: $targetColumn->status_key,
             projectId: $project->id,
-        ));
+        );
 
         return back(303);
     }

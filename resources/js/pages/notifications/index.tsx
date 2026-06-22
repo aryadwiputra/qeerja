@@ -158,6 +158,7 @@ export default function NotificationsIndex({
                 data: [newItem, ...prev.data].slice(0, 60),
             }));
         },
+        [userId],
     );
 
     const groups = groupByDate(notifications.data);

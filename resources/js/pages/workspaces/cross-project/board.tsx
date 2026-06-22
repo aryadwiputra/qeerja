@@ -94,7 +94,9 @@ export default function CrossProjectBoard({
 
     return (
         <>
-            <Head title={t('cross_project.board_title', { name: workspace.name })} />
+            <Head
+                title={t('cross_project.board_title', { name: workspace.name })}
+            />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <PageHeader

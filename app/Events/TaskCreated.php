@@ -32,7 +32,16 @@ class TaskCreated implements ShouldBroadcast
     public function broadcastWith(): array
     {
         $task = Task::with(['assignees:id,name,avatar', 'priority', 'taskType', 'epics', 'sprints'])
-            ->findOrFail($this->taskId);
+            ->find($this->taskId);
+
+        if (! $task) {
+            return [
+                'projectId' => $this->projectId,
+                'taskId' => $this->taskId,
+                'column_id' => null,
+                'task' => [],
+            ];
+        }
 
         return [
             'projectId' => $this->projectId,
