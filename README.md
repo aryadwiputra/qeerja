@@ -19,6 +19,9 @@
             <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
         </a>
     </p>
+    <p>
+        <a href="README.id.md"><strong>Bahasa Indonesia</strong></a> · <strong>English</strong>
+    </p>
 </div>
 
 ---
