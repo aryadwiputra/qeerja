@@ -32,6 +32,7 @@ class NotificationPreferenceController extends Controller
                 'label' => $label,
                 'in_app_enabled' => $preference?->in_app_enabled ?? true,
                 'email_enabled' => $preference?->email_enabled ?? true,
+                'whatsapp_enabled' => $preference?->whatsapp_enabled ?? false,
             ];
         }
 
@@ -46,6 +47,7 @@ class NotificationPreferenceController extends Controller
             'preferences' => 'required|array',
             'preferences.*.in_app_enabled' => 'required|boolean',
             'preferences.*.email_enabled' => 'required|boolean',
+            'preferences.*.whatsapp_enabled' => 'nullable|boolean',
         ]);
 
         $user = $request->user();
@@ -56,6 +58,7 @@ class NotificationPreferenceController extends Controller
                 [
                     'in_app_enabled' => $settings['in_app_enabled'],
                     'email_enabled' => $settings['email_enabled'],
+                    'whatsapp_enabled' => $settings['whatsapp_enabled'] ?? false,
                 ]
             );
         }

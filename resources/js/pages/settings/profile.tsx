@@ -117,6 +117,24 @@ export default function Profile({
                                     </div>
                                 )}
 
+                            <div className="grid gap-2">
+                                <Label htmlFor="phone">
+                                    {t('profile.phone')}
+                                </Label>
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    className="mt-1 block w-full"
+                                    defaultValue={auth.user.phone ?? ''}
+                                    name="phone"
+                                    placeholder="+628123456789"
+                                />
+                                <InputError
+                                    className="mt-2"
+                                    message={errors.phone}
+                                />
+                            </div>
+
                             <div className="flex items-center gap-4">
                                 <Button
                                     disabled={processing}

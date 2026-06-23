@@ -9,6 +9,7 @@ interface NotificationPreference {
     label: string;
     in_app_enabled: boolean;
     email_enabled: boolean;
+    whatsapp_enabled: boolean;
 }
 
 type Props = {
@@ -53,6 +54,9 @@ export default function NotificationSettings({ preferences }: Props) {
                                             <th className="px-4 py-3 text-center font-medium">
                                                 {t('profile.email')}
                                             </th>
+                                            <th className="px-4 py-3 text-center font-medium">
+                                                WhatsApp
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -82,6 +86,17 @@ export default function NotificationSettings({ preferences }: Props) {
                                                             name={`preferences[${type}][email_enabled]`}
                                                             defaultChecked={
                                                                 pref.email_enabled
+                                                            }
+                                                            value="1"
+                                                            className="size-4 rounded border-gray-300"
+                                                        />
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            name={`preferences[${type}][whatsapp_enabled]`}
+                                                            defaultChecked={
+                                                                pref.whatsapp_enabled
                                                             }
                                                             value="1"
                                                             className="size-4 rounded border-gray-300"

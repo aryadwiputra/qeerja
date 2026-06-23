@@ -6,6 +6,7 @@ export type User = {
     avatar_file?: string;
     timezone?: string;
     locale?: string;
+    phone?: string;
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
     created_at: string;

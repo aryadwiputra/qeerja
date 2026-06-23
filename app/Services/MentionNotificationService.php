@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\TaskUpdated;
+use App\Jobs\SendWhatsAppNotification;
 use App\Models\Notification;
 use App\Models\NotificationPreference;
 use App\Models\Task;
@@ -55,6 +56,23 @@ class MentionNotificationService
 
             if (NotificationPreference::isEmailEnabled($user, 'task.mentioned')) {
                 $user->notify(new TaskMentionedNotification($task, $comment, $commenter));
+            }
+
+            if (NotificationPreference::isWhatsAppEnabled($user, 'task.mentioned')) {
+                $truncated = mb_strlen($comment->body) > 100
+                    ? mb_substr($comment->body, 0, 100).'...'
+                    : $comment->body;
+
+                $url = route('projects.tasks.show', [
+                    'workspace' => $task->project->workspace->slug,
+                    'project' => $task->project->slug,
+                    'task' => $task->id,
+                ]);
+
+                SendWhatsAppNotification::dispatch(
+                    $user->phone,
+                    "💬 @{$commenter->name} mentioned you in {$task->code}\n📌 {$task->title}\n✏️ \"{$truncated}\"\n\n🔗 {$url}",
+                );
             }
         }
     }

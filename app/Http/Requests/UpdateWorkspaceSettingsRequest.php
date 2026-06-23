@@ -17,12 +17,13 @@ class UpdateWorkspaceSettingsRequest extends FormRequest
             'default_locale' => ['nullable', 'string', 'in:en,id'],
             'default_timezone' => ['nullable', 'string', 'timezone:all'],
             'auto_watch_own_tasks' => ['nullable', 'boolean'],
+            'whatsapp_gateway_enabled' => ['nullable', 'boolean'],
         ];
     }
 
     public function validatedWithKeys(): array
     {
-        $allowed = ['default_locale', 'default_timezone', 'auto_watch_own_tasks'];
+        $allowed = ['default_locale', 'default_timezone', 'auto_watch_own_tasks', 'whatsapp_gateway_enabled'];
         $result = [];
 
         foreach ($allowed as $key) {

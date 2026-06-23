@@ -20,6 +20,7 @@ trait ProfileValidationRules
             'email' => $this->emailRules($userId),
             'timezone' => ['nullable', 'string', 'max:100'],
             'locale' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^\+?[1-9]\d{6,19}$/'],
             'avatar' => ['nullable', 'string', 'max:500'],
         ];
     }

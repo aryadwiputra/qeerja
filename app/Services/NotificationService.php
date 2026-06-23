@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Events\TaskAssigned;
 use App\Events\TaskCommented;
 use App\Events\TaskUpdated;
+use App\Jobs\SendWhatsAppNotification;
 use App\Models\Notification;
 use App\Models\NotificationPreference;
 use App\Models\Task;
@@ -47,6 +48,14 @@ class NotificationService
         if (NotificationPreference::isEmailEnabled($assignee, 'task.assigned')) {
             $assignee->notify(new TaskAssignedNotification($task, $assignedBy));
         }
+
+        $this->sendWhatsApp($assignee, 'task.assigned', sprintf(
+            "📋 Task: %s\n📌 %s\n⚡ Priority: %s\n👤 Assigned by: %s",
+            $task->code,
+            $task->title,
+            $task->priority?->name ?? '-',
+            $assignedBy->name,
+        ), $task);
     }
 
     /**
@@ -150,5 +159,23 @@ class NotificationService
                 'task_code' => $task->code,
             ], $extraData),
         ]);
+    }
+
+    private function sendWhatsApp(User $user, string $type, string $message, Task $task): void
+    {
+        if (! NotificationPreference::isWhatsAppEnabled($user, $type)) {
+            return;
+        }
+
+        $url = route('projects.tasks.show', [
+            'workspace' => $task->project->workspace->slug,
+            'project' => $task->project->slug,
+            'task' => $task->id,
+        ]);
+
+        SendWhatsAppNotification::dispatch(
+            $user->phone,
+            "{$message}\n\n🔗 {$url}",
+        );
     }
 }

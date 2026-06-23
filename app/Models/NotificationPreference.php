@@ -13,11 +13,13 @@ class NotificationPreference extends Model
         'type',
         'in_app_enabled',
         'email_enabled',
+        'whatsapp_enabled',
     ];
 
     protected $casts = [
         'in_app_enabled' => 'boolean',
         'email_enabled' => 'boolean',
+        'whatsapp_enabled' => 'boolean',
     ];
 
     public function user(): BelongsTo
@@ -51,5 +53,18 @@ class NotificationPreference extends Model
             ->first();
 
         return $preference?->in_app_enabled ?? true;
+    }
+
+    public static function isWhatsAppEnabled(User $user, string $type): bool
+    {
+        if (! $user->phone) {
+            return false;
+        }
+
+        $preference = static::where('user_id', $user->id)
+            ->where('type', $type)
+            ->first();
+
+        return $preference?->whatsapp_enabled ?? false;
     }
 }

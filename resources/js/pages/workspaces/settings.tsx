@@ -31,6 +31,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { WhatsAppSettingsTab } from '@/components/whatsapp-settings-tab';
 import { WorkspaceMemberDialog } from '@/components/workspace-member-dialog';
 import {
     destroy as workspaceDestroy,
@@ -304,6 +305,7 @@ export default function WorkspaceSettings({
                             <TabsTrigger value="members">
                                 {t('workspace.members_tab')}
                             </TabsTrigger>
+                            <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
                             <TabsTrigger value="danger">
                                 {t('workspace.danger_zone')}
                             </TabsTrigger>
@@ -1250,6 +1252,12 @@ export default function WorkspaceSettings({
                                     </div>
                                 </CardContent>
                             </Card>
+                        </TabsContent>
+
+                        <TabsContent value="whatsapp">
+                            <WhatsAppSettingsTab
+                                workspaceSlug={workspace.slug}
+                            />
                         </TabsContent>
 
                         <TabsContent value="danger">

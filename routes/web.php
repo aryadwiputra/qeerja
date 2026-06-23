@@ -90,6 +90,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::put('/workspaces/{workspace:slug}/settings', [WorkspaceSettingController::class, 'update'])->name('workspaces.settings.update');
 
+        Route::get('/workspaces/{workspace:slug}/settings/whatsapp/status', [WhatsAppGatewayController::class, 'status'])->name('workspaces.settings.whatsapp.status');
+        Route::post('/workspaces/{workspace:slug}/settings/whatsapp/connect', [WhatsAppGatewayController::class, 'connect'])->name('workspaces.settings.whatsapp.connect');
+        Route::delete('/workspaces/{workspace:slug}/settings/whatsapp/disconnect', [WhatsAppGatewayController::class, 'disconnect'])->name('workspaces.settings.whatsapp.disconnect');
+
         Route::get('/workspaces/{workspace:slug}/cross-project/timeline', [CrossProjectController::class, 'timeline'])->name('workspaces.cross-project.timeline');
         Route::get('/workspaces/{workspace:slug}/cross-project/board', [CrossProjectController::class, 'board'])->name('workspaces.cross-project.board');
 
