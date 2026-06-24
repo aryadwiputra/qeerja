@@ -15,20 +15,6 @@ module.exports = {
             },
         },
         {
-            name: 'qeerja-reverb',
-            script: 'artisan',
-            cwd: '/var/www/taska.web.id',
-            interpreter: 'php',
-            args: ['reverb:start', '--host=0.0.0.0', '--port=6001', '--debug'],
-            instances: 1,
-            autorestart: true,
-            watch: false,
-            max_memory_restart: '256M',
-            env: {
-                NODE_ENV: 'production',
-            },
-        },
-        {
             name: 'qeerja-whatsapp',
             script: 'index.js',
             cwd: '/var/www/taska.web.id/whatsapp-gateway',

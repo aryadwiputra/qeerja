@@ -26,8 +26,9 @@ test('authenticated users can ping typing indicator', function () {
         ->post(route('projects.tasks.comments.typing', [$workspace, $project, $task]))
         ->assertOk();
 
-    Http::assertSent(function ($request) use ($project, $task, $user) {
+    Http::assertSent(function ($request) use ($project) {
         $body = $request->data();
+
         return str_contains($request->url(), '/broadcast')
             && ($body['channel'] ?? '') === "project.{$project->id}"
             && ($body['event'] ?? '') === 'comment.typing';
@@ -71,8 +72,9 @@ test('project members can ping typing indicator', function () {
         ->post(route('projects.tasks.comments.typing', [$workspace, $project, $task]))
         ->assertOk();
 
-    Http::assertSent(function ($request) use ($project, $task, $member) {
+    Http::assertSent(function ($request) use ($project) {
         $body = $request->data();
+
         return str_contains($request->url(), '/broadcast')
             && ($body['channel'] ?? '') === "project.{$project->id}"
             && ($body['event'] ?? '') === 'comment.typing';

@@ -29,6 +29,7 @@ test('notifyAssigned broadcasts via realtime gateway', function () {
 
     Http::assertSent(function ($request) use ($assignee, $task) {
         $body = $request->data();
+
         return str_contains($request->url(), '/broadcast')
             && ($body['channel'] ?? '') === "user.{$assignee->id}"
             && ($body['event'] ?? '') === 'notification'
@@ -63,8 +64,9 @@ test('notifyComment broadcasts via realtime gateway', function () {
     $service = app(NotificationService::class);
     $service->notifyComment($task, $commenter, $comment);
 
-    Http::assertSent(function ($request) use ($assignee, $task) {
+    Http::assertSent(function ($request) use ($assignee) {
         $body = $request->data();
+
         return str_contains($request->url(), '/broadcast')
             && ($body['channel'] ?? '') === "user.{$assignee->id}"
             && ($body['event'] ?? '') === 'notification';
@@ -95,6 +97,7 @@ test('notifyWatchers broadcasts via realtime gateway', function () {
 
     Http::assertSent(function ($request) use ($watcher, $task) {
         $body = $request->data();
+
         return str_contains($request->url(), '/broadcast')
             && ($body['channel'] ?? '') === "user.{$watcher->id}"
             && ($body['event'] ?? '') === 'notification'
@@ -129,6 +132,7 @@ test('mention broadcasts via realtime gateway', function () {
 
     Http::assertSent(function ($request) use ($mentioned, $task) {
         $body = $request->data();
+
         return str_contains($request->url(), '/broadcast')
             && ($body['channel'] ?? '') === "user.{$mentioned->id}"
             && ($body['event'] ?? '') === 'notification'
