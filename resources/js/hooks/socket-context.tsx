@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 
@@ -13,35 +13,45 @@ const SocketContext = createContext<SocketContextValue>({
 });
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
+    const [socket, setSocket] = useState<Socket | null>(null);
     const [connected, setConnected] = useState(false);
-    const socketRef = useRef<Socket | null>(null);
-    const initializedRef = useRef(false);
 
     useEffect(() => {
-        initializedRef.current = true;
+        let currentSocket: Socket | null = null;
 
         const baseUrl = import.meta.env.VITE_SOCKETIO_URL || '';
 
-        fetch(`${baseUrl}/api/socket/token`).then((r) => r.json()).then(({ token }) => {
-            const socket = io(baseUrl, {
+        fetch(`${baseUrl}/api/socket/token`).then((r) => {
+            if (!r.ok) {
+                throw new Error('auth failed');
+            }
+
+            return r.json();
+        }).then(({ token }) => {
+            if (!token) {
+                return;
+            }
+
+            const s = io(baseUrl, {
                 auth: { token },
                 transports: ['websocket'],
             });
 
-            socket.on('connect', () => setConnected(true));
-            socket.on('disconnect', () => setConnected(false));
-            socketRef.current = socket;
+            s.on('connect', () => setConnected(true));
+            s.on('disconnect', () => setConnected(false));
+            setSocket(s);
+            currentSocket = s;
         }).catch(() => {
             // Auth endpoint not available — no realtime
         });
 
         return () => {
-            socketRef.current?.close();
+            currentSocket?.close();
         };
     }, []);
 
     return (
-        <SocketContext.Provider value={{ socket: socketRef.current, connected }}>
+        <SocketContext.Provider value={{ socket, connected }}>
             {children}
         </SocketContext.Provider>
     );
