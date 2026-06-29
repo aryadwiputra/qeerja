@@ -1,6 +1,6 @@
-# Berkontribusi ke Qeerja
+# Berkontribusi ke Taska
 
-Terima kasih sudah mempertimbangkan untuk berkontribusi ke Qeerja.
+Terima kasih sudah mempertimbangkan untuk berkontribusi ke Taska.
 
 ## Konvensi Cabang (_Branch_)
 
@@ -60,4 +60,4 @@ test(sprint): add burndown chart calculation tests
 
 ## Pertanyaan?
 
-Buka [Diskusi](https://github.com/aryadwiputra/qeerja/discussions) di GitHub.
+Buka [Diskusi](https://github.com/aryadwiputra/taska/discussions) di GitHub.

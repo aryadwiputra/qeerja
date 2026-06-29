@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
     {
         User::factory()->asSuperAdmin()->create([
             'name' => 'Admin',
-            'email' => 'admin@qeerja.test',
+            'email' => 'admin@taska.test',
         ]);
 
         $user = User::factory()->create([
@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $teammate = User::factory()->create([
-            'name' => 'Qeerja Teammate',
+            'name' => 'Taska Teammate',
             'email' => 'teammate@example.com',
         ]);
 

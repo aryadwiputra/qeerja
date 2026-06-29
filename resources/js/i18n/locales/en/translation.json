@@ -1022,10 +1022,10 @@
         "preview_not_available": "Preview not available for this file type."
     },
     "welcome": {
-        "title": "Qeerja",
+        "title": "Taska",
         "eyebrow": "Project work, clearly connected",
         "hero_title": "Plan work without losing context",
-        "hero_description": "Qeerja brings boards, sprints, approvals, releases, and automation into one focused workspace.",
+        "hero_description": "Taska brings boards, sprints, approvals, releases, and automation into one focused workspace.",
         "primary_cta": "Get started",
         "secondary_cta": "Log in",
         "hero_image_alt": "Focused workspace with planning boards and team notes",
@@ -1061,7 +1061,7 @@
             }
         },
         "collaboration_title": "Built for the moments between updates",
-        "collaboration_description": "Qeerja keeps the conversation near the task, so context survives reviews, blocked work, and handoffs.",
+        "collaboration_description": "Taska keeps the conversation near the task, so context survives reviews, blocked work, and handoffs.",
         "collaboration_image_alt": "Team planning table with notes and product planning material",
         "collaboration": {
             "plan": {

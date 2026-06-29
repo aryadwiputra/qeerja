@@ -1,8 +1,8 @@
-# Qeerja Design System
+# Taska Design System
 
 ## Design Philosophy
 
-Qeerja is a modern project management platform focused on:
+Taska is a modern project management platform focused on:
 
 * Simplicity
 * Clarity

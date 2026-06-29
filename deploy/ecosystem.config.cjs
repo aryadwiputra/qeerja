@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            name: 'qeerja-queue',
+            name: 'taska-queue',
             script: 'artisan',
             cwd: '/var/www/taska.web.id',
             interpreter: 'php',
@@ -15,7 +15,7 @@ module.exports = {
             },
         },
         {
-            name: 'qeerja-whatsapp',
+            name: 'taska-whatsapp',
             script: 'index.js',
             cwd: '/var/www/taska.web.id/whatsapp-gateway',
             instances: 1,
@@ -31,7 +31,7 @@ module.exports = {
             },
         },
         {
-            name: 'qeerja-realtime',
+            name: 'taska-realtime',
             script: 'index.js',
             cwd: '/var/www/taska.web.id/realtime-gateway',
             instances: 1,

@@ -1,6 +1,6 @@
 <div align="center">
     <br/>
-    <h1>Qeerja</h1>
+    <h1>Taska</h1>
     <p><em>Project work, clearly connected.</em></p>
     <p>
         <a href="#">
@@ -26,7 +26,7 @@
 
 ---
 
-**Qeerja** is a modern open-source project management tool built on Laravel, Inertia, and React. It brings boards, sprints, approvals, automation, and releases into one focused workspace — with real-time collaboration via Node.js and Socket.IO.
+**Taska** is a modern open-source project management tool built on Laravel, Inertia, and React. It brings boards, sprints, approvals, automation, and releases into one focused workspace — with real-time collaboration via Node.js and Socket.IO.
 
 ## Features
 
@@ -72,8 +72,8 @@
 
 ```bash
 # Clone the repository
-git clone git@github.com:aryadwiputra/qeerja.git
-cd qeerja
+git clone git@github.com:aryadwiputra/taska.git
+cd taska
 
 # Install PHP dependencies
 composer install
@@ -102,7 +102,7 @@ Open `http://localhost:8000` in your browser.
 
 ## Realtime Gateway
 
-Qeerja uses a standalone Node.js Socket.IO service for real-time board updates, typing indicators, and notifications.
+Taska uses a standalone Node.js Socket.IO service for real-time board updates, typing indicators, and notifications.
 
 ### Setup
 
@@ -125,7 +125,7 @@ npm start
 
 ## WhatsApp Gateway
 
-Qeerja includes a standalone Node.js service for sending WhatsApp notifications using `whatsapp-web.js`.
+Taska includes a standalone Node.js service for sending WhatsApp notifications using `whatsapp-web.js`.
 
 ### Setup
 
@@ -152,7 +152,7 @@ npm start
 
 ## Realtime Gateway
 
-Qeerja uses a standalone Node.js Socket.IO service for real-time board updates, typing indicators, and notifications.
+Taska uses a standalone Node.js Socket.IO service for real-time board updates, typing indicators, and notifications.
 
 ### Setup
 
@@ -195,7 +195,7 @@ npm run types:check
 
 ## Testing
 
-Qeerja uses [Pest 4](https://pestphp.com/) for testing.
+Taska uses [Pest 4](https://pestphp.com/) for testing.
 
 ```bash
 # Run all tests
@@ -214,7 +214,7 @@ If you discover a security vulnerability, please email the maintainer directly. 
 
 ## License
 
-Qeerja is open-source software licensed under the [MIT license](LICENSE.md).
+Taska is open-source software licensed under the [MIT license](LICENSE.md).
 
 ---
 

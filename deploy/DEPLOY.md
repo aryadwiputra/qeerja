@@ -1,4 +1,4 @@
-# Deployment Guide — Qeerja di Ubuntu VPS
+# Deployment Guide — Taska di Ubuntu VPS
 
 ## Prasyarat Server
 
@@ -40,7 +40,7 @@ sudo apt install -y ca-certificates fonts-liberation libappindicator3-1 \
 
 ```bash
 # Clone repo
-git clone git@github.com:aryadwiputra/qeerja.git /var/www/taska.web.id
+git clone git@github.com:aryadwiputra/taska.git /var/www/taska.web.id
 cd /var/www/taska.web.id
 
 # Install PHP dependencies
@@ -86,10 +86,10 @@ sudo pm2 startup  # ikuti output untuk enable systemd
 ## Supervisor — Queue Worker (alternatif)
 
 ```bash
-sudo cp /var/www/taska.web.id/deploy/supervisor-queue.conf /etc/supervisor/conf.d/qeerja-queue.conf
+sudo cp /var/www/taska.web.id/deploy/supervisor-queue.conf /etc/supervisor/conf.d/taska-queue.conf
 sudo supervisorctl reread
 sudo supervisorctl update
-sudo supervisorctl start qeerja-queue:*
+sudo supervisorctl start taska-queue:*
 ```
 
 ## Nginx
@@ -109,7 +109,7 @@ php -r "echo bin2hex(random_bytes(16)) . PHP_EOL;"
 # Copy output → WHATSAPP_API_TOKEN di .env
 
 # Cd ke whatsapp-gateway, jalankan untuk scan QR:
-pm2 logs qeerja-whatsapp
+pm2 logs taska-whatsapp
 
 # Atau via terminal:
 cd /var/www/taska.web.id/whatsapp-gateway
@@ -149,8 +149,8 @@ php artisan optimize:clear
 
 ```bash
 pm2 status                    # semua service
-pm2 logs qeerja-whatsapp     # log WhatsApp gateway
-pm2 logs qeerja-realtime     # log Realtime gateway
+pm2 logs taska-whatsapp     # log WhatsApp gateway
+pm2 logs taska-realtime     # log Realtime gateway
 pm2 monit                     # realtime CPU/memory
 
 # Laravel logs

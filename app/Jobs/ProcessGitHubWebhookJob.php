@@ -199,7 +199,7 @@ class ProcessGitHubWebhookJob implements ShouldQueue
     protected function getBotUserId(): int
     {
         $user = User::firstOrCreate(
-            ['email' => 'github-bot@qeerja.test'],
+            ['email' => 'github-bot@taska.test'],
             [
                 'name' => 'GitHub Bot',
                 'password' => bcrypt(\Str::random(32)),

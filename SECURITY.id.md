@@ -2,7 +2,7 @@
 
 ## Melaporkan Kerentanan
 
-Jika Anda menemukan kerentanan keamanan di Qeerja, harap **jangan** buka _issue_ publik.
+Jika Anda menemukan kerentanan keamanan di Taska, harap **jangan** buka _issue_ publik.
 
 Sebagai gantinya, kirim email langsung ke pengelola. Anda akan menerima balasan dalam waktu 48 jam.
 
@@ -15,7 +15,7 @@ Harap sertakan:
 
 ## Cakupan
 
-Kebijakan keamanan ini mencakup aplikasi Qeerja dan paket resminya. Tidak mencakup dependensi pihak ketiga — harap laporkan itu ke pengelola masing-masing.
+Kebijakan keamanan ini mencakup aplikasi Taska dan paket resminya. Tidak mencakup dependensi pihak ketiga — harap laporkan itu ke pengelola masing-masing.
 
 ## Pengungkapan
 

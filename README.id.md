@@ -1,6 +1,6 @@
 <div align="center">
     <br/>
-    <h1>Qeerja</h1>
+    <h1>Taska</h1>
     <p><em>Kerja proyek jadi lebih rapi.</em></p>
     <p>
         <a href="#">
@@ -26,7 +26,7 @@
 
 ---
 
-**Qeerja** adalah alat manajemen proyek _open-source_ modern yang dibangun dengan Laravel, Inertia, dan React. Qeerja menyatukan papan (_board_), sprint, persetujuan, otomatisasi, dan rilis dalam satu ruang kerja yang terfokus — dengan kolaborasi _real-time_ via Node.js dan Socket.IO.
+**Taska** adalah alat manajemen proyek _open-source_ modern yang dibangun dengan Laravel, Inertia, dan React. Taska menyatukan papan (_board_), sprint, persetujuan, otomatisasi, dan rilis dalam satu ruang kerja yang terfokus — dengan kolaborasi _real-time_ via Node.js dan Socket.IO.
 
 ## Fitur
 
@@ -72,8 +72,8 @@
 
 ```bash
 # Clone repositori
-git clone git@github.com:aryadwiputra/qeerja.git
-cd qeerja
+git clone git@github.com:aryadwiputra/taska.git
+cd taska
 
 # Install dependensi PHP
 composer install
@@ -102,7 +102,7 @@ Buka `http://localhost:8000` di peramban Anda.
 
 ## Gateway Realtime
 
-Qeerja menggunakan layanan Node.js Socket.IO terpisah untuk pembaruan papan secara real-time, indikator pengetikan, dan notifikasi.
+Taska menggunakan layanan Node.js Socket.IO terpisah untuk pembaruan papan secara real-time, indikator pengetikan, dan notifikasi.
 
 ### Persiapan
 
@@ -125,7 +125,7 @@ npm start
 
 ## WhatsApp Gateway
 
-Qeerja menyertakan layanan Node.js terpisah untuk mengirim notifikasi WhatsApp menggunakan `whatsapp-web.js`.
+Taska menyertakan layanan Node.js terpisah untuk mengirim notifikasi WhatsApp menggunakan `whatsapp-web.js`.
 
 ### Persiapan
 
@@ -152,7 +152,7 @@ npm start
 
 ## Gateway Realtime
 
-Qeerja menggunakan layanan Node.js Socket.IO terpisah untuk pembaruan papan _real-time_, indikator pengetikan, dan notifikasi.
+Taska menggunakan layanan Node.js Socket.IO terpisah untuk pembaruan papan _real-time_, indikator pengetikan, dan notifikasi.
 
 ### Persiapan
 
@@ -195,7 +195,7 @@ npm run types:check
 
 ## Pengujian
 
-Qeerja menggunakan [Pest 4](https://pestphp.com/) untuk pengujian.
+Taska menggunakan [Pest 4](https://pestphp.com/) untuk pengujian.
 
 ```bash
 # Jalankan semua tes
@@ -214,7 +214,7 @@ Jika Anda menemukan kerentanan keamanan, harap kirim email langsung ke pengelola
 
 ## Lisensi
 
-Qeerja adalah perangkat lunak _open-source_ yang dilisensikan di bawah [lisensi MIT](LICENSE.md).
+Taska adalah perangkat lunak _open-source_ yang dilisensikan di bawah [lisensi MIT](LICENSE.md).
 
 ---
 

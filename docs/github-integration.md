@@ -1,6 +1,6 @@
 # GitHub Integration
 
-Menghubungkan project Qeerja ke GitHub untuk melacak commit dan pull request ke task.
+Menghubungkan project Taska ke GitHub untuk melacak commit dan pull request ke task.
 
 ## Arsitektur
 
@@ -57,7 +57,7 @@ Buka **GitHub Settings > Developer settings > OAuth Apps > New OAuth App**.
 
 | Field                      | Value                                                                      |
 | -------------------------- | -------------------------------------------------------------------------- |
-| Application name           | `Qeerja (local)` (atau bebas)                                              |
+| Application name           | `Taska (local)` (atau bebas)                                              |
 | Homepage URL               | `http://localhost:8000`                                                    |
 | Authorization callback URL | `http://localhost:8000/workspaces/{workspace}/projects/{project}/github/callback` |
 
@@ -104,7 +104,7 @@ Untuk setiap repo GitHub yang ingin diintegrasikan:
 
 | Field        | Value                                        |
 | ------------ | -------------------------------------------- |
-| Payload URL  | Copy dari halaman settings Qeerja (step sebelumnya) |
+| Payload URL  | Copy dari halaman settings Taska (step sebelumnya) |
 | Content type | `application/json`                           |
 | Secret       | `GITHUB_WEBHOOK_SECRET` yang sudah dibuat    |
 | Events       | Pilih **Just the push event**                |
@@ -156,4 +156,4 @@ Jika PR yang mengandung kode task di-merge, task akan otomatis ter-set sebagai c
 - Hanya commit ke **default branch** (biasanya `main`/`master`) yang diproses
 - Webhook endpoint **tidak membutuhkan auth session** — verifikasi via HMAC signature
 - CSRF exemption sudah di-set di `bootstrap/app.php` untuk webhook URL
-- Bot user (`github-bot@qeerja.test`) dibuat otomatis untuk menulis komentar/aktivitas
+- Bot user (`github-bot@taska.test`) dibuat otomatis untuk menulis komentar/aktivitas

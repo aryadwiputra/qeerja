@@ -1,4 +1,4 @@
-# Gap Analysis — Qeerja
+# Gap Analysis — Taska
 
 > Generated: June 12, 2026
 > Stack: PHP 8.3 / Laravel 13 / React 19 / Inertia v3 / Tailwind v4 / Pest 4

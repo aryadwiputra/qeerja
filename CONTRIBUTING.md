@@ -1,6 +1,6 @@
-# Contributing to Qeerja
+# Contributing to Taska
 
-Thank you for considering contributing to Qeerja.
+Thank you for considering contributing to Taska.
 
 ## Branch Convention
 
@@ -60,4 +60,4 @@ test(sprint): add burndown chart calculation tests
 
 ## Questions?
 
-Open a [Discussion](https://github.com/aryadwiputra/qeerja/discussions) on GitHub.
+Open a [Discussion](https://github.com/aryadwiputra/taska/discussions) on GitHub.

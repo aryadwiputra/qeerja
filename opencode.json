@@ -7,7 +7,7 @@
             "command": [
                 "wsl.exe",
                 "/usr/bin/php8.3",
-                "/home/asus/projects/private/qeerja/artisan",
+                "artisan",
                 "boost:mcp"
             ]
         }

@@ -429,7 +429,7 @@ Start with generic outgoing webhooks before platform-specific integrations.
 ### Security & Reliability
 
 - Encrypt webhook secret at rest if possible.
-- Sign every request with `X-Qeerja-Signature` using HMAC SHA-256.
+- Sign every request with `X-Taska-Signature` using HMAC SHA-256.
 - Use queued jobs with retry/backoff.
 - Set explicit HTTP timeout and connect timeout.
 - Redact secrets from logs and UI after creation.

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Melanjutkan revamp UI Qeerja berdasarkan `design.md` sampai seluruh aplikasi konsisten dengan arah Notion-like:
+Melanjutkan revamp UI Taska berdasarkan `design.md` sampai seluruh aplikasi konsisten dengan arah Notion-like:
 
 - Warm canvas `#f6f5f4`
 - White/dark surface cards

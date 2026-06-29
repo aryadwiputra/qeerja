@@ -1,5 +1,5 @@
 {
-    "name": "qeerja-whatsapp-gateway",
+    "name": "taska-whatsapp-gateway",
     "type": "module",
     "scripts": {
         "start": "node index.js",

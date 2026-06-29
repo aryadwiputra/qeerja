@@ -5,7 +5,7 @@ const { Client, LocalAuth } = pkg;
 export function createClient() {
     return new Client({
         authStrategy: new LocalAuth({
-            clientId: 'qeerja',
+            clientId: 'taska',
             dataPath: './sessions',
         }),
         puppeteer: {

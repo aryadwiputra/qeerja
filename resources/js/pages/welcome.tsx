@@ -190,7 +190,7 @@ export default function Welcome() {
                                 <div className="absolute -top-8 -left-8 hidden h-36 w-36 rounded-full bg-primary/10 blur-3xl md:block" />
                                 <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-elevated">
                                     <img
-                                        src="https://picsum.photos/seed/qeerja-planning-room/1100/860"
+                                        src="https://picsum.photos/seed/taska-planning-room/1100/860"
                                         alt={t('welcome.hero_image_alt')}
                                         className="aspect-[1.18/1] w-full object-cover"
                                     />
@@ -291,7 +291,7 @@ export default function Welcome() {
                         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
                             <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-elevated">
                                 <img
-                                    src="https://picsum.photos/seed/qeerja-team-workflow/980/760"
+                                    src="https://picsum.photos/seed/taska-team-workflow/980/760"
                                     alt={t('welcome.collaboration_image_alt')}
                                     className="aspect-[1.28/1] w-full object-cover"
                                 />

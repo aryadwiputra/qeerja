@@ -1,4 +1,4 @@
-# Database Schema Qeerja
+# Database Schema Taska
 
 Platform project & task management mirip Jira.
 
@@ -327,8 +327,8 @@ Index:
 - due_date
 
 Contoh code:
-- QEERJA-1
-- QEERJA-2
+- TASKA-1
+- TASKA-2
 
 ---
 

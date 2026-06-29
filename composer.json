@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "aryadwiputra/qeerja",
+    "name": "aryadwiputra/taska",
     "type": "project",
-    "description": "Qeerja — Project work, clearly connected.",
+    "description": "Taska — Project work, clearly connected.",
     "keywords": [
         "laravel",
         "project-management",

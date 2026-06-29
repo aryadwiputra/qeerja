@@ -989,10 +989,10 @@
         "not_set": "Belum diatur"
     },
     "welcome": {
-        "title": "Qeerja",
+        "title": "Taska",
         "eyebrow": "Kerja proyek jadi lebih rapi",
         "hero_title": "Atur pekerjaan tim tanpa kehilangan konteks",
-        "hero_description": "Qeerja membantu tim mengelola board, sprint, approval, rilis, dan otomasi di satu tempat.",
+        "hero_description": "Taska membantu tim mengelola board, sprint, approval, rilis, dan otomasi di satu tempat.",
         "primary_cta": "Mulai",
         "secondary_cta": "Masuk",
         "hero_image_alt": "Ruang kerja tim dengan board rencana dan catatan proyek",
@@ -1028,7 +1028,7 @@
             }
         },
         "collaboration_title": "Biar diskusi proyek tidak tercecer",
-        "collaboration_description": "Qeerja menjaga percakapan tetap dekat dengan tugas, jadi konteks tidak hilang saat review, ada blocker, atau pekerjaan berpindah tangan.",
+        "collaboration_description": "Taska menjaga percakapan tetap dekat dengan tugas, jadi konteks tidak hilang saat review, ada blocker, atau pekerjaan berpindah tangan.",
         "collaboration_image_alt": "Meja kerja tim dengan catatan dan bahan perencanaan produk",
         "collaboration": {
             "plan": {
@@ -1045,7 +1045,7 @@
             }
         },
         "developer_title": "Nyaman juga untuk developer",
-        "developer_description": "Qeerja dibangun di atas stack yang mudah dipahami, dikembangkan, dan dideploy oleh tim teknis.",
+        "developer_description": "Taska dibangun di atas stack yang mudah dipahami, dikembangkan, dan dideploy oleh tim teknis.",
         "developer": {
             "laravel": {
                 "title": "Backend Laravel",

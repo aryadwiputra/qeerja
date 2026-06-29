@@ -191,7 +191,7 @@ class AutomationEngine
         }
 
         $botUser = User::firstOrCreate(
-            ['email' => 'automation-bot@qeerja.test'],
+            ['email' => 'automation-bot@taska.test'],
             ['name' => 'Automation Bot', 'password' => bcrypt(\Str::random(32))]
         );
 
