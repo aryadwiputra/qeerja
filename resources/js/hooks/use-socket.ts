@@ -16,8 +16,8 @@ export function useSocketEvent<T = Record<string, unknown>>(
 
     useEffect(() => {
         if (!socket || !channel) {
-return;
-}
+            return;
+        }
 
         const handler = (data: T) => {
             callbackRef.current(data);
@@ -33,24 +33,25 @@ return;
 
 export function useSocketPresence(channel: string | null) {
     const { socket } = useSocket();
-    const onlineUsersRef = useRef<Set<number>>(new Set());
-    const [, forceUpdate] = useState(0);
+    const [onlineUsers, setOnlineUsers] = useState<Set<number>>(new Set());
 
     useEffect(() => {
         if (!socket || !channel) {
-return;
-}
+            return;
+        }
 
         socket.emit('join', channel);
 
         socket.on('user:joined', ({ id }: { id: number }) => {
-            onlineUsersRef.current.add(id);
-            forceUpdate((n) => n + 1);
+            setOnlineUsers((prev) => new Set(prev).add(id));
         });
 
         socket.on('user:left', ({ id }: { id: number }) => {
-            onlineUsersRef.current.delete(id);
-            forceUpdate((n) => n + 1);
+            setOnlineUsers((prev) => {
+                const next = new Set(prev);
+                next.delete(id);
+                return next;
+            });
         });
 
         socket.emit('presence:subscribe', channel);
@@ -62,5 +63,5 @@ return;
         };
     }, [socket, channel]);
 
-    return { onlineUsers: [...onlineUsersRef.current] };
+    return { onlineUsers: [...onlineUsers] };
 }

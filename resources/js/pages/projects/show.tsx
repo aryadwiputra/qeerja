@@ -712,7 +712,7 @@ export default function ProjectShow({
                 },
             },
         ],
-        [editingCell, boardColumns, priorities, members, updateTaskField],
+        [editingCell, boardColumns, priorities, members, updateTaskField, t],
     );
 
     // eslint-disable-next-line react-hooks/incompatible-library
