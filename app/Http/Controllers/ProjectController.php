@@ -10,6 +10,7 @@ use App\Models\Project;
 use App\Models\TaskActivity;
 use App\Models\TaskAttachment;
 use App\Models\Workspace;
+use App\Services\RealtimeGatewayService;
 use App\Services\SettingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
@@ -412,6 +413,16 @@ class ProjectController extends Controller
     public function update(UpdateProjectRequest $request, Workspace $workspace, Project $project): RedirectResponse
     {
         $project->update($request->validated());
+
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'project.updated', [
+            'id' => $project->id,
+            'name' => $project->name,
+            'key' => $project->key,
+            'slug' => $project->slug,
+            'description' => $project->description,
+            'color' => $project->color,
+            'visibility' => $project->visibility,
+        ]);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Project updated.']);
 

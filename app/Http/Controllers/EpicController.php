@@ -6,7 +6,9 @@ use App\Http\Requests\StoreEpicRequest;
 use App\Http\Requests\UpdateEpicRequest;
 use App\Models\Epic;
 use App\Models\Project;
+use App\Models\Task;
 use App\Models\Workspace;
+use App\Services\RealtimeGatewayService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -92,6 +94,18 @@ class EpicController extends Controller
 
         $epic->tasks()->syncWithoutDetaching([$validated['task_id']]);
 
+        $task = Task::find($validated['task_id']);
+        if ($task) {
+            app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'task.field.updated', [
+                'taskId' => $task->id,
+                'changes' => [
+                    'epics' => $epic->tasks()->where('task_id', $task->id)->exists()
+                        ? $task->epics()->get(['epics.id', 'name', 'color', 'status'])->toArray()
+                        : [],
+                ],
+            ]);
+        }
+
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Task added to epic.']);
 
         return back();
@@ -108,6 +122,16 @@ class EpicController extends Controller
         ]);
 
         $epic->tasks()->detach($validated['task_id']);
+
+        $task = Task::find($validated['task_id']);
+        if ($task) {
+            app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'task.field.updated', [
+                'taskId' => $task->id,
+                'changes' => [
+                    'epics' => $task->epics()->get(['epics.id', 'name', 'color', 'status'])->toArray(),
+                ],
+            ]);
+        }
 
         Inertia::flash('toast', ['type' => 'info', 'message' => 'Task removed from epic.']);
 
@@ -127,6 +151,10 @@ class EpicController extends Controller
             'status' => $validated['status'] ?? 'active',
         ]);
 
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'epic.created', [
+            'name' => $validated['name'],
+        ]);
+
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Epic created.']);
 
         return back();
@@ -137,6 +165,13 @@ class EpicController extends Controller
         $this->ensureEpicBelongsToProject($epic, $project);
 
         $epic->update($request->validated());
+
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'epic.updated', [
+            'id' => $epic->id,
+            'name' => $epic->name,
+            'color' => $epic->color,
+            'status' => $epic->status,
+        ]);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Epic updated.']);
 
@@ -151,6 +186,10 @@ class EpicController extends Controller
 
         $epic->tasks()->detach();
         $epic->delete();
+
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'epic.deleted', [
+            'id' => $epic->id,
+        ]);
 
         Inertia::flash('toast', ['type' => 'info', 'message' => 'Epic deleted.']);
 

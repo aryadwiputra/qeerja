@@ -6,7 +6,9 @@ use App\Http\Requests\StoreSprintRequest;
 use App\Http\Requests\UpdateSprintRequest;
 use App\Models\Project;
 use App\Models\Sprint;
+use App\Models\Task;
 use App\Models\Workspace;
+use App\Services\RealtimeGatewayService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -99,6 +101,16 @@ class SprintController extends Controller
 
         $sprint->tasks()->syncWithoutDetaching([$validated['task_id']]);
 
+        $task = Task::find($validated['task_id']);
+        if ($task) {
+            app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'task.field.updated', [
+                'taskId' => $task->id,
+                'changes' => [
+                    'sprints' => $task->sprints()->get(['sprints.id', 'name', 'status', 'start_date', 'end_date'])->toArray(),
+                ],
+            ]);
+        }
+
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Task added to sprint.']);
 
         return back();
@@ -115,6 +127,16 @@ class SprintController extends Controller
         ]);
 
         $sprint->tasks()->detach($validated['task_id']);
+
+        $task = Task::find($validated['task_id']);
+        if ($task) {
+            app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'task.field.updated', [
+                'taskId' => $task->id,
+                'changes' => [
+                    'sprints' => $task->sprints()->get(['sprints.id', 'name', 'status', 'start_date', 'end_date'])->toArray(),
+                ],
+            ]);
+        }
 
         Inertia::flash('toast', ['type' => 'info', 'message' => 'Task removed from sprint.']);
 
@@ -135,6 +157,10 @@ class SprintController extends Controller
             'completed_at' => ($validated['status'] ?? null) === 'completed' ? now() : null,
         ]);
 
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'sprint.created', [
+            'name' => $validated['name'],
+        ]);
+
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Sprint created.']);
 
         return back();
@@ -150,6 +176,12 @@ class SprintController extends Controller
             : null;
 
         $sprint->update($validated);
+
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'sprint.updated', [
+            'id' => $sprint->id,
+            'name' => $sprint->name,
+            'status' => $sprint->status,
+        ]);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Sprint updated.']);
 
@@ -171,6 +203,12 @@ class SprintController extends Controller
             'start_date' => $sprint->start_date ?? now()->toDateString(),
         ]);
 
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'sprint.updated', [
+            'id' => $sprint->id,
+            'name' => $sprint->name,
+            'status' => $sprint->status,
+        ]);
+
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Sprint started.']);
 
         return back();
@@ -187,6 +225,12 @@ class SprintController extends Controller
             'status' => 'completed',
             'completed_at' => $sprint->completed_at ?? now(),
             'end_date' => $sprint->end_date ?? now()->toDateString(),
+        ]);
+
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'sprint.updated', [
+            'id' => $sprint->id,
+            'name' => $sprint->name,
+            'status' => $sprint->status,
         ]);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Sprint completed.']);
@@ -296,6 +340,10 @@ class SprintController extends Controller
         $this->ensureSprintBelongsToProject($sprint, $project);
         $sprint->tasks()->detach();
         $sprint->delete();
+
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'sprint.deleted', [
+            'id' => $sprint->id,
+        ]);
 
         Inertia::flash('toast', ['type' => 'info', 'message' => 'Sprint deleted.']);
 
