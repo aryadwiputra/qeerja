@@ -2,7 +2,6 @@
 
 import type { RequestPayload } from '@inertiajs/core';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useSocketEvent } from '@/hooks/use-socket';
 import { Eye, EyeOff, Paperclip, Plus, Trash2, Upload, X } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +29,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useSocketEvent } from '@/hooks/use-socket';
 import { cn } from '@/lib/utils';
 import { show as projectShow } from '@/routes/projects';
 import {

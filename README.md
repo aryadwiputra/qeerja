@@ -150,6 +150,28 @@ npm start
 
 > **Note:** The gateway runs on port `3001` by default. Configure via `WHATSAPP_GATEWAY_URL` in your `.env` file.
 
+## Realtime Gateway
+
+Qeerja uses a standalone Node.js Socket.IO service for real-time board updates, typing indicators, and notifications.
+
+### Setup
+
+```bash
+# Navigate to the gateway directory (already installed above)
+cd realtime-gateway
+
+# Copy environment
+cp .env.example .env
+
+# Edit .env — set LARAVEL_URL to match your local server
+# nano .env
+
+# Start the gateway
+npm start
+```
+
+> **Note:** The gateway runs on port `3002` by default. Configure via `GATEWAY_PORT` and `LARAVEL_URL` in your `.env` file. It starts automatically when running `composer run dev`.
+
 ## Development
 
 ```bash

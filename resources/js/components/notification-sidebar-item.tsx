@@ -3,8 +3,8 @@ import { Bell } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { useSocketEvent } from '@/hooks/use-socket';
 import { SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { useSocketEvent } from '@/hooks/use-socket';
 import { index as notificationsIndex } from '@/routes/my-notifications';
 import type { Auth } from '@/types/auth';
 

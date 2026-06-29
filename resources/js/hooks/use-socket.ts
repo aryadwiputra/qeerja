@@ -15,7 +15,9 @@ export function useSocketEvent<T = Record<string, unknown>>(
     }, [callback]);
 
     useEffect(() => {
-        if (!socket || !channel) return;
+        if (!socket || !channel) {
+return;
+}
 
         const handler = (data: T) => {
             callbackRef.current(data);
@@ -35,7 +37,9 @@ export function useSocketPresence(channel: string | null) {
     const [, forceUpdate] = useState(0);
 
     useEffect(() => {
-        if (!socket || !channel) return;
+        if (!socket || !channel) {
+return;
+}
 
         socket.emit('join', channel);
 

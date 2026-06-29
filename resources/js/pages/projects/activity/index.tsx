@@ -1,5 +1,4 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { useSocketEvent } from '@/hooks/use-socket';
 import { Activity } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useSocketEvent } from '@/hooks/use-socket';
 import { show as projectShow } from '@/routes/projects';
 import { index as activityIndex } from '@/routes/projects/activity';
 import { show as taskShow } from '@/routes/projects/tasks';

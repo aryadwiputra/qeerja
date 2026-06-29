@@ -150,6 +150,28 @@ npm start
 
 > **Catatan:** Gateway berjalan di port `3001` secara bawaan. Konfigurasikan via `WHATSAPP_GATEWAY_URL` di file `.env`.
 
+## Gateway Realtime
+
+Qeerja menggunakan layanan Node.js Socket.IO terpisah untuk pembaruan papan _real-time_, indikator pengetikan, dan notifikasi.
+
+### Persiapan
+
+```bash
+# Masuk ke direktori gateway (sudah diinstall di atas)
+cd realtime-gateway
+
+# Salin lingkungan
+cp .env.example .env
+
+# Edit .env — setel LARAVEL_URL sesuai server lokal Anda
+# nano .env
+
+# Jalankan gateway
+npm start
+```
+
+> **Catatan:** Gateway berjalan di port `3002` secara bawaan. Konfigurasikan via `GATEWAY_PORT` dan `LARAVEL_URL` di file `.env`. Gateway berjalan otomatis saat menjalankan `composer run dev`.
+
 ## Pengembangan
 
 ```bash

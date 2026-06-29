@@ -1,5 +1,4 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { useSocketEvent } from '@/hooks/use-socket';
 import {
     AtSign,
     Bell,
@@ -17,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/empty-state';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
+import { useSocketEvent } from '@/hooks/use-socket';
 import { cn } from '@/lib/utils';
 import {
     readAll as notificationReadAll,

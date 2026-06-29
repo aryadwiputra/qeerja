@@ -1,5 +1,4 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { useSocketEvent } from '@/hooks/use-socket';
 import {
     flexRender,
     getCoreRowModel,
@@ -41,6 +40,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { useSocketEvent } from '@/hooks/use-socket';
 import {
     board as projectBoard,
     index as projectsIndex,

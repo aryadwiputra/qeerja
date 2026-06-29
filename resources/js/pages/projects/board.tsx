@@ -16,7 +16,6 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { Head, router, usePage } from '@inertiajs/react';
-import { useSocketEvent, useSocketPresence } from '@/hooks/use-socket';
 import { GripVertical, Settings2, Users } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -41,6 +40,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { useSocketEvent, useSocketPresence } from '@/hooks/use-socket';
 import {
     buildColumnReorderPayload,
     buildTaskReorderPayload,

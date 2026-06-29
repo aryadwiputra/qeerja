@@ -1,6 +1,5 @@
 import type { RequestPayload } from '@inertiajs/core';
 import { router, usePage } from '@inertiajs/react';
-import { useSocketEvent } from '@/hooks/use-socket';
 import {
     Activity,
     ChevronRight,
@@ -39,6 +38,7 @@ import {
     SheetDescription,
     SheetTitle,
 } from '@/components/ui/sheet';
+import { useSocketEvent } from '@/hooks/use-socket';
 import { cn } from '@/lib/utils';
 import {
     destroy as destroyTask,
