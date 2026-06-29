@@ -36,12 +36,11 @@ test('authenticated users can update notification preferences', function () {
         ->put(route('notifications.update'), [
             'preferences' => [
                 'task.assigned' => [
-                    'in_app_enabled' => true,
-                    'email_enabled' => false,
-                ],
-                'task.commented' => [
-                    'in_app_enabled' => false,
-                    'email_enabled' => true,
+                    'channels' => [
+                        'in_app' => true,
+                        'email' => false,
+                        'whatsapp' => false,
+                    ],
                 ],
             ],
         ])
@@ -76,8 +75,11 @@ test('notification preferences are updated when they already exist', function ()
         ->put(route('notifications.update'), [
             'preferences' => [
                 'task.assigned' => [
-                    'in_app_enabled' => false,
-                    'email_enabled' => false,
+                    'channels' => [
+                        'in_app' => false,
+                        'email' => false,
+                        'whatsapp' => false,
+                    ],
                 ],
             ],
         ])

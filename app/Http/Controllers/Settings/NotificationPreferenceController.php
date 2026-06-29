@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\NotificationChannel;
 use App\Models\NotificationPreference;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,16 +26,33 @@ class NotificationPreferenceController extends Controller
             'workspace.invitation' => 'Workspace invitation',
         ];
 
-        $channels = ['in_app', 'email', 'whatsapp'];
+        $userWorkspaceIds = $request->user()->workspaces()->pluck('workspaces.id');
+
+        $externalChannels = NotificationChannel::enabled()
+            ->whereIn('workspace_id', $userWorkspaceIds)
+            ->get()
+            ->map(fn ($c) => [
+                'key' => $c->driver,
+                'name' => $c->name,
+                'label' => ucfirst($c->driver),
+            ]);
+
+        $builtInChannels = [
+            ['key' => 'in_app', 'name' => 'In-App', 'label' => 'In-App'],
+            ['key' => 'email', 'name' => 'Email', 'label' => 'Email'],
+            ['key' => 'whatsapp', 'name' => 'WhatsApp', 'label' => 'WhatsApp'],
+        ];
+
+        $allChannels = collect([...$builtInChannels, ...$externalChannels])->unique('key')->values();
 
         $result = [];
         foreach ($notificationTypes as $type => $label) {
-            $row = ['label' => $label];
+            $row = ['label' => $label, 'channels' => []];
 
-            foreach ($channels as $channel) {
-                $pref = $preferences->get($type)?->firstWhere('channel', $channel);
+            foreach ($allChannels as $channel) {
+                $pref = $preferences->get($type)?->firstWhere('channel', $channel['key']);
                 $defaults = ['in_app' => true, 'email' => true, 'whatsapp' => false];
-                $row[$channel.'_enabled'] = $pref?->enabled ?? $defaults[$channel];
+                $row['channels'][$channel['key']] = $pref?->enabled ?? ($defaults[$channel['key']] ?? true);
             }
 
             $result[$type] = $row;
@@ -42,6 +60,7 @@ class NotificationPreferenceController extends Controller
 
         return Inertia::render('settings/notifications', [
             'preferences' => $result,
+            'channels' => $allChannels,
         ]);
     }
 
@@ -49,18 +68,17 @@ class NotificationPreferenceController extends Controller
     {
         $validated = $request->validate([
             'preferences' => 'required|array',
-            'preferences.*.in_app_enabled' => 'required|boolean',
-            'preferences.*.email_enabled' => 'required|boolean',
-            'preferences.*.whatsapp_enabled' => 'nullable|boolean',
+            'preferences.*.channels' => 'required|array',
+            'preferences.*.channels.*' => 'boolean',
         ]);
 
         $user = $request->user();
 
         foreach ($validated['preferences'] as $type => $settings) {
-            foreach (['in_app', 'email', 'whatsapp'] as $channel) {
+            foreach ($settings['channels'] as $channel => $enabled) {
                 NotificationPreference::updateOrCreate(
                     ['user_id' => $user->id, 'type' => $type, 'channel' => $channel],
-                    ['enabled' => $settings[$channel.'_enabled'] ?? false],
+                    ['enabled' => $enabled],
                 );
             }
         }
