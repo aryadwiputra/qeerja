@@ -42,7 +42,13 @@ class TaskPolicy
         $isReporterOrAssignee = (int) $task->reporter_id === (int) $user->id
             || $task->assignees()->where('users.id', $user->id)->exists();
 
-        return ($isReporterOrAssignee || Rbac::userCanInWorkspace($user, $task->project->workspace, 'task.edit-any'))
+        $canEditByProjectRole = in_array(
+            Rbac::projectRole($user, $task->project),
+            ['lead', 'manager', 'developer'],
+            true,
+        );
+
+        return ($isReporterOrAssignee || $canEditByProjectRole || Rbac::userCanInWorkspace($user, $task->project->workspace, 'task.edit-any'))
             && Rbac::projectRoleAllows($user, $task->project, ['lead', 'manager', 'developer', 'qa', 'member']);
     }
 
@@ -51,7 +57,13 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): bool
     {
-        return Rbac::userCanInWorkspace($user, $task->project->workspace, 'task.delete-any')
+        $canDeleteByProjectRole = in_array(
+            Rbac::projectRole($user, $task->project),
+            ['lead', 'manager'],
+            true,
+        );
+
+        return ($canDeleteByProjectRole || Rbac::userCanInWorkspace($user, $task->project->workspace, 'task.delete-any'))
             && Rbac::projectRoleAllows($user, $task->project, ['lead', 'manager']);
     }
 
