@@ -2,7 +2,6 @@ import {
     DndContext,
     DragOverlay,
     PointerSensor,
-    closestCorners,
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
@@ -42,6 +41,7 @@ import {
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { useSocketEvent, useSocketPresence } from '@/hooks/use-socket';
 import {
+    boardCollisionDetection,
     buildColumnReorderPayload,
     buildTaskReorderPayload,
     calcSameColumnPosition,
@@ -408,30 +408,30 @@ function BoardClient({
     };
 
     interface TaskMovedEvent {
-        task_id: number;
-        from_column_id: number;
-        to_column_id: number;
+        taskId: number;
+        task: BoardTaskItem;
+        fromColumnId: number;
+        toColumnId: number;
         position: number;
         status: string;
-        task: BoardTaskItem;
     }
 
     const handleTaskMoved = useCallback(
         (e: TaskMovedEvent) => {
-            if (activeTask?.id === e.task_id) {
+            if (activeTask?.id === e.taskId) {
                 return;
             }
 
             setColumns((prev) => {
                 const srcIdx = prev.findIndex((c) =>
-                    c.tasks.some((t) => t.id === e.task_id),
+                    c.tasks.some((t) => t.id === e.taskId),
                 );
 
                 if (srcIdx < 0) {
                     return prev;
                 }
 
-                const tgtIdx = prev.findIndex((c) => c.id === e.to_column_id);
+                const tgtIdx = prev.findIndex((c) => c.id === e.toColumnId);
 
                 if (tgtIdx < 0) {
                     return prev;
@@ -441,7 +441,7 @@ function BoardClient({
                     if (idx === srcIdx) {
                         return {
                             ...col,
-                            tasks: col.tasks.filter((t) => t.id !== e.task_id),
+                            tasks: col.tasks.filter((t) => t.id !== e.taskId),
                         };
                     }
 
@@ -483,7 +483,10 @@ function BoardClient({
                     return col;
                 }
 
-                return { ...col, tasks: [...col.tasks, e.task] };
+                const tasks = [...col.tasks, e.task];
+                tasks.sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+
+                return { ...col, tasks };
             }),
         );
     }, []);
@@ -651,10 +654,16 @@ function BoardClient({
                     },
                     body: JSON.stringify({ columns: updatedColumns }),
                 },
-            ).catch(() => {
-                setColumns(columnsSnapshotRef.current);
-                showError('Failed to reorder columns. Please try again.');
-            });
+            )
+                .then((res) => {
+                    if (!res.ok) {
+                        throw new Error('Request failed');
+                    }
+                })
+                .catch(() => {
+                    setColumns(columnsSnapshotRef.current);
+                    showError('Failed to reorder columns. Please try again.');
+                });
 
             return;
         }
@@ -969,7 +978,7 @@ function BoardClient({
                 <DndContext
                     id="board-dnd"
                     sensors={sensors}
-                    collisionDetection={closestCorners}
+                    collisionDetection={boardCollisionDetection}
                     onDragStart={handleDragStart}
                     onDragOver={handleDragOver}
                     onDragEnd={handleDragEnd}

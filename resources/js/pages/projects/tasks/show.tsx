@@ -708,12 +708,25 @@ export default function TaskShow({
     useSocketEvent(
         `project.${projectId}`,
         'task.field.updated',
-        (e: { task_id: number; changes: Record<string, unknown> }) => {
-            if (e.task_id !== task.id) {
+        (e: { taskId: number }) => {
+            if (e.taskId !== task.id) {
                 return;
             }
 
-            setTask((prev) => ({ ...prev, ...e.changes }));
+            refreshTaskDetails();
+        },
+        [projectId, task.id],
+    );
+
+    useSocketEvent(
+        `project.${projectId}`,
+        'task.moved',
+        (e: { taskId: number }) => {
+            if (e.taskId !== task.id) {
+                return;
+            }
+
+            refreshTaskDetails();
         },
         [projectId, task.id],
     );
@@ -723,14 +736,14 @@ export default function TaskShow({
         'activity.logged',
         (e: {
             task_id: number;
-            id: number;
+            activity_id: number;
             action: string;
             field_name: string | null;
             old_value: string | null;
             new_value: string | null;
             user_id: number;
             user_name: string;
-            created_at: string;
+            timestamp: string;
         }) => {
             if (e.task_id !== task.id) {
                 return;
@@ -738,12 +751,12 @@ export default function TaskShow({
 
             setActivities((prev) => [
                 {
-                    id: e.id,
+                    id: e.activity_id,
                     action: e.action,
                     field_name: e.field_name,
                     old_value: e.old_value,
                     new_value: e.new_value,
-                    created_at: e.created_at,
+                    created_at: e.timestamp,
                     user: e.user_id
                         ? { id: e.user_id, name: e.user_name, avatar: null }
                         : null,
@@ -800,6 +813,38 @@ export default function TaskShow({
             );
         },
         [projectId, task.id, user?.id],
+    );
+
+    useSocketEvent(
+        `project.${projectId}`,
+        'comment.updated',
+        (e: { taskId: number; commentId: number; body: string }) => {
+            if (e.taskId !== task.id) {
+                return;
+            }
+
+            setComments((prev) =>
+                prev.map((c) =>
+                    c.id === e.commentId ? { ...c, body: e.body } : c,
+                ),
+            );
+        },
+        [projectId, task.id],
+    );
+
+    useSocketEvent(
+        `project.${projectId}`,
+        'comment.deleted',
+        (e: { taskId: number; commentId: number }) => {
+            if (e.taskId !== task.id) {
+                return;
+            }
+
+            setComments((prev) =>
+                prev.filter((c) => c.id !== e.commentId),
+            );
+        },
+        [projectId, task.id],
     );
 
     return (
