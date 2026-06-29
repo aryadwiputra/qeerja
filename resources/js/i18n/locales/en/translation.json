@@ -629,7 +629,8 @@
         "type_due_date": "Due date",
         "group_yesterday": "Yesterday",
         "group_this_week": "This Week",
-        "group_older": "Older"
+        "group_older": "Older",
+        "view_all": "View all notifications"
     },
     "onboarding": {
         "get_started": "Get Started",

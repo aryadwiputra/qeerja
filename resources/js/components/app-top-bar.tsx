@@ -1,4 +1,5 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { NotificationDropdown } from '@/components/notification-dropdown';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { WorkspaceSwitcher } from '@/components/workspace-switcher';
@@ -16,7 +17,8 @@ export function AppTopBar({
             <div className="ml-auto hidden min-w-0 items-center md:flex">
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
             </div>
-            <ThemeToggle className="ml-2 shrink-0" />
+            <NotificationDropdown />
+            <ThemeToggle className="shrink-0" />
         </header>
     );
 }

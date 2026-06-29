@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -57,5 +58,28 @@ class NotificationController extends Controller
         $notification->delete();
 
         return back();
+    }
+
+    public function recent(Request $request): JsonResponse
+    {
+        $notifications = $request->user()
+            ->notifications()
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn (Notification $n) => [
+                'id' => $n->id,
+                'type' => $n->type,
+                'title' => $n->title,
+                'body' => $n->body,
+                'data' => $n->data,
+                'read_at' => $n->read_at,
+                'created_at' => $n->created_at->toISOString(),
+            ]);
+
+        return response()->json([
+            'notifications' => $notifications,
+            'unread_count' => $request->user()->notifications()->unread()->count(),
+        ]);
     }
 }

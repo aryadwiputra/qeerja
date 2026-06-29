@@ -13,7 +13,6 @@ import { ConnectionStatus } from '@/components/connection-status';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { NotificationSidebarItem } from '@/components/notification-sidebar-item';
 import {
     Sidebar,
     SidebarContent,
@@ -86,10 +85,6 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
-
-                <SidebarMenu className="px-2 py-0">
-                    <NotificationSidebarItem />
-                </SidebarMenu>
 
                 {currentWorkspace && (
                     <SidebarMenu className="px-2 py-0">
