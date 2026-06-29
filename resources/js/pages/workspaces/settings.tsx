@@ -325,9 +325,9 @@ export default function WorkspaceSettings({
                     backLabel="Workspaces"
                 />
 
-                <div className="mx-auto w-full max-w-2xl">
+                <div className="mx-auto w-full max-w-4xl">
                     <Tabs defaultValue="general">
-                        <TabsList className="mb-6">
+                        <TabsList className="mb-6 flex h-auto max-w-full flex-wrap justify-start">
                             <TabsTrigger value="general">
                                 {t('workspace.general')}
                             </TabsTrigger>
@@ -1305,10 +1305,19 @@ export default function WorkspaceSettings({
                         </TabsContent>
 
                         <TabsContent value="notifications">
-                            <WorkspaceNotificationChannels
-                                workspaceSlug={workspace.slug}
-                                channels={channels}
-                            />
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>
+                                        Notification Channels
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <WorkspaceNotificationChannels
+                                        workspaceSlug={workspace.slug}
+                                        channels={channels}
+                                    />
+                                </CardContent>
+                            </Card>
                         </TabsContent>
 
                         <TabsContent value="roles">

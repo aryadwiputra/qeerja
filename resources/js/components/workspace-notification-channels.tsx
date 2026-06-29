@@ -135,15 +135,11 @@ export function WorkspaceNotificationChannels({ workspaceSlug, channels }: Props
     );
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Notification Channels</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                    Configure external notification channels for this workspace.
-                    Users can then enable/disable each channel in their notification preferences.
-                </p>
+        <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+                Configure external notification channels for this workspace.
+                Users can then enable/disable each channel in their notification preferences.
+            </p>
 
                 {channels.map((channel) => (
                     <div
@@ -199,15 +195,14 @@ export function WorkspaceNotificationChannels({ workspaceSlug, channels }: Props
                     </>
                 )}
 
-                {channels.length === 0 && !adding && (
-                    <div className="flex flex-col items-center gap-2 py-8">
-                        <Plus className="size-8 text-muted-foreground/40" />
-                        <p className="text-sm text-muted-foreground">
-                            No notification channels configured yet.
-                        </p>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
+            {channels.length === 0 && !adding && (
+                <div className="flex flex-col items-center gap-2 py-8">
+                    <Plus className="size-8 text-muted-foreground/40" />
+                    <p className="text-sm text-muted-foreground">
+                        No notification channels configured yet.
+                    </p>
+                </div>
+            )}
+        </div>
     );
 }
