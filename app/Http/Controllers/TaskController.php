@@ -262,8 +262,8 @@ class TaskController extends Controller
         }
 
         app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'task.created', [
-            'projectId' => $project->id,
-            'taskId' => $task->id,
+            'task' => $this->formatTaskForRealtime($task->load(['assignees:id,name,avatar', 'priority', 'taskType', 'epics', 'sprints', 'boardColumn'])),
+            'column_id' => $task->board_column_id,
         ]);
 
         app(AutomationEngine::class)->handleTaskEvent($task->refresh(), 'task.created');
@@ -367,16 +367,94 @@ class TaskController extends Controller
         }
 
         $fieldChanges = [];
-        foreach (['title', 'description', 'priority_id', 'board_column_id', 'story_points', 'start_date', 'due_date'] as $field) {
+        foreach (['title', 'description', 'priority_id', 'board_column_id', 'story_points', 'start_date', 'due_date', 'task_type_id', 'parent_id'] as $field) {
             if (array_key_exists($field, $validated) && ($before[$field] ?? '') !== ($task->{$field} ?? '')) {
                 $fieldChanges[$field] = $task->{$field};
             }
         }
 
         if ($fieldChanges !== []) {
+            $changes = [];
+
+            foreach ($fieldChanges as $field => $value) {
+                switch ($field) {
+                    case 'priority_id':
+                        $changes['priority'] = $task->priority ? [
+                            'id' => $task->priority->id,
+                            'name' => $task->priority->name,
+                            'key' => $task->priority->key,
+                            'color' => $task->priority->color,
+                        ] : null;
+                        break;
+                    case 'board_column_id':
+                        $changes['board_column'] = $task->boardColumn ? [
+                            'id' => $task->boardColumn->id,
+                            'name' => $task->boardColumn->name,
+                            'status_key' => $task->boardColumn->status_key,
+                            'color' => $task->boardColumn->color,
+                        ] : null;
+                        break;
+                    case 'task_type_id':
+                        $changes['task_type'] = [
+                            'id' => $task->taskType->id,
+                            'name' => $task->taskType->name,
+                            'key' => $task->taskType->key,
+                            'color' => $task->taskType->color,
+                        ];
+                        break;
+                    case 'parent_id':
+                        $changes['parent'] = $task->parent ? [
+                            'id' => $task->parent->id,
+                            'code' => $task->parent->code,
+                            'title' => $task->parent->title,
+                        ] : null;
+                        $changes['parent_id'] = $value;
+                        break;
+                    default:
+                        $changes[$field] = $value;
+                        break;
+                }
+            }
+
+            if (array_key_exists('assignee_ids', $validated)) {
+                $changes['assignees'] = $task->assignees->map(fn ($u) => [
+                    'id' => $u->id,
+                    'name' => $u->name,
+                    'avatar' => $u->avatar,
+                ])->values()->all();
+            }
+            if (array_key_exists('label_ids', $validated)) {
+                $changes['labels'] = $task->labels->map(fn ($l) => [
+                    'id' => $l->id,
+                    'name' => $l->name,
+                    'slug' => $l->slug,
+                    'color' => $l->color,
+                ])->values()->all();
+            }
+            if (array_key_exists('epic_ids', $validated)) {
+                $changes['epics'] = $task->epics->map(fn ($e) => [
+                    'id' => $e->id,
+                    'name' => $e->name,
+                    'color' => $e->color,
+                    'status' => $e->status,
+                ])->values()->all();
+            }
+            if (array_key_exists('sprint_ids', $validated)) {
+                $changes['sprints'] = $task->sprints->map(fn ($s) => [
+                    'id' => $s->id,
+                    'name' => $s->name,
+                    'status' => $s->status,
+                    'start_date' => $s->start_date,
+                    'end_date' => $s->end_date,
+                ])->values()->all();
+            }
+            if (array_key_exists('watcher_ids', $validated)) {
+                $changes['watcher_count'] = $task->watchers()->count();
+            }
+
             app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'task.field.updated', [
-                'task_id' => $task->id,
-                'changes' => $fieldChanges,
+                'taskId' => $task->id,
+                'changes' => $changes,
             ]);
         }
 
@@ -392,9 +470,10 @@ class TaskController extends Controller
             $task->refresh();
 
             app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'task.moved', [
-                'task_id' => $task->id,
-                'from_column_id' => $oldColumnId,
-                'to_column_id' => $toColumn->id,
+                'taskId' => $task->id,
+                'task' => $this->formatTaskForRealtime($task->load(['assignees:id,name,avatar', 'priority', 'taskType', 'epics', 'sprints', 'boardColumn'])),
+                'fromColumnId' => $oldColumnId,
+                'toColumnId' => $toColumn->id,
                 'position' => $task->position,
                 'status' => $toColumn->status_key,
             ]);
@@ -412,7 +491,7 @@ class TaskController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Task updated.']);
 
-        return back();
+        return back(303);
     }
 
     public function destroy(Workspace $workspace, Project $project, Task $task, TaskActivityService $activity): RedirectResponse
@@ -549,9 +628,10 @@ class TaskController extends Controller
         }
 
         app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'task.moved', [
-            'task_id' => $task->id,
-            'from_column_id' => $oldColumnId,
-            'to_column_id' => $targetColumn->id,
+            'taskId' => $task->id,
+            'task' => $this->formatTaskForRealtime($task->load(['assignees:id,name,avatar', 'priority', 'taskType', 'epics', 'sprints', 'boardColumn'])),
+            'fromColumnId' => $oldColumnId,
+            'toColumnId' => $targetColumn->id,
             'position' => $task->position,
             'status' => $targetColumn->status_key,
         ]);
@@ -637,5 +717,49 @@ class TaskController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to create branch: '.$e->getMessage()], 500);
         }
+    }
+
+    private function formatTaskForRealtime(Task $task): array
+    {
+        return [
+            'id' => $task->id,
+            'task_number' => $task->task_number,
+            'code' => $task->code,
+            'title' => $task->title,
+            'status' => $task->status,
+            'position' => $task->position,
+            'due_date' => $task->due_date,
+            'story_points' => $task->story_points,
+            'priority' => $task->priority ? [
+                'id' => $task->priority->id,
+                'name' => $task->priority->name,
+                'key' => $task->priority->key,
+                'color' => $task->priority->color,
+            ] : null,
+            'task_type' => [
+                'id' => $task->taskType->id,
+                'name' => $task->taskType->name,
+                'key' => $task->taskType->key,
+                'color' => $task->taskType->color,
+            ],
+            'assignees' => $task->assignees->map(fn ($u) => [
+                'id' => $u->id,
+                'name' => $u->name,
+                'avatar' => $u->avatar,
+            ])->values()->all(),
+            'epics' => $task->epics->map(fn ($e) => [
+                'id' => $e->id,
+                'name' => $e->name,
+                'color' => $e->color,
+                'status' => $e->status,
+            ])->values()->all(),
+            'sprints' => $task->sprints->map(fn ($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+                'status' => $s->status,
+                'start_date' => $s->start_date,
+                'end_date' => $s->end_date,
+            ])->values()->all(),
+        ];
     }
 }

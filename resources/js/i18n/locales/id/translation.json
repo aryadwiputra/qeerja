@@ -72,7 +72,14 @@
         "no_projects": "Belum ada proyek",
         "create_first_project": "Buat proyek pertama Anda",
         "create_workspace_prompt": "Buat ruang kerja untuk memulai dengan proyek dan tugas.",
-        "new_project": "Proyek baru"
+        "new_project": "Proyek baru",
+        "goals": "Tujuan",
+        "cross_board": "Semua Papan",
+        "cross_timeline": "Linimasa",
+        "board": "Papan",
+        "backlog": "Backlog",
+        "epics": "Epic",
+        "sprints": "Sprint"
     },
     "user_menu": {
         "settings": "Pengaturan",
@@ -576,6 +583,7 @@
         "group_yesterday": "Kemarin",
         "group_this_week": "Minggu Ini",
         "group_older": "Lama",
+        "view_all": "Lihat semua notifikasi",
         "type_task_assigned": "Tugas ditugaskan",
         "type_task_updated": "Tugas diperbarui",
         "type_comment": "Komentar",
@@ -705,6 +713,9 @@
         "hide_archived": "Sembunyikan arsip",
         "show_archived": "Tampilkan arsip",
         "level": "Level",
+        "notifications_tab": "Notifikasi",
+        "roles_tab": "Peran",
+        "roles_title": "Izin Peran",
         "projects_title": "{{name}} — Proyek",
         "settings_title": "{{name}} — Pengaturan"
     },
@@ -1327,6 +1338,34 @@
     "workspace_settings": {
         "task_type_placeholder": "Bug",
         "priority_placeholder": "Kritis"
+    },
+    "roles": {
+        "permissions": {
+            "workspace_view": "Lihat ruang kerja",
+            "workspace_edit": "Edit pengaturan ruang kerja",
+            "workspace_delete": "Hapus ruang kerja",
+            "workspace_manage_members": "Kelola anggota",
+            "workspace_manage_labels": "Kelola label",
+            "workspace_manage_task_types": "Kelola tipe tugas",
+            "workspace_manage_priorities": "Kelola prioritas",
+            "project_create": "Buat proyek",
+            "project_view": "Lihat proyek",
+            "project_edit": "Edit proyek",
+            "project_delete": "Hapus proyek",
+            "project_manage_members": "Kelola anggota proyek",
+            "task_create": "Buat tugas",
+            "task_edit": "Edit semua tugas",
+            "task_delete": "Hapus semua tugas",
+            "task_comment": "Komentar di tugas",
+            "task_delete_comment": "Hapus semua komentar",
+            "epic_create": "Buat epic",
+            "epic_edit": "Edit epic",
+            "epic_delete": "Hapus epic",
+            "sprint_create": "Buat sprint",
+            "sprint_edit": "Edit sprint",
+            "sprint_delete": "Hapus sprint",
+            "board_manage": "Kelola papan"
+        }
     },
     "app_header": {
         "repository": "Repositori",

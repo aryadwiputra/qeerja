@@ -57,6 +57,12 @@ class TaskCommentController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Comment updated.']);
 
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'comment.updated', [
+            'taskId' => $task->id,
+            'commentId' => $comment->id,
+            'body' => $comment->body,
+        ]);
+
         return back();
     }
 
@@ -100,6 +106,11 @@ class TaskCommentController extends Controller
         Gate::authorize('delete', $comment);
 
         $comment->delete();
+
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'comment.deleted', [
+            'taskId' => $task->id,
+            'commentId' => $comment->id,
+        ]);
 
         Inertia::flash('toast', ['type' => 'info', 'message' => 'Comment deleted.']);
 

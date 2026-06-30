@@ -30,7 +30,13 @@ class BoardPolicy
      */
     public function create(User $user, Project $project): bool
     {
-        return Rbac::userCanInWorkspace($user, $project->workspace, 'board.manage')
+        $canManageByProjectRole = in_array(
+            Rbac::projectRole($user, $project),
+            ['lead', 'manager'],
+            true,
+        );
+
+        return ($canManageByProjectRole || Rbac::userCanInWorkspace($user, $project->workspace, 'board.manage'))
             && Rbac::projectRoleAllows($user, $project, ['lead', 'manager']);
     }
 
@@ -39,7 +45,13 @@ class BoardPolicy
      */
     public function update(User $user, Board $board): bool
     {
-        return Rbac::userCanInWorkspace($user, $board->project->workspace, 'board.manage')
+        $canManageByProjectRole = in_array(
+            Rbac::projectRole($user, $board->project),
+            ['lead', 'manager'],
+            true,
+        );
+
+        return ($canManageByProjectRole || Rbac::userCanInWorkspace($user, $board->project->workspace, 'board.manage'))
             && Rbac::projectRoleAllows($user, $board->project, ['lead', 'manager']);
     }
 

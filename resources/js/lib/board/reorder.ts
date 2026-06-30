@@ -1,3 +1,5 @@
+import { closestCorners, pointerWithin } from '@dnd-kit/core';
+import type { CollisionDetection, UniqueIdentifier } from '@dnd-kit/core';
 import type {
     BoardColumn,
     BoardDropPosition,
@@ -309,4 +311,60 @@ export function detectClosestEdge(
     rectHeight: number,
 ): 'top' | 'bottom' {
     return pointerY < rectTop + rectHeight / 2 ? 'top' : 'bottom';
+}
+
+/**
+ * Custom collision detection for the board drag-and-drop.
+ *
+ * Uses pointerWithin first. If the pointer is outside all droppables
+ * (e.g. dragging near column headers), falls back to vertical proximity:
+ * find the closest droppable by center distance on the Y axis.
+ * This makes dropping at the top of a column reliable.
+ */
+export function boardCollisionDetection(
+    args: Parameters<CollisionDetection>[0],
+) {
+    const { pointerCoordinates } = args;
+    const pointer = pointerCoordinates ?? null;
+
+    if (!pointer) {
+        return [];
+    }
+
+    const pointerResults = pointerWithin(args);
+
+    if (pointerResults.length > 0) {
+        return pointerResults;
+    }
+
+    const containers = args.droppableContainers.filter(
+        (c) => c.data.current?.type !== 'column',
+    );
+
+    if (containers.length === 0) {
+        return closestCorners(args);
+    }
+
+    let closest: { id: UniqueIdentifier; distance: number } | null = null;
+
+    for (const container of containers) {
+        const rect = container.rect.current;
+
+        if (!rect || rect.initial === null) {
+            continue;
+        }
+
+        const centerY = rect.top + rect.height / 2;
+        const distance = Math.abs(pointer.y - centerY);
+
+        if (!closest || distance < closest.distance) {
+            closest = { id: container.id, distance };
+        }
+    }
+
+    if (closest) {
+        return [{ id: closest.id }];
+    }
+
+    return closestCorners(args);
 }

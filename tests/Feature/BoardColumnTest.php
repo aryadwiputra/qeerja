@@ -205,7 +205,11 @@ test('project managers can reorder columns', function () {
                 ['id' => $col1->id, 'position' => 1],
             ],
         ])
-        ->assertRedirect();
+        ->assertOk()
+        ->assertExactJson(['columns' => [
+            ['id' => $col2->id, 'position' => 0],
+            ['id' => $col1->id, 'position' => 1],
+        ]]);
 
     expect($col2->refresh()->position)->toBe(0)
         ->and($col1->refresh()->position)->toBe(1);

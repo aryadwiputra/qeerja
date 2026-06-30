@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateLabelRequest;
 use App\Models\Label;
 use App\Models\Project;
 use App\Models\Workspace;
+use App\Services\RealtimeGatewayService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
@@ -84,6 +85,11 @@ class LabelController extends Controller
             'color' => $validated['color'] ?? null,
         ]);
 
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'label.created', [
+            'name' => $validated['name'],
+            'color' => $validated['color'] ?? null,
+        ]);
+
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Label created.']);
 
         return back();
@@ -101,6 +107,13 @@ class LabelController extends Controller
             'color' => $validated['color'] ?? null,
         ]);
 
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'label.updated', [
+            'id' => $label->id,
+            'name' => $label->name,
+            'slug' => $label->slug,
+            'color' => $label->color,
+        ]);
+
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Label updated.']);
 
         return back();
@@ -114,6 +127,10 @@ class LabelController extends Controller
 
         $label->tasks()->detach();
         $label->delete();
+
+        app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'label.deleted', [
+            'id' => $label->id,
+        ]);
 
         Inertia::flash('toast', ['type' => 'info', 'message' => 'Label deleted.']);
 

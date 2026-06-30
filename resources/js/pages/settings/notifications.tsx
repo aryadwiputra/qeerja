@@ -5,18 +5,23 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { edit } from '@/routes/notifications';
 
+interface ChannelInfo {
+    key: string;
+    name: string;
+    label: string;
+}
+
 interface NotificationPreference {
     label: string;
-    in_app_enabled: boolean;
-    email_enabled: boolean;
-    whatsapp_enabled: boolean;
+    channels: Record<string, boolean>;
 }
 
 type Props = {
     preferences: Record<string, NotificationPreference>;
+    channels: ChannelInfo[];
 };
 
-export default function NotificationSettings({ preferences }: Props) {
+export default function NotificationSettings({ preferences, channels }: Props) {
     const { t } = useTranslation();
 
     return (
@@ -41,22 +46,21 @@ export default function NotificationSettings({ preferences }: Props) {
                 >
                     {({ processing }) => (
                         <>
-                            <div className="overflow-hidden rounded-lg border">
+                            <div className="overflow-hidden overflow-x-auto rounded-lg border">
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b bg-muted/50">
                                             <th className="px-4 py-3 text-left font-medium">
                                                 {t('settings.event')}
                                             </th>
-                                            <th className="px-4 py-3 text-center font-medium">
-                                                {t('settings.in_app')}
-                                            </th>
-                                            <th className="px-4 py-3 text-center font-medium">
-                                                {t('profile.email')}
-                                            </th>
-                                            <th className="px-4 py-3 text-center font-medium">
-                                                WhatsApp
-                                            </th>
+                                            {channels.map((ch) => (
+                                                <th
+                                                    key={ch.key}
+                                                    className="px-3 py-3 text-center font-medium"
+                                                >
+                                                    {ch.name}
+                                                </th>
+                                            ))}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -69,39 +73,25 @@ export default function NotificationSettings({ preferences }: Props) {
                                                     <td className="px-4 py-3">
                                                         {pref.label}
                                                     </td>
-                                                    <td className="px-4 py-3 text-center">
-                                                        <input
-                                                            type="checkbox"
-                                                            name={`preferences[${type}][in_app_enabled]`}
-                                                            defaultChecked={
-                                                                pref.in_app_enabled
-                                                            }
-                                                            value="1"
-                                                            className="size-4 rounded border-gray-300"
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-3 text-center">
-                                                        <input
-                                                            type="checkbox"
-                                                            name={`preferences[${type}][email_enabled]`}
-                                                            defaultChecked={
-                                                                pref.email_enabled
-                                                            }
-                                                            value="1"
-                                                            className="size-4 rounded border-gray-300"
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-3 text-center">
-                                                        <input
-                                                            type="checkbox"
-                                                            name={`preferences[${type}][whatsapp_enabled]`}
-                                                            defaultChecked={
-                                                                pref.whatsapp_enabled
-                                                            }
-                                                            value="1"
-                                                            className="size-4 rounded border-gray-300"
-                                                        />
-                                                    </td>
+                                                    {channels.map((ch) => (
+                                                        <td
+                                                            key={ch.key}
+                                                            className="px-3 py-3 text-center"
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                name={`preferences[${type}][channels][${ch.key}]`}
+                                                                defaultChecked={
+                                                                    pref
+                                                                        .channels[
+                                                                        ch.key
+                                                                    ] ?? true
+                                                                }
+                                                                value="1"
+                                                                className="size-4 rounded border-gray-300"
+                                                            />
+                                                        </td>
+                                                    ))}
                                                 </tr>
                                             ),
                                         )}

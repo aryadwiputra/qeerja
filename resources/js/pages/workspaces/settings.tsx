@@ -33,10 +33,12 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { WhatsAppSettingsTab } from '@/components/whatsapp-settings-tab';
 import { WorkspaceMemberDialog } from '@/components/workspace-member-dialog';
+import { WorkspaceNotificationChannels } from '@/components/workspace-notification-channels';
+import { WorkspaceRolesPermissions } from '@/components/workspace-roles-permissions';
 import {
     destroy as workspaceDestroy,
-    index as workspaceIndex,
     restore as workspaceRestore,
+    show as workspaceShow,
     update as workspaceUpdate,
 } from '@/routes/workspaces';
 import {
@@ -119,6 +121,14 @@ interface Props {
     settings: WorkspaceSettings;
     taskTypes: TaskTypeData[];
     priorities: PriorityData[];
+    rolesPermissions: Record<string, string | string[]>;
+    channels: Array<{
+        id: number;
+        driver: string;
+        name: string;
+        config: Record<string, string>;
+        enabled: boolean;
+    }>;
 }
 
 export default function WorkspaceSettings({
@@ -128,6 +138,8 @@ export default function WorkspaceSettings({
     settings,
     taskTypes,
     priorities,
+    rolesPermissions,
+    channels,
 }: Props) {
     const { t } = useTranslation();
     const roleLabels: Record<string, string> = {
@@ -136,6 +148,40 @@ export default function WorkspaceSettings({
         manager: t('members.manager'),
         member: t('members.member'),
         viewer: t('members.viewer'),
+    };
+    const permissionLabels: Record<string, string> = {
+        'workspace.view': t('roles.permissions.workspace_view'),
+        'workspace.edit': t('roles.permissions.workspace_edit'),
+        'workspace.delete': t('roles.permissions.workspace_delete'),
+        'workspace.manage-members': t(
+            'roles.permissions.workspace_manage_members',
+        ),
+        'workspace.manage-labels': t(
+            'roles.permissions.workspace_manage_labels',
+        ),
+        'workspace.manage-task-types': t(
+            'roles.permissions.workspace_manage_task_types',
+        ),
+        'workspace.manage-priorities': t(
+            'roles.permissions.workspace_manage_priorities',
+        ),
+        'project.create': t('roles.permissions.project_create'),
+        'project.view-any': t('roles.permissions.project_view'),
+        'project.edit': t('roles.permissions.project_edit'),
+        'project.delete': t('roles.permissions.project_delete'),
+        'project.manage-members': t('roles.permissions.project_manage_members'),
+        'task.create': t('roles.permissions.task_create'),
+        'task.edit-any': t('roles.permissions.task_edit'),
+        'task.delete-any': t('roles.permissions.task_delete'),
+        'task.comment': t('roles.permissions.task_comment'),
+        'task.delete-comment-any': t('roles.permissions.task_delete_comment'),
+        'epic.create': t('roles.permissions.epic_create'),
+        'epic.edit': t('roles.permissions.epic_edit'),
+        'epic.delete': t('roles.permissions.epic_delete'),
+        'sprint.create': t('roles.permissions.sprint_create'),
+        'sprint.edit': t('roles.permissions.sprint_edit'),
+        'sprint.delete': t('roles.permissions.sprint_delete'),
+        'board.manage': t('roles.permissions.board_manage'),
     };
     const [addMemberOpen, setAddMemberOpen] = useState(false);
     const [inviteEmail, setInviteEmail] = useState('');
@@ -283,13 +329,13 @@ export default function WorkspaceSettings({
                 <PageHeader
                     title={workspace.name}
                     description={t('workspace.settings')}
-                    backHref={workspaceIndex()}
-                    backLabel="Workspaces"
+                    backHref={workspaceShow({ workspace: workspace.slug }).url}
+                    backLabel={workspace.name}
                 />
 
-                <div className="mx-auto w-full max-w-2xl">
+                <div className="mx-auto w-full max-w-4xl">
                     <Tabs defaultValue="general">
-                        <TabsList className="mb-6">
+                        <TabsList className="mb-6 flex h-auto max-w-full flex-wrap justify-start">
                             <TabsTrigger value="general">
                                 {t('workspace.general')}
                             </TabsTrigger>
@@ -306,6 +352,12 @@ export default function WorkspaceSettings({
                                 {t('workspace.members_tab')}
                             </TabsTrigger>
                             <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
+                            <TabsTrigger value="notifications">
+                                {t('workspace.notifications_tab')}
+                            </TabsTrigger>
+                            <TabsTrigger value="roles">
+                                {t('workspace.roles_tab')}
+                            </TabsTrigger>
                             <TabsTrigger value="danger">
                                 {t('workspace.danger_zone')}
                             </TabsTrigger>
@@ -1258,6 +1310,37 @@ export default function WorkspaceSettings({
                             <WhatsAppSettingsTab
                                 workspaceSlug={workspace.slug}
                             />
+                        </TabsContent>
+
+                        <TabsContent value="notifications">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Notification Channels</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <WorkspaceNotificationChannels
+                                        workspaceSlug={workspace.slug}
+                                        channels={channels}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="roles">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>
+                                        {t('workspace.roles_title')}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <WorkspaceRolesPermissions
+                                        rolesPermissions={rolesPermissions}
+                                        permissionLabels={permissionLabels}
+                                        roleLabels={roleLabels}
+                                    />
+                                </CardContent>
+                            </Card>
                         </TabsContent>
 
                         <TabsContent value="danger">

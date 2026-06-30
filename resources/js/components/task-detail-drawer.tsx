@@ -428,7 +428,7 @@ export function TaskDetailDrawer({
     useSocketEvent(
         projectId ? `project.${projectId}` : '',
         'comment.created',
-        (e: { task_id: number; comment_id: number; body: string }) => {
+        (e: { task_id: number; commentId: number; body: string }) => {
             if (e.task_id !== taskId || !user) {
                 return;
             }
@@ -441,18 +441,40 @@ export function TaskDetailDrawer({
     useSocketEvent(
         projectId ? `project.${projectId}` : '',
         'task.field.updated',
-        (e: { task_id: number; changes: Record<string, unknown> }) => {
-            if (e.task_id !== taskId) {
+        (e: { taskId: number }) => {
+            if (e.taskId !== taskId) {
                 return;
             }
 
-            setTask((prev) => {
-                if (!prev) {
-                    return prev;
-                }
+            refreshTaskDetails();
+        },
+        [projectId, taskId],
+    );
 
-                return { ...prev, ...e.changes };
-            });
+    useSocketEvent(
+        projectId ? `project.${projectId}` : '',
+        'task.moved',
+        (e: { taskId: number }) => {
+            if (e.taskId !== taskId) {
+                return;
+            }
+
+            refreshTaskDetails();
+        },
+        [projectId, taskId],
+    );
+
+    useSocketEvent(
+        projectId ? `project.${projectId}` : '',
+        'task.deleted',
+        (e: { taskId: number }) => {
+            if (e.taskId !== taskId) {
+                return;
+            }
+
+            onOpenChange(false);
+            setTask(null);
+            onDelete?.();
         },
         [projectId, taskId],
     );
@@ -462,30 +484,60 @@ export function TaskDetailDrawer({
         'activity.logged',
         (e: {
             task_id: number;
-            id: number;
+            activity_id: number;
             action: string;
             field_name: string | null;
             old_value: string | null;
             new_value: string | null;
             user_id: number;
             user_name: string;
-            created_at: string;
+            timestamp: string;
         }) => {
             if (e.task_id !== taskId) {
                 return;
             }
 
             const newItem: ActivityItem = {
-                id: e.id,
+                id: e.activity_id,
                 action: e.action,
                 field_name: e.field_name,
                 old_value: e.old_value,
                 new_value: e.new_value,
-                created_at: e.created_at,
+                created_at: e.timestamp,
                 user: { id: e.user_id, name: e.user_name, avatar: null },
             };
 
             setActivities((prev) => [newItem, ...prev].slice(0, 20));
+        },
+        [projectId, taskId],
+    );
+
+    useSocketEvent(
+        projectId ? `project.${projectId}` : '',
+        'comment.updated',
+        (e: { taskId: number; commentId: number; body: string }) => {
+            if (e.taskId !== taskId) {
+                return;
+            }
+
+            setComments((prev) =>
+                prev.map((c) =>
+                    c.id === e.commentId ? { ...c, body: e.body } : c,
+                ),
+            );
+        },
+        [projectId, taskId],
+    );
+
+    useSocketEvent(
+        projectId ? `project.${projectId}` : '',
+        'comment.deleted',
+        (e: { taskId: number; commentId: number }) => {
+            if (e.taskId !== taskId) {
+                return;
+            }
+
+            setComments((prev) => prev.filter((c) => c.id !== e.commentId));
         },
         [projectId, taskId],
     );
@@ -1131,7 +1183,9 @@ export function TaskDetailDrawer({
                                         {t('task.status')}
                                     </Label>
                                     <Select
-                                        value={String(task.board_column.id)}
+                                        value={String(
+                                            task.board_column?.id ?? '',
+                                        )}
                                         onValueChange={(value) => {
                                             const column =
                                                 options.board_columns.find(
@@ -1140,7 +1194,7 @@ export function TaskDetailDrawer({
                                                         Number(value),
                                                 );
 
-                                            if (!column) {
+                                            if (!column || !task.board_column) {
                                                 return;
                                             }
 

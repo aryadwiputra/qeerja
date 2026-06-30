@@ -164,6 +164,14 @@ class WorkspaceController extends Controller
             'settings' => $settings->all($workspace),
             'taskTypes' => $workspace->taskTypes()->orderBy('name')->get(['id', 'name', 'key', 'icon', 'color']),
             'priorities' => $workspace->priorities()->orderBy('level')->get(['id', 'name', 'key', 'level', 'color']),
+            'rolesPermissions' => config('permissions.roles'),
+            'channels' => $workspace->notificationChannels()->get()->map(fn ($c) => [
+                'id' => $c->id,
+                'driver' => $c->driver,
+                'name' => $c->name,
+                'config' => $c->config,
+                'enabled' => $c->enabled,
+            ])->values(),
         ]);
     }
 

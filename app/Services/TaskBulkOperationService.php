@@ -60,9 +60,22 @@ class TaskBulkOperationService
             $oldSprintIds = $this->ids($task->sprints);
             $oldWatcherIds = $this->ids($task->watchers);
 
+            $oldColumnId = $task->board_column_id;
+
             $task->update([
                 'board_id' => $column->board_id,
                 'board_column_id' => $column->id,
+                'status' => $column->status_key,
+            ]);
+
+            $task->load(['assignees:id,name,avatar', 'priority', 'taskType', 'epics', 'sprints', 'boardColumn']);
+
+            app(RealtimeGatewayService::class)->broadcast("project.{$task->project_id}", 'task.moved', [
+                'taskId' => $task->id,
+                'task' => $this->formatTaskForBulkRealtime($task),
+                'fromColumnId' => $oldColumnId,
+                'toColumnId' => $column->id,
+                'position' => $task->position,
                 'status' => $column->status_key,
             ]);
 
@@ -85,6 +98,19 @@ class TaskBulkOperationService
 
             $task->assignees()->sync($newAssigneeIds);
 
+            $task->load('assignees:id,name,avatar');
+
+            app(RealtimeGatewayService::class)->broadcast("project.{$task->project_id}", 'task.field.updated', [
+                'taskId' => $task->id,
+                'changes' => [
+                    'assignees' => $task->assignees->map(fn ($u) => [
+                        'id' => $u->id,
+                        'name' => $u->name,
+                        'avatar' => $u->avatar,
+                    ])->values()->all(),
+                ],
+            ]);
+
             $this->activity->updated($task->refresh(), $actor, [], $oldAssigneeIds, $newAssigneeIds, $oldEpicIds, $oldEpicIds, $oldSprintIds, $oldSprintIds, $oldWatcherIds, $oldWatcherIds);
         }
     }
@@ -101,6 +127,25 @@ class TaskBulkOperationService
 
             $task->update(['priority_id' => $priorityId]);
 
+            $task->load('priority');
+
+            $changes = [];
+            if ($task->priority) {
+                $changes['priority'] = [
+                    'id' => $task->priority->id,
+                    'name' => $task->priority->name,
+                    'key' => $task->priority->key,
+                    'color' => $task->priority->color,
+                ];
+            } else {
+                $changes['priority'] = null;
+            }
+
+            app(RealtimeGatewayService::class)->broadcast("project.{$task->project_id}", 'task.field.updated', [
+                'taskId' => $task->id,
+                'changes' => $changes,
+            ]);
+
             $this->activity->updated($task->refresh(), $actor, $before, $oldAssigneeIds, $oldAssigneeIds, $oldEpicIds, $oldEpicIds, $oldSprintIds, $oldSprintIds, $oldWatcherIds, $oldWatcherIds);
         }
     }
@@ -116,6 +161,21 @@ class TaskBulkOperationService
             $newLabelIds = $this->applyIds($oldLabelIds, $labelIds, $mode);
 
             $task->labels()->sync($newLabelIds);
+
+            $task->load('labels:id,name,slug,color');
+
+            app(RealtimeGatewayService::class)->broadcast("project.{$task->project_id}", 'task.field.updated', [
+                'taskId' => $task->id,
+                'changes' => [
+                    'labels' => $task->labels->map(fn ($l) => [
+                        'id' => $l->id,
+                        'name' => $l->name,
+                        'slug' => $l->slug,
+                        'color' => $l->color,
+                    ])->values()->all(),
+                ],
+            ]);
+
             $this->activity->bulkChanged($task, $actor, 'labels_changed', 'labels', implode(',', $oldLabelIds), implode(',', $newLabelIds));
         }
     }
@@ -136,6 +196,11 @@ class TaskBulkOperationService
     {
         foreach ($tasks as $task) {
             $this->activity->deleted($task, $actor);
+
+            app(RealtimeGatewayService::class)->broadcast("project.{$task->project_id}", 'task.deleted', [
+                'taskId' => $task->id,
+            ]);
+
             $task->delete();
         }
     }
@@ -178,5 +243,49 @@ class TaskBulkOperationService
                 'task_ids' => Arr::sort($taskIds),
             ],
         ]);
+    }
+
+    private function formatTaskForBulkRealtime(Task $task): array
+    {
+        return [
+            'id' => $task->id,
+            'task_number' => $task->task_number,
+            'code' => $task->code,
+            'title' => $task->title,
+            'status' => $task->status,
+            'position' => $task->position,
+            'due_date' => $task->due_date,
+            'story_points' => $task->story_points,
+            'priority' => $task->priority ? [
+                'id' => $task->priority->id,
+                'name' => $task->priority->name,
+                'key' => $task->priority->key,
+                'color' => $task->priority->color,
+            ] : null,
+            'task_type' => [
+                'id' => $task->taskType->id,
+                'name' => $task->taskType->name,
+                'key' => $task->taskType->key,
+                'color' => $task->taskType->color,
+            ],
+            'assignees' => $task->assignees->map(fn ($u) => [
+                'id' => $u->id,
+                'name' => $u->name,
+                'avatar' => $u->avatar,
+            ])->values()->all(),
+            'epics' => $task->epics->map(fn ($e) => [
+                'id' => $e->id,
+                'name' => $e->name,
+                'color' => $e->color,
+                'status' => $e->status,
+            ])->values()->all(),
+            'sprints' => $task->sprints->map(fn ($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+                'status' => $s->status,
+                'start_date' => $s->start_date,
+                'end_date' => $s->end_date,
+            ])->values()->all(),
+        ];
     }
 }

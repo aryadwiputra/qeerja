@@ -10,6 +10,7 @@ use App\Models\BoardColumn;
 use App\Models\Project;
 use App\Models\Workspace;
 use App\Services\RealtimeGatewayService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -71,7 +72,7 @@ class BoardColumnController extends Controller
         return back(303);
     }
 
-    public function reorder(ReorderBoardColumnsRequest $request, Workspace $workspace, Project $project, Board $board): RedirectResponse
+    public function reorder(ReorderBoardColumnsRequest $request, Workspace $workspace, Project $project, Board $board): JsonResponse
     {
         $validated = $request->validated();
 
@@ -83,8 +84,6 @@ class BoardColumnController extends Controller
 
         app(RealtimeGatewayService::class)->broadcast("project.{$project->id}", 'columns.reordered', ['columns' => $validated['columns']]);
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Columns reordered.']);
-
-        return back(303);
+        return response()->json(['columns' => $validated['columns']]);
     }
 }

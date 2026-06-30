@@ -36,12 +36,11 @@ test('authenticated users can update notification preferences', function () {
         ->put(route('notifications.update'), [
             'preferences' => [
                 'task.assigned' => [
-                    'in_app_enabled' => true,
-                    'email_enabled' => false,
-                ],
-                'task.commented' => [
-                    'in_app_enabled' => false,
-                    'email_enabled' => true,
+                    'channels' => [
+                        'in_app' => true,
+                        'email' => false,
+                        'whatsapp' => false,
+                    ],
                 ],
             ],
         ])
@@ -50,15 +49,15 @@ test('authenticated users can update notification preferences', function () {
     $this->assertDatabaseHas('notification_preferences', [
         'user_id' => $user->id,
         'type' => 'task.assigned',
-        'in_app_enabled' => true,
-        'email_enabled' => false,
+        'channel' => 'in_app',
+        'enabled' => true,
     ]);
 
     $this->assertDatabaseHas('notification_preferences', [
         'user_id' => $user->id,
-        'type' => 'task.commented',
-        'in_app_enabled' => false,
-        'email_enabled' => true,
+        'type' => 'task.assigned',
+        'channel' => 'email',
+        'enabled' => false,
     ]);
 });
 
@@ -68,16 +67,19 @@ test('notification preferences are updated when they already exist', function ()
     NotificationPreference::create([
         'user_id' => $user->id,
         'type' => 'task.assigned',
-        'in_app_enabled' => true,
-        'email_enabled' => true,
+        'channel' => 'in_app',
+        'enabled' => true,
     ]);
 
     $this->actingAs($user)
         ->put(route('notifications.update'), [
             'preferences' => [
                 'task.assigned' => [
-                    'in_app_enabled' => false,
-                    'email_enabled' => false,
+                    'channels' => [
+                        'in_app' => false,
+                        'email' => false,
+                        'whatsapp' => false,
+                    ],
                 ],
             ],
         ])
@@ -86,8 +88,8 @@ test('notification preferences are updated when they already exist', function ()
     $this->assertDatabaseHas('notification_preferences', [
         'user_id' => $user->id,
         'type' => 'task.assigned',
-        'in_app_enabled' => false,
-        'email_enabled' => false,
+        'channel' => 'in_app',
+        'enabled' => false,
     ]);
 });
 
@@ -101,8 +103,8 @@ test('notification preference model checks email enabled correctly', function ()
     NotificationPreference::create([
         'user_id' => $user->id,
         'type' => 'task.assigned',
-        'in_app_enabled' => true,
-        'email_enabled' => false,
+        'channel' => 'email',
+        'enabled' => false,
     ]);
 
     expect(NotificationPreference::isEmailEnabled($user, 'task.assigned'))->toBeFalse();
@@ -118,8 +120,8 @@ test('notification preference model checks in-app enabled correctly', function (
     NotificationPreference::create([
         'user_id' => $user->id,
         'type' => 'task.assigned',
-        'in_app_enabled' => false,
-        'email_enabled' => true,
+        'channel' => 'in_app',
+        'enabled' => false,
     ]);
 
     expect(NotificationPreference::isInAppEnabled($user, 'task.assigned'))->toBeFalse();

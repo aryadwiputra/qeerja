@@ -71,7 +71,14 @@
         "no_projects": "No projects yet",
         "create_first_project": "Create your first project",
         "create_workspace_prompt": "Create a workspace to get started with projects and tasks.",
-        "new_project": "New project"
+        "new_project": "New project",
+        "goals": "Goals",
+        "cross_board": "All Boards",
+        "cross_timeline": "Timeline",
+        "board": "Board",
+        "backlog": "Backlog",
+        "epics": "Epics",
+        "sprints": "Sprints"
     },
     "user_menu": {
         "settings": "Settings",
@@ -629,7 +636,8 @@
         "type_due_date": "Due date",
         "group_yesterday": "Yesterday",
         "group_this_week": "This Week",
-        "group_older": "Older"
+        "group_older": "Older",
+        "view_all": "View all notifications"
     },
     "onboarding": {
         "get_started": "Get Started",
@@ -754,7 +762,10 @@
         "edit": "Edit",
         "hide_archived": "Hide archived",
         "show_archived": "Show archived",
-        "level": "Level"
+        "level": "Level",
+        "notifications_tab": "Notifications",
+        "roles_tab": "Roles",
+        "roles_title": "Role Permissions"
     },
     "admin": {
         "dashboard": "Admin Dashboard",
@@ -1326,6 +1337,34 @@
     "workspace_settings": {
         "task_type_placeholder": "Bug",
         "priority_placeholder": "Critical"
+    },
+    "roles": {
+        "permissions": {
+            "workspace_view": "View workspace",
+            "workspace_edit": "Edit workspace settings",
+            "workspace_delete": "Delete workspace",
+            "workspace_manage_members": "Manage members",
+            "workspace_manage_labels": "Manage labels",
+            "workspace_manage_task_types": "Manage task types",
+            "workspace_manage_priorities": "Manage priorities",
+            "project_create": "Create projects",
+            "project_view": "View projects",
+            "project_edit": "Edit projects",
+            "project_delete": "Delete projects",
+            "project_manage_members": "Manage project members",
+            "task_create": "Create tasks",
+            "task_edit": "Edit any task",
+            "task_delete": "Delete any task",
+            "task_comment": "Comment on tasks",
+            "task_delete_comment": "Delete any comment",
+            "epic_create": "Create epics",
+            "epic_edit": "Edit epics",
+            "epic_delete": "Delete epics",
+            "sprint_create": "Create sprints",
+            "sprint_edit": "Edit sprints",
+            "sprint_delete": "Delete sprints",
+            "board_manage": "Manage boards"
+        }
     },
     "app_header": {
         "repository": "Repository",
