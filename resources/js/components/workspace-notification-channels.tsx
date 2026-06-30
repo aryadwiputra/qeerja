@@ -1,9 +1,7 @@
 import { router } from '@inertiajs/react';
 import { MessageCircle, MessageSquare, Plus, Send, Trash2, Webhook } from 'lucide-react';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -110,7 +108,6 @@ function ChannelForm({
 }
 
 export function WorkspaceNotificationChannels({ workspaceSlug, channels }: Props) {
-    const { t } = useTranslation();
     const [adding, setAdding] = useState<string | null>(null);
 
     const handleToggle = (channel: NotificationChannelItem) => {
@@ -122,7 +119,9 @@ export function WorkspaceNotificationChannels({ workspaceSlug, channels }: Props
     };
 
     const handleDelete = (channelId: number) => {
-        if (!confirm('Remove this channel?')) return;
+        if (!confirm('Remove this channel?')) {
+return;
+}
 
         router.delete(
             destroy({ workspace: workspaceSlug, channel: channelId }),
@@ -179,6 +178,7 @@ export function WorkspaceNotificationChannels({ workspaceSlug, channels }: Props
                         <div className="flex flex-wrap gap-2">
                             {availableDrivers.map((driver) => {
                                 const Icon = DRIVER_ICONS[driver];
+
                                 return (
                                     <Button
                                         key={driver}
