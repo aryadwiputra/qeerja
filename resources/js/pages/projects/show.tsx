@@ -266,7 +266,12 @@ export default function ProjectShow({
 
     const { t } = useTranslation();
     const [search, setSearch] = useState('');
-    const [activeTab, setActiveTab] = useState('list');
+    const [activeTab, setActiveTab] = useState(() => {
+        if (typeof window === 'undefined') return 'list';
+        const tab = new URL(window.location.href).searchParams.get('tab');
+
+        return tab ?? 'list';
+    });
     const [sorting, setSorting] = useState<SortingState>([]);
     const [page, setPage] = useState(0);
     const [localTasks, setLocalTasks] = useState(tasks);
@@ -822,7 +827,7 @@ export default function ProjectShow({
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}
-                    className="flex flex-col gap-4"
+                    className="mx-auto w-full max-w-6xl flex-col gap-4"
                 >
                     <TabsList>
                         <TabsTrigger
