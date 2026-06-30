@@ -171,4 +171,5 @@ tail -f /var/www/taska.web.id/storage/logs/laravel.log
 | `WHATSAPP_API_TOKEN` | WhatsApp auth token | (random 32 hex) |
 | `REALTIME_GATEWAY_URL` | Realtime gateway | `http://127.0.0.1:3002` |
 | `REALTIME_API_TOKEN` | Realtime auth token | (random 32 hex) |
+| `LARAVEL_API_TOKEN` | Laravel API auth token | (random 32 hex) |
 | `VITE_SOCKETIO_URL` | Socket.IO client URL | `https://taska.web.id` |
