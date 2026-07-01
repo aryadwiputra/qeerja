@@ -6,6 +6,7 @@ import {
     ChevronRight,
     Clock,
     FileText,
+    History,
     Pencil,
     Plus,
     Trash2,
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { RichEditor } from '@/components/rich-editor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +27,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { VersionHistory } from '@/components/version-history';
 import { cn } from '@/lib/utils';
 import { show as projectShow } from '@/routes/projects';
 import {
@@ -60,6 +63,7 @@ export default function DocsShow({
     const [collapsed, setCollapsed] = useState<Set<number>>(new Set());
     const [creating, setCreating] = useState(false);
     const [newTitle, setNewTitle] = useState('');
+    const [versionsOpen, setVersionsOpen] = useState(false);
 
     const toggleCollapse = (id: number) => {
         setCollapsed((prev) => {
@@ -375,6 +379,14 @@ export default function DocsShow({
                                     <Button
                                         size="sm"
                                         variant="outline"
+                                        onClick={() => setVersionsOpen(true)}
+                                    >
+                                        <History className="size-3.5" />
+                                        <span className="hidden sm:inline">{t('docs.version_history')}</span>
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
                                         onClick={() => setEditing(true)}
                                     >
                                         <Pencil className="size-3.5" />
@@ -462,6 +474,14 @@ export default function DocsShow({
                     )}
                 </div>
             </div>
+
+            <VersionHistory
+                workspaceSlug={workspace.slug}
+                projectSlug={project.slug}
+                docSlug={doc.slug}
+                open={versionsOpen}
+                onOpenChange={setVersionsOpen}
+            />
         </div>
     );
 }

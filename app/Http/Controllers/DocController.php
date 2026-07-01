@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDocRequest;
 use App\Models\Doc;
+use App\Models\DocVersion;
 use App\Models\Project;
 use App\Models\Workspace;
 use App\Support\DocTreeBuilder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -41,7 +44,7 @@ class DocController extends Controller
         return Inertia::render('projects/docs/show', [
             'workspace' => ['id' => $workspace->id, 'name' => $workspace->name, 'slug' => $workspace->slug],
             'project' => ['id' => $project->id, 'name' => $project->name, 'key' => $project->key, 'slug' => $project->slug],
-            'doc' => $doc->toArray() + ['breadcrumbs' => $breadcrumbs],
+            'doc' => $doc->toArray() + ['breadcrumbs' => $breadcrumbs, 'versions_count' => $doc->versions()->count()],
         ]);
     }
 
@@ -83,6 +86,29 @@ class DocController extends Controller
         Inertia::flash('toast', ['type' => 'info', 'message' => 'Doc deleted.']);
 
         return to_route('projects.docs.index', [$workspace, $project]);
+    }
+
+    public function versions(Workspace $workspace, Project $project, Doc $doc): JsonResponse
+    {
+        Gate::authorize('view', $doc);
+
+        $versions = $doc->versions()->with('editor:id,name,avatar')->latest()->get();
+
+        return response()->json($versions);
+    }
+
+    public function restoreVersion(Request $request, Workspace $workspace, Project $project, Doc $doc, DocVersion $version): RedirectResponse
+    {
+        Gate::authorize('update', $doc);
+
+        $doc->update([
+            'title' => $version->title,
+            'content' => $version->content,
+        ]);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Version restored.']);
+
+        return back(303);
     }
 
     private function buildBreadcrumbs(Doc $doc): array

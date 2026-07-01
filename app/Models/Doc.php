@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Doc extends Model
 {
@@ -28,6 +29,21 @@ class Doc extends Model
         return [
             'sort_order' => 'integer',
         ];
+    }
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::updating(function (Doc $doc) {
+            if ($doc->isDirty(['title', 'content']) && Auth::check()) {
+                $doc->versions()->create([
+                    'edited_by' => Auth::id(),
+                    'title' => $doc->getOriginal('title'),
+                    'content' => $doc->getOriginal('content') ?? '',
+                ]);
+            }
+        });
     }
 
     public function getRouteKeyName(): string
@@ -53,6 +69,11 @@ class Doc extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function versions(): HasMany
+    {
+        return $this->hasMany(DocVersion::class, 'doc_id');
     }
 
     public function scopeRoots(Builder $query): Builder

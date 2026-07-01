@@ -1390,6 +1390,7 @@
         "last_edited": "Last edited by {name}",
         "created_by": "Created by {name}",
         "uncollapse": "Expand all",
-        "collapse": "Collapse all"
+        "collapse": "Collapse all",
+        "version_history": "Version history"
     }
 }

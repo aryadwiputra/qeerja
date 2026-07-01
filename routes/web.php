@@ -256,6 +256,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/docs', [DocController::class, 'store'])->name('projects.docs.store');
         Route::patch('/workspaces/{workspace:slug}/projects/{project:slug}/docs/{doc:slug}', [DocController::class, 'update'])->name('projects.docs.update');
         Route::delete('/workspaces/{workspace:slug}/projects/{project:slug}/docs/{doc:slug}', [DocController::class, 'destroy'])->name('projects.docs.destroy');
+        Route::get('/workspaces/{workspace:slug}/projects/{project:slug}/docs/{doc:slug}/versions', [DocController::class, 'versions'])->name('projects.docs.versions');
+        Route::post('/workspaces/{workspace:slug}/projects/{project:slug}/docs/{doc:slug}/versions/{version}/restore', [DocController::class, 'restoreVersion'])->name('projects.docs.versions.restore');
     });
 });
 
