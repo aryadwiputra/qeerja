@@ -189,6 +189,7 @@
 
     body {
         @apply bg-background text-foreground;
+        overflow: hidden;
         font-feature-settings:
             'lnum' 1,
             'locl' 1;
