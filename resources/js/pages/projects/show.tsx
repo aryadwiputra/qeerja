@@ -245,6 +245,7 @@ interface Props {
     priorities: PriorityOption[];
     attachments: AttachmentRow[];
     activities: ActivityRow[];
+    userProjectRole?: string | null;
 }
 
 const pageSize = 10;
@@ -254,13 +255,14 @@ export default function ProjectShow({
     project,
     members,
     tasks,
-    epics,
-    sprints,
-    labels,
+    epics: initialEpics,
+    sprints: initialSprints,
+    labels: initialLabels,
     boardColumns,
     priorities,
     attachments,
     activities,
+    userProjectRole,
 }: Props) {
     'use no memo';
 
@@ -1938,6 +1940,7 @@ export default function ProjectShow({
                     open={drawerOpen}
                     onOpenChange={setDrawerOpen}
                     onDelete={() => router.reload()}
+                    userProjectRole={projectRole}
                 />
             </div>
         </>

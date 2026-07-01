@@ -39,6 +39,12 @@ import {
     SheetTitle,
 } from '@/components/ui/sheet';
 import { useSocketEvent } from '@/hooks/use-socket';
+import {
+    canComment,
+    canDeleteTask,
+    canEditTask,
+    toastNoAccess,
+} from '@/lib/permissions';
 import { cn } from '@/lib/utils';
 import {
     destroy as destroyTask,
@@ -245,6 +251,7 @@ interface Props {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onDelete?: () => void;
+    userProjectRole?: string | null;
 }
 
 const priorityColors: Record<string, string> = {
@@ -263,9 +270,16 @@ export function TaskDetailDrawer({
     open,
     onOpenChange,
     onDelete,
+    userProjectRole,
 }: Props) {
     const { t } = useTranslation();
     const user = usePage().props.auth?.user as { id: number } | null;
+    const { props } = usePage();
+    const currentWorkspace = props.currentWorkspace as { role?: string } | null;
+    const wsRole = currentWorkspace?.role;
+    const canEdit = canEditTask(wsRole, userProjectRole);
+    const canDel = canDeleteTask(wsRole, userProjectRole);
+    const canWriteComment = canComment(wsRole, userProjectRole);
     const [loading, setLoading] = useState(false);
     const [task, setTask] = useState<TaskDetail | null>(null);
     const [options, setOptions] = useState<TaskOptions>({
@@ -1007,19 +1021,30 @@ export function TaskDetailDrawer({
                                         <span className="font-mono text-xs text-muted-foreground">
                                             {task.code}
                                         </span>
-                                        <Input
-                                            value={task.title}
-                                            onChange={(event) =>
-                                                updateTaskDraft({
-                                                    title: event.target.value,
-                                                })
-                                            }
-                                            onBlur={() =>
-                                                patchTask({ title: task.title })
-                                            }
-                                            className="mt-1 h-auto border-0 bg-transparent px-0 py-0 text-lg font-semibold shadow-none focus-visible:ring-0"
-                                            aria-label={t('task.aria_title')}
-                                        />
+                                        {canEdit ? (
+                                            <Input
+                                                value={task.title}
+                                                onChange={(event) =>
+                                                    updateTaskDraft({
+                                                        title: event.target
+                                                            .value,
+                                                    })
+                                                }
+                                                onBlur={() =>
+                                                    patchTask({
+                                                        title: task.title,
+                                                    })
+                                                }
+                                                className="mt-1 h-auto border-0 bg-transparent px-0 py-0 text-lg font-semibold shadow-none focus-visible:ring-0"
+                                                aria-label={t(
+                                                    'task.aria_title',
+                                                )}
+                                            />
+                                        ) : (
+                                            <p className="mt-1 text-lg font-semibold">
+                                                {task.title}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="flex shrink-0 gap-1">
                                         <Button
@@ -1051,18 +1076,20 @@ export function TaskDetailDrawer({
                                         >
                                             <ExternalLink className="size-5" />
                                         </Button>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="icon"
-                                            className="text-muted-foreground hover:text-destructive"
-                                            onClick={handleDeleteTask}
-                                            aria-label={t(
-                                                'task.aria_delete_task',
-                                            )}
-                                        >
-                                            <Trash2 className="size-5" />
-                                        </Button>
+                                        {canDel && (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-muted-foreground hover:text-destructive"
+                                                onClick={handleDeleteTask}
+                                                aria-label={t(
+                                                    'task.aria_delete_task',
+                                                )}
+                                            >
+                                                <Trash2 className="size-5" />
+                                            </Button>
+                                        )}
                                     </div>
                                 </div>
 
@@ -1959,25 +1986,29 @@ export function TaskDetailDrawer({
                                     </h3>
                                 </div>
 
-                                <form
-                                    onSubmit={handleAddComment}
-                                    className="mb-4"
-                                >
-                                    <MentionInput
-                                        value={commentBody}
-                                        onChange={handleCommentInputChange}
-                                        members={options.assignees}
-                                        placeholder={t('task.write_comment')}
-                                    />
-                                    {typingUsers.length > 0 && (
-                                        <p className="mt-1 text-xs text-muted-foreground italic">
-                                            {typingUsers
-                                                .map((u) => u.name)
-                                                .join(', ')}{' '}
-                                            typing...
-                                        </p>
-                                    )}
-                                </form>
+                                {canWriteComment && (
+                                    <form
+                                        onSubmit={handleAddComment}
+                                        className="mb-4"
+                                    >
+                                        <MentionInput
+                                            value={commentBody}
+                                            onChange={handleCommentInputChange}
+                                            members={options.assignees}
+                                            placeholder={t(
+                                                'task.write_comment',
+                                            )}
+                                        />
+                                        {typingUsers.length > 0 && (
+                                            <p className="mt-1 text-xs text-muted-foreground italic">
+                                                {typingUsers
+                                                    .map((u) => u.name)
+                                                    .join(', ')}{' '}
+                                                typing...
+                                            </p>
+                                        )}
+                                    </form>
+                                )}
 
                                 {comments.length > 0 ? (
                                     <div className="flex flex-col gap-4">

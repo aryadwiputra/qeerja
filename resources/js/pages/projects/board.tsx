@@ -50,6 +50,11 @@ import {
     reorderColumns as reorderCols,
     reorderSameColumnTasks,
 } from '@/lib/board/reorder';
+import {
+    canCreateTask,
+    canManageBoard,
+    toastNoAccess,
+} from '@/lib/permissions';
 import { cn } from '@/lib/utils';
 import { board as projectBoard, show as projectShow } from '@/routes/projects';
 import { reorder as reorderColumns } from '@/routes/projects/boards/columns';
@@ -137,6 +142,7 @@ interface Props {
         end_date: string | null;
     }>;
     activeSprintId: number | null;
+    userProjectRole?: string | null;
 }
 
 function getCsrfToken(): string {
@@ -242,8 +248,14 @@ function BoardClient({
     epics,
     sprints,
     activeSprintId,
+    userProjectRole,
 }: Props) {
     const { t } = useTranslation();
+    const { props: pageProps } = usePage();
+    const currentWorkspace = pageProps.currentWorkspace as {
+        role?: string;
+    } | null;
+    const wsRole = currentWorkspace?.role;
     const boardGuide = useBoardGuide(t);
     const [columns, setColumns] = useState(initialColumns);
     const columnsSnapshotRef = useRef(columns);
@@ -295,7 +307,15 @@ function BoardClient({
         () => [
             {
                 key: 'n',
-                handler: () => setNewTaskOpen(true),
+                handler: () => {
+                    if (!canCreateTask(wsRole)) {
+                        toastNoAccess();
+
+                        return;
+                    }
+
+                    setNewTaskOpen(true);
+                },
                 enabled: !newTaskOpen,
                 description: 'New task',
             },
@@ -950,7 +970,17 @@ function BoardClient({
                             <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => setColumnManagerOpen(true)}
+                                onClick={() => {
+                                    if (
+                                        !canManageBoard(wsRole, userProjectRole)
+                                    ) {
+                                        toastNoAccess();
+
+                                        return;
+                                    }
+
+                                    setColumnManagerOpen(true);
+                                }}
                             >
                                 <Settings2 className="size-3.5" />
                                 <span>{t('board.columns')}</span>
@@ -1178,6 +1208,7 @@ function BoardClient({
                     open={drawerOpen}
                     onOpenChange={setDrawerOpen}
                     onDelete={() => router.reload()}
+                    userProjectRole={userProjectRole}
                 />
             </div>
         </>
