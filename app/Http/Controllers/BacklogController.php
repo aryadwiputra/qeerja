@@ -62,6 +62,7 @@ class BacklogController extends Controller
             ],
             'sprints' => $sprints,
             'backlogTasks' => $backlogTasks,
+            'userProjectRole' => $project->members()->where('user_id', $request->user()->id)->value('role'),
         ]);
     }
 

@@ -13,6 +13,7 @@ use App\Models\Workspace;
 use App\Services\RealtimeGatewayService;
 use App\Services\SettingService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -104,7 +105,7 @@ class ProjectController extends Controller
         return to_route('projects.show', [$workspace, $project]);
     }
 
-    public function show(Workspace $workspace, Project $project): Response
+    public function show(Workspace $workspace, Project $project, Request $request): Response
     {
         Gate::authorize('view', $project);
 
@@ -306,6 +307,8 @@ class ProjectController extends Controller
                 'color' => $priority->color,
             ]);
 
+        $currentMember = $project->members()->where('user_id', $request->user()->id)->first();
+
         return Inertia::render('projects/show', [
             'workspace' => [
                 'id' => $workspace->id,
@@ -322,6 +325,7 @@ class ProjectController extends Controller
                 'visibility' => $project->visibility,
                 'status' => $project->status,
             ],
+            'userProjectRole' => $currentMember?->role,
             'members' => $members,
             'tasks' => $tasks,
             'epics' => $epics,

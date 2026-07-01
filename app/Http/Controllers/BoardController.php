@@ -111,6 +111,7 @@ class BoardController extends Controller
             'epics' => $project->epics()->orderBy('name')->get(['id', 'name', 'color', 'status']),
             'sprints' => $project->sprints()->orderByRaw("CASE status WHEN 'active' THEN 0 WHEN 'planned' THEN 1 WHEN 'completed' THEN 2 ELSE 3 END")->orderByDesc('start_date')->get(['id', 'name', 'status', 'start_date', 'end_date']),
             'activeSprintId' => $sprintId ? (int) $sprintId : null,
+            'userProjectRole' => $project->members()->where('user_id', $request->user()->id)->value('role'),
         ]);
     }
 
