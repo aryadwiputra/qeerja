@@ -386,7 +386,6 @@ export default function BacklogIndex({
         role?: string;
     } | null;
     const wsRole = currentWorkspace?.role;
-    const wsRole = currentWorkspace?.role;
     const canReorder = canManageBoard(wsRole, userProjectRole);
     const backlogGuide = useBacklogGuide(t);
     const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
