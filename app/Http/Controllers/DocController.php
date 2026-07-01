@@ -8,6 +8,7 @@ use App\Models\DocVersion;
 use App\Models\Project;
 use App\Models\Workspace;
 use App\Support\DocTreeBuilder;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -86,6 +87,56 @@ class DocController extends Controller
         Inertia::flash('toast', ['type' => 'info', 'message' => 'Doc deleted.']);
 
         return to_route('projects.docs.index', [$workspace, $project]);
+    }
+
+    public function search(Request $request, Workspace $workspace, Project $project): JsonResponse
+    {
+        Gate::authorize('view', $project);
+
+        $q = $request->query('q', '');
+
+        $results = $project->docs()
+            ->where(function ($query) use ($q) {
+                $query->where('title', 'like', "%{$q}%")
+                    ->orWhere('content', 'like', "%{$q}%");
+            })
+            ->ordered()
+            ->get(['id', 'title', 'slug', 'parent_id', 'updated_at']);
+
+        return response()->json($results);
+    }
+
+    public function reorder(Request $request, Workspace $workspace, Project $project): JsonResponse
+    {
+        Gate::authorize('update', $project);
+
+        $orders = $request->validate([
+            'orders' => ['required', 'array'],
+            'orders.*.id' => ['required', 'integer', 'exists:docs,id'],
+            'orders.*.sort_order' => ['required', 'integer', 'min:0'],
+        ]);
+
+        foreach ($orders['orders'] as $order) {
+            Doc::where('id', $order['id'])->update(['sort_order' => $order['sort_order']]);
+        }
+
+        return response()->json(['message' => 'Reordered.']);
+    }
+
+    public function pdf(Workspace $workspace, Project $project, Doc $doc): \Illuminate\Http\Response
+    {
+        Gate::authorize('view', $doc);
+
+        $html = view('docs.pdf', [
+            'title' => $doc->title,
+            'content' => $doc->content,
+            'project' => $project->name,
+            'updated_at' => $doc->updated_at->format('Y-m-d'),
+        ])->render();
+
+        $pdf = Pdf::loadHTML($html);
+
+        return $pdf->download(Str::slug($doc->title).'.pdf');
     }
 
     public function versions(Workspace $workspace, Project $project, Doc $doc): JsonResponse

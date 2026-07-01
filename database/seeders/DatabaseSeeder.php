@@ -112,5 +112,7 @@ class DatabaseSeeder extends Seeder
                 ['key' => 'auto_assign_reporter', 'value' => json_encode(['value' => false])],
             ]);
         }
+
+        $this->call(DocTemplateSeeder::class);
     }
 }

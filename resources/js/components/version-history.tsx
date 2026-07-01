@@ -12,7 +12,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { versions as versionsRoute, restoreVersion } from '@/routes/projects/docs';
+import { restoreVersion } from '@/actions/DocController';
+import { versions as versionsRoute } from '@/routes/projects/docs';
 
 interface VersionItem {
     id: number;
